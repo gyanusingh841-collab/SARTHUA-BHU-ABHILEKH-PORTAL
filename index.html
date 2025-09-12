@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>सरथुआ भू-अभिलेख पोर्टल - आधुनिक डिजिटल पोर्टल</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="modern-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-icon">
+                    <i class="fas fa-landmark"></i>
+                </div>
+                <h1 class="village-title">सरथुआ भू-अभिलेख पोर्टल</h1>
+                <p class="header-subtitle">आधुनिक डिजिटल भूमि अभिलेख प्रणाली</p>
+                <div class="village-details">
+                    <div class="village-info">
+                        <span class="info-item"><i class="fas fa-map-marker-alt"></i> <strong>जिला:</strong> भोजपुर</span>
+                        <span class="info-item"><i class="fas fa-building"></i> <strong>प्रखंड:</strong> उदवंतनगर</span>
+                        <span class="info-item"><i class="fas fa-flag"></i> <strong>राज्य:</strong> बिहार</span>
+                        <span class="info-item"><i class="fas fa-hashtag"></i> <strong>थाना:</strong> 218</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Support E-Book Section -->
+    <section class="support-ebook">
+        <div class="container">
+            <div class="ebook-card">
+                <div class="ebook-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div class="ebook-content">
+                    <h3>कैथी से देवनागरी रूपांतरण गाइड</h3>
+                    <p>पुराने कैथी लिपि दस्तावेज़ों को समझने के लिए विशेष सहायता पुस्तिका</p>
+                    <a href="https://1drv.ms/b/c/98cca50e3110828e/EWrev9st8N1Mqz73a9DVcJcBRYd3vZh5yQvYXwG3tenBZw" 
+                       target="_blank" class="btn btn--ebook">
+                        <i class="fas fa-external-link-alt"></i>
+                        सहायता पुस्तिका देखें
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section class="modern-dashboard">
+        <div class="container">
+            <h2 class="section-title">
+                <i class="fas fa-chart-bar"></i>
+                डैशबोर्ड अवलोकन
+            </h2>
+            <div class="stats-grid">
+                <div class="stat-card stat-card--primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalVolumes">33</div>
+                        <div class="stat-label">कुल दस्तावेज़</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-card--success">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalPages">5,956</div>
+                        <div class="stat-label">कुल पेज</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-card--info">
+                    <div class="stat-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalSize">1.8 GB</div>
+                        <div class="stat-label">कुल डेटा</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-card--warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">सहायता सेवा</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Section -->
+            <div class="modern-search">
+                <div class="search-container">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchInput" placeholder="वॉल्यूम नंबर या खाता संख्या खोजें..." class="modern-search-input">
+                    </div>
+                    <button onclick="searchRecords()" class="btn btn--search">
+                        <i class="fas fa-search"></i>
+                        खोजें
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Navigation Tabs -->
+            <nav class="modern-tab-nav">
+                <button class="modern-tab-btn active" onclick="showTab('jamabandi')">
+                    <i class="fas fa-book"></i>
+                    <span>जमाबंदी पंजी (1970)</span>
+                </button>
+                <button class="modern-tab-btn" onclick="showTab('revisional')">
+                    <i class="fas fa-history"></i>
+                    <span>Revisional Survey (1970)</span>
+                </button>
+                <button class="modern-tab-btn" onclick="showTab('cadastral')">
+                    <i class="fas fa-map"></i>
+                    <span>Cadastral Survey (1911)</span>
+                </button>
+                <button class="modern-tab-btn" onclick="showTab('services')">
+                    <i class="fas fa-phone"></i>
+                    <span>संपर्क सेवाएं</span>
+                </button>
+            </nav>
+
+            <!-- Jamabandi Panji Section -->
+            <div id="jamabandi" class="tab-content active">
+                <div class="modern-section-header">
+                    <h3><i class="fas fa-book"></i> जमाबंदी पंजी (रजिस्टर 2) - 1970 से वर्तमान तक</h3>
+                    <p>कुल वॉल्यूम: 22 | सभी दस्तावेज़ केवल देखने के लिए उपलब्ध हैं</p>
+                </div>
+                <div class="modern-table-container">
+                    <div class="table-responsive">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-hashtag"></i> क्र. सं.</th>
+                                    <th><i class="fas fa-folder-open"></i> वॉल्यूम</th>
+                                    <th><i class="fas fa-file-alt"></i> कुल पेज</th>
+                                    <th><i class="fas fa-weight"></i> फाइल साइज़</th>
+                                    <th><i class="fas fa-cogs"></i> कार्य</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jamabandi-tbody">
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revisional Survey Section -->
+            <div id="revisional" class="tab-content">
+                <div class="modern-section-header">
+                    <h3><i class="fas fa-history"></i> Revisional Survey Khatiyan (1970)</h3>
+                    <p>कुल पुस्तकें: 9 | संशोधित सर्वेक्षण अभिलेख</p>
+                </div>
+                <div class="modern-table-container">
+                    <div class="table-responsive">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-hashtag"></i> क्र. सं.</th>
+                                    <th><i class="fas fa-book"></i> रजिस्टर नं.</th>
+                                    <th><i class="fas fa-list-ol"></i> खाता संख्या</th>
+                                    <th><i class="fas fa-file-alt"></i> कुल पेज</th>
+                                    <th><i class="fas fa-weight"></i> फाइल साइज़</th>
+                                    <th><i class="fas fa-cogs"></i> कार्य</th>
+                                </tr>
+                            </thead>
+                            <tbody id="revisional-tbody">
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cadastral Survey Section -->
+            <div id="cadastral" class="tab-content">
+                <div class="modern-section-header">
+                    <h3><i class="fas fa-map"></i> Cadastral Survey Khatiyan (1911)</h3>
+                    <p>कुल पुस्तकें: 2 | मूल भूकर सर्वेक्षण अभिलेख</p>
+                </div>
+                <div class="modern-table-container">
+                    <div class="table-responsive">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-hashtag"></i> क्र. सं.</th>
+                                    <th><i class="fas fa-book"></i> रजिस्टर नं.</th>
+                                    <th><i class="fas fa-list-ol"></i> खाता संख्या</th>
+                                    <th><i class="fas fa-file-alt"></i> कुल पेज</th>
+                                    <th><i class="fas fa-weight"></i> फाइल साइज़</th>
+                                    <th><i class="fas fa-cogs"></i> कार्य</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cadastral-tbody">
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Services Section -->
+            <div id="services" class="tab-content">
+                <div class="modern-section-header">
+                    <h3><i class="fas fa-phone"></i> संपर्क सेवाएं</h3>
+                    <p>त्वरित सहायता और WhatsApp सपोर्ट</p>
+                </div>
+                <div class="modern-services-grid">
+                    <div class="modern-service-card">
+                        <div class="service-icon service-icon--primary">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                        <div class="service-header">
+                            <h4>मूल प्रति का अनुरोध</h4>
+                            <span class="service-code">SRV001</span>
+                        </div>
+                        <p class="service-description">गांव के भू-अभिलेख की मूल प्रति प्राप्त करने के लिए त्वरित सेवा</p>
+                        <div class="service-details">
+                            <div class="service-detail">
+                                <i class="fas fa-clock"></i>
+                                <span><strong>समय सीमा:</strong> तत्काल</span>
+                            </div>
+                            <div class="service-detail">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span><strong>शुल्क:</strong> निःशुल्क</span>
+                            </div>
+                            <div class="service-detail">
+                                <i class="fas fa-calendar-check"></i>
+                                <span><strong>उपलब्धता:</strong> 24/7</span>
+                            </div>
+                        </div>
+                        <a href="https://wa.me/919006035986?text=नमस्कार! मैं सरथुआ गांव के भू-अभिलेख की मूल प्रति चाहता हूं।" 
+                           target="_blank" class="btn btn--whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                            WhatsApp पर संपर्क करें
+                        </a>
+                    </div>
+
+                    <div class="modern-service-card">
+                        <div class="service-icon service-icon--success">
+                            <i class="fas fa-copy"></i>
+                        </div>
+                        <div class="service-header">
+                            <h4>खतियान की प्रतिलिपि</h4>
+                            <span class="service-code">SRV002</span>
+                        </div>
+                        <p class="service-description">विशिष्ट खाता संख्या की खतियान की डिजिटल प्रतिलिपि</p>
+                        <div class="service-details">
+                            <div class="service-detail">
+                                <i class="fas fa-clock"></i>
+                                <span><strong>समय सीमा:</strong> 1 दिन</span>
+                            </div>
+                            <div class="service-detail">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span><strong>शुल्क:</strong> निःशुल्क</span>
+                            </div>
+                            <div class="service-detail">
+                                <i class="fas fa-calendar-check"></i>
+                                <span><strong>उपलब्धता:</strong> 24/7</span>
+                            </div>
+                        </div>
+                        <a href="https://wa.me/919006035986?text=नमस्कार! मुझे खतियान की प्रतिलिपि चाहिए।" 
+                           target="_blank" class="btn btn--whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                            WhatsApp पर संपर्क करें
+                        </a>
+                    </div>
+
+                    <div class="modern-service-card">
+                        <div class="service-icon service-icon--info">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="service-header">
+                            <h4>तकनीकी सहायता</h4>
+                            <span class="service-code">SRV003</span>
+                        </div>
+                        <p class="service-description">डिजिटल फाइल एक्सेस और तकनीकी समस्याओं का समाधान</p>
+                        <div class="service-details">
+                            <div class="service-detail">
+                                <i class="fas fa-clock"></i>
+                                <span><strong>समय सीमा:</strong> तत्काल</span>
+                            </div>
+                            <div class="service-detail">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span><strong>शुल्क:</strong> निःशुल्क</span>
+                            </div>
+                            <div class="service-detail">
+                                <i class="fas fa-calendar-check"></i>
+                                <span><strong>उपलब्धता:</strong> 24/7</span>
+                            </div>
+                        </div>
+                        <a href="https://wa.me/919006035986?text=नमस्कार! मुझे तकनीकी सहायता चाहिए।" 
+                           target="_blank" class="btn btn--whatsapp">
+                            <i class="fab fa-whatsapp"></i>
+                            WhatsApp पर संपर्क करें
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Admin Footer -->
+    <footer class="admin-footer">
+        <div class="container">
+            <div class="admin-info">
+                <div class="admin-card">
+                    <div class="admin-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="admin-content">
+                        <h4>पोर्टल व्यवस्थापक</h4>
+                        <p class="admin-name">This Website Owned By <strong>Gyanu Kumar</strong></p>
+                        <div class="admin-contact">
+                            <a href="https://wa.me/919006035986" target="_blank" class="admin-whatsapp">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>WhatsApp: +91 9006035986</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-credits">
+                    <p>&copy; 2025 सरथुआ भू-अभिलेख पोर्टल | आधुनिक डिजिटल भारत की पहल</p>
+                    <p class="tech-credits">Powered by Modern Web Technologies</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Modal -->
+    <div id="loadingModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="loading-spinner"></div>
+            <p><i class="fas fa-file-pdf"></i> PDF लोड हो रहा है...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
