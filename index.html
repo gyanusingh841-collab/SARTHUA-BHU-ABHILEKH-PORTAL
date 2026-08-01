@@ -351,6 +351,70 @@
         </div>
     </div>
 
+    <!-- PDF Viewer Modal -->
+    <div id="pdfViewerModal" class="pdf-modal hidden">
+        <div class="pdf-modal-container">
+            <!-- Header Toolbar -->
+            <div class="pdf-toolbar">
+                <div class="pdf-toolbar-title">
+                    <i class="fas fa-file-pdf"></i>
+                    <span id="pdfViewerTitle">PDF Viewer</span>
+                </div>
+                
+                <div class="pdf-toolbar-controls">
+                    <!-- Page Navigation -->
+                    <div class="pdf-control-group">
+                        <button id="pdfPrevBtn" class="pdf-btn" title="पिछला पेज (Left Arrow)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="pdf-page-indicator">
+                            <span>पेज</span>
+                            <input type="number" id="pdfPageNumInput" value="1" min="1" class="pdf-page-input">
+                            <span>/ <span id="pdfTotalPagesCount">0</span></span>
+                        </div>
+                        <button id="pdfNextBtn" class="pdf-btn" title="अगला पेज (Right Arrow)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Zoom Controls -->
+                    <div class="pdf-control-group">
+                        <button id="pdfZoomOutBtn" class="pdf-btn" title="ज़ूम आउट (-)">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <span id="pdfZoomPercent" class="pdf-zoom-text">100%</span>
+                        <button id="pdfZoomInBtn" class="pdf-btn" title="ज़ूम इन (+)">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button id="pdfFullscreenBtn" class="pdf-btn" title="फुलस्क्रीन (Fullscreen)">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+
+                    <!-- Close -->
+                    <div class="pdf-control-group">
+                        <button id="pdfCloseBtn" class="pdf-btn pdf-btn--close" title="बंद करें (Esc)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PDF Canvas Viewport -->
+            <div class="pdf-viewport" id="pdfViewport">
+                <div id="pdfLoadingIndicator" class="pdf-loading-overlay">
+                    <div class="loading-spinner"></div>
+                    <p><i class="fas fa-cloud-download-alt"></i> PDF पेज लोड हो रहा है (Streaming)...</p>
+                </div>
+                <div class="pdf-canvas-wrapper" id="pdfCanvasWrapper">
+                    <canvas id="pdfRenderCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF.js Library CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

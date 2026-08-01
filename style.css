@@ -1622,3 +1622,270 @@ body {
     padding: var(--space-12);
   }
 }
+
+/* ==========================================================================
+   PDF Viewer Modal Styles (PDF.js Range Request Viewer)
+   ========================================================================== */
+
+.pdf-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.pdf-modal.hidden {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pdf-modal-container {
+  width: 95vw;
+  height: 92vh;
+  background-color: #1e293b;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* Native Fullscreen API Styling */
+.pdf-modal:fullscreen,
+.pdf-modal:-webkit-full-screen {
+  background-color: #0f172a;
+}
+
+.pdf-modal:fullscreen .pdf-modal-container,
+.pdf-modal:-webkit-full-screen .pdf-modal-container {
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  border: none;
+}
+
+/* PDF Toolbar Header */
+.pdf-toolbar {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pdf-toolbar-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #38bdf8;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdf-toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pdf-control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pdf-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.pdf-btn i {
+  pointer-events: none;
+}
+
+.pdf-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.pdf-btn:active {
+  transform: scale(0.92);
+}
+
+.pdf-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pdf-btn--close {
+  background: #dc2626;
+  color: white;
+}
+
+.pdf-btn--close:hover {
+  background: #b91c1c;
+}
+
+.pdf-page-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.pdf-page-input {
+  width: 55px;
+  padding: 4px 6px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  color: #f8fafc;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  -moz-appearance: textfield;
+}
+
+/* Hide Chrome, Safari, Edge, Opera number input spinners */
+.pdf-page-input::-webkit-outer-spin-button,
+.pdf-page-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.pdf-page-input:focus {
+  outline: none;
+  border-color: #38bdf8;
+}
+
+.pdf-zoom-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+  min-width: 45px;
+  text-align: center;
+}
+
+/* PDF Viewport */
+.pdf-viewport {
+  flex: 1;
+  background-color: #0f172a;
+  overflow: auto;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px;
+}
+
+.pdf-canvas-wrapper {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-radius: 4px;
+  background-color: #ffffff;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+}
+
+#pdfRenderCanvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Loading Overlay */
+.pdf-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #f8fafc;
+  z-index: 10;
+  font-size: 1rem;
+}
+
+.pdf-loading-overlay.hidden {
+  display: none;
+}
+
+/* Mobile Responsiveness for Viewer */
+@media (max-width: 768px) {
+  .pdf-modal-container {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .pdf-toolbar {
+    padding: 8px 12px;
+  }
+
+  .pdf-toolbar-title {
+    font-size: 0.95rem;
+    max-width: 180px;
+  }
+
+  .pdf-control-group {
+    padding: 2px 4px;
+    gap: 4px;
+  }
+
+  .pdf-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+
+  .pdf-page-input {
+    width: 40px;
+    padding: 2px 4px;
+  }
+
+  .pdf-viewport {
+    padding: 12px;
+  }
+}
