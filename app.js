@@ -21,8 +21,8 @@ const portalData = {
         { "sr_no": 1, "volume": "VOL-01", "total_pages": 8, "filename": "Sarthua_Vol_01_1970.pdf", "file_size_mb": 2.14, "pdf_link": "https://talentwale-875180007571-ap-south-1-an.s3.ap-south-1.amazonaws.com/Sarthua_bhuAbhilekh/jamabandi_panji/Sarthua_Vol_01_1970.pdf" },
         { "sr_no": 2, "volume": "VOL-02", "total_pages": 256, "filename": "Sarthua_Vol_02_1970.pdf", "file_size_mb": 76.54, "pdf_link": "https://talentwale-875180007571-ap-south-1-an.s3.ap-south-1.amazonaws.com/Sarthua_bhuAbhilekh/jamabandi_panji/Sarthua_Vol_02_1970.pdf" },
         { "sr_no": 3, "volume": "VOL-03", "total_pages": 0, "filename": "DOC NOT FOUND", "file_size_mb": 0, "pdf_link": "DOC NOT FOUND" },
-        { "sr_no": 4, "volume": "VOL-04", "total_pages": 193, "filename": "Sarthua_Vol_04_1970.pdf", "file_size_mb": 53.02, "pdf_link": "https://1drv.ms/b/c/98cca50e3110828e/EbAR5IkBVY1EuWN8iJdvw1cBLe5HAKFu1BaALznSC94b9w" },
-        { "sr_no": 5, "volume": "VOL-05", "total_pages": 167, "filename": "Sarthua_Vol_05_1970.pdf", "file_size_mb": 46.01, "pdf_link": "https://1drv.ms/b/c/98cca50e3110828e/EaHd1b7E-RBEugZbBo_tnJAB2stWXfayJVacgRqAVLz6lw" },
+        { "sr_no": 4, "volume": "VOL-04", "total_pages": 193, "filename": "Sarthua_Vol_04_1970.pdf", "file_size_mb": 53.02, "pdf_link": "https://talentwale-875180007571-ap-south-1-an.s3.ap-south-1.amazonaws.com/Sarthua_bhuAbhilekh/jamabandi_panji/Sarthua_Vol_04_1970.pdf" },
+        { "sr_no": 5, "volume": "VOL-05", "total_pages": 167, "filename": "Sarthua_Vol_05_1970.pdf", "file_size_mb": 46.01, "pdf_link": "https://talentwale-875180007571-ap-south-1-an.s3.ap-south-1.amazonaws.com/Sarthua_bhuAbhilekh/jamabandi_panji/Sarthua_Vol_05_1970.pdf" },
         { "sr_no": 6, "volume": "VOL-06", "total_pages": 151, "filename": "Sarthua_Vol_06_1970.pdf", "file_size_mb": 40.97, "pdf_link": "https://1drv.ms/b/c/98cca50e3110828e/ERx5RtK91T1IvIVtw3-MQ8QBIUWZIZGkyr2BTYTFJtkq_g" },
         { "sr_no": 7, "volume": "VOL-07", "total_pages": 211, "filename": "Sarthua_Vol_07_1970.pdf", "file_size_mb": 64.51, "pdf_link": "https://1drv.ms/b/c/98cca50e3110828e/EdGco6yoRNpAl36HKe51ZdEBIKSdOMfYiMBYCqIH9bZlQQ" },
         { "sr_no": 8, "volume": "VOL-08", "total_pages": 4, "filename": "Sarthua_Vol_08_1970.pdf", "file_size_mb": 1, "pdf_link": "https://1drv.ms/b/c/98cca50e3110828e/Ecc3jRWKx3NAioBHPLtWi10BiPUvm2EtFshxIntl13Zbmw" },
@@ -496,7 +496,7 @@ function renderPdfPage(pageNum) {
 function closePdfModal() {
     if (document.fullscreenElement || document.webkitFullscreenElement) {
         if (document.exitFullscreen) {
-            document.exitFullscreen().catch(() => {});
+            document.exitFullscreen().catch(() => { });
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
         }
@@ -519,13 +519,13 @@ function togglePdfFullscreen() {
 
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
         if (modal.requestFullscreen) {
-            modal.requestFullscreen().catch(() => {});
+            modal.requestFullscreen().catch(() => { });
         } else if (modal.webkitRequestFullscreen) {
             modal.webkitRequestFullscreen();
         }
     } else {
         if (document.exitFullscreen) {
-            document.exitFullscreen().catch(() => {});
+            document.exitFullscreen().catch(() => { });
         } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
         }
