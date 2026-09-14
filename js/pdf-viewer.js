@@ -43,6 +43,7 @@ const PdfViewerEngine = {
         const zoomResetBtn = document.getElementById('pdfZoomResetBtn');
         const fitModeBtn = document.getElementById('pdfFitModeBtn');
         const rotateBtn = document.getElementById('pdfRotateBtn');
+        const printBtn = document.getElementById('pdfPrintBtn');
         const fullscreenBtn = document.getElementById('pdfFullscreenBtn');
         const closeBtn = document.getElementById('pdfCloseBtn');
         const pageInput = document.getElementById('pdfPageNumInput');
@@ -69,12 +70,19 @@ const PdfViewerEngine = {
             canvas.addEventListener('dragstart', preventSave);
         }
 
-        // Block Ctrl+S, Ctrl+P, Ctrl+U, etc. keyboard shortcuts when viewer is active
+        // Block Ctrl+S, Ctrl+U, etc., and let Ctrl+P trigger single-page official print
         window.addEventListener('keydown', (e) => {
             const isModalOpen = modal && !modal.classList.contains('hidden');
             if (!isModalOpen) return;
 
-            if ((e.ctrlKey || e.metaKey) && ['s', 'S', 'p', 'P', 'u', 'U'].includes(e.key)) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.printCurrentView();
+                return false;
+            }
+
+            if ((e.ctrlKey || e.metaKey) && ['s', 'S', 'u', 'U'].includes(e.key)) {
                 e.preventDefault();
                 e.stopPropagation();
                 return false;
@@ -173,6 +181,14 @@ const PdfViewerEngine = {
                 this.state.rotation = (this.state.rotation + 90) % 360;
                 this.state.preRenderedCanvases = {};
                 this.renderPage(this.state.currentPage);
+            });
+        }
+
+        // Print Active Page
+        if (printBtn) {
+            printBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.printCurrentView();
             });
         }
 
@@ -578,6 +594,59 @@ const PdfViewerEngine = {
                     delete this.state.preRenderedCanvases[k];
                 }
             });
+        }
+    },
+
+    // Print Single Active Page with Official Watermark Header/Footer
+    printCurrentView: function () {
+        const canvas = document.getElementById('pdfRenderCanvas');
+        if (!canvas) return;
+
+        try {
+            const dataUrl = canvas.toDataURL('image/png');
+            const printWin = window.open('', '_blank');
+            if (!printWin) {
+                if (typeof AppView !== 'undefined' && AppView.showAlert) {
+                    AppView.showAlert('कृपया प्रिंट के लिए पॉपअप विंडो की अनुमति दें।', 'error');
+                }
+                return;
+            }
+
+            printWin.document.write(`
+                <!DOCTYPE html>
+                <html lang="hi">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>प्रिंट - ${this.state.filename || 'सरथुआ भू-अभिलेख'} (पेज ${this.state.currentPage})</title>
+                    <style>
+                        body { margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; }
+                        .print-header { width: 100%; text-align: center; margin-bottom: 12px; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; }
+                        .print-header h2 { margin: 0 0 4px 0; font-size: 16px; color: #1e3a8a; }
+                        .print-header p { margin: 0; font-size: 12px; color: #555; }
+                        img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+                        .print-footer { margin-top: 15px; font-size: 10px; color: #777; text-align: center; }
+                        @media print { body { padding: 0; } img { max-height: 94vh; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="print-header">
+                        <h2>सरथुआ भू-अभिलेख पोर्टल | ग्राम: सरथुआ, थाना: 218, भोजपुर (बिहार)</h2>
+                        <p>दस्तावेज़: <strong>${this.state.filename || ''}</strong> | पेज संख्या: <strong>${this.state.currentPage} / ${this.state.totalPages}</strong></p>
+                    </div>
+                    <img src="${dataUrl}" alt="Land Record Page" />
+                    <div class="print-footer">
+                        * यह प्रतिलिपि केवल जन-सूचना एवं अध्ययन हेतु है। विधिक प्रमाण हेतु अंचल कार्यालय से प्रमाणित प्रतिलिपि प्राप्त करें।
+                    </div>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+            printWin.focus();
+            setTimeout(() => printWin.print(), 500);
+        } catch (e) {
+            if (typeof AppView !== 'undefined' && AppView.showAlert) {
+                AppView.showAlert('प्रिंट तैयार करने में त्रुटि आई।', 'error');
+            }
         }
     },
 
