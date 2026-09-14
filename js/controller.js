@@ -84,16 +84,28 @@ const AppController = {
                     }
                 } else if (e.key === '+' || e.key === '=') {
                     e.preventDefault();
-                    if (PdfViewerEngine.state.zoomScale < 3.0) {
-                        PdfViewerEngine.state.zoomScale += 0.25;
+                    if (PdfViewerEngine.state.zoomScale < 3.5) {
+                        PdfViewerEngine.state.zoomMode = 'manual';
+                        PdfViewerEngine.state.zoomScale = Math.min(3.5, Number((PdfViewerEngine.state.zoomScale + 0.25).toFixed(2)));
+                        PdfViewerEngine.state.preRenderedCanvases = {};
                         PdfViewerEngine.renderPage(PdfViewerEngine.state.currentPage);
                     }
                 } else if (e.key === '-' || e.key === '_') {
                     e.preventDefault();
-                    if (PdfViewerEngine.state.zoomScale > 0.25) {
-                        PdfViewerEngine.state.zoomScale -= 0.25;
+                    if (PdfViewerEngine.state.zoomScale > 0.3) {
+                        PdfViewerEngine.state.zoomMode = 'manual';
+                        PdfViewerEngine.state.zoomScale = Math.max(0.3, Number((PdfViewerEngine.state.zoomScale - 0.25).toFixed(2)));
+                        PdfViewerEngine.state.preRenderedCanvases = {};
                         PdfViewerEngine.renderPage(PdfViewerEngine.state.currentPage);
                     }
+                } else if (e.key.toLowerCase() === 'r') {
+                    e.preventDefault();
+                    PdfViewerEngine.state.rotation = (PdfViewerEngine.state.rotation + 90) % 360;
+                    PdfViewerEngine.state.preRenderedCanvases = {};
+                    PdfViewerEngine.renderPage(PdfViewerEngine.state.currentPage);
+                } else if (e.key.toLowerCase() === 'f') {
+                    e.preventDefault();
+                    document.getElementById('pdfFitModeBtn')?.click();
                 }
                 return;
             }

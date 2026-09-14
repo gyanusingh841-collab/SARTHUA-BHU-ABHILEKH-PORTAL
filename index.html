@@ -403,71 +403,97 @@
         </div>
     </div>
 
-    <!-- PDF Viewer Modal -->
-    <div id="pdfViewerModal" class="pdf-modal hidden">
+    <!-- Modern Slim PDF Reader Modal -->
+    <div id="pdfViewerModal" class="pdf-modal hidden" aria-modal="true" role="dialog">
         <div class="pdf-modal-container">
-            <!-- Header Toolbar -->
-            <div class="pdf-toolbar">
-                <div class="pdf-toolbar-title">
-                    <i class="fas fa-file-pdf"></i>
-                    <span id="pdfViewerTitle">PDF Viewer</span>
+            <!-- Slim Top Header Bar -->
+            <header class="pdf-topbar" id="pdfTopbar">
+                <div class="pdf-topbar-left">
+                    <span class="pdf-file-icon"><i class="fas fa-file-pdf"></i></span>
+                    <div class="pdf-title-meta">
+                        <span id="pdfViewerTitle" class="pdf-title-text" title="दस्तावेज़">PDF Viewer</span>
+                        <span id="pdfDocBadge" class="pdf-doc-badge">भू-अभिलेख</span>
+                    </div>
                 </div>
                 
-                <div class="pdf-toolbar-controls">
-                    <!-- Page Navigation -->
-                    <div class="pdf-control-group">
-                        <button id="pdfPrevBtn" class="pdf-btn" title="पिछला पेज (Left Arrow)">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <div class="pdf-page-indicator">
-                            <span>पेज</span>
-                            <input type="number" id="pdfPageNumInput" value="1" min="1" class="pdf-page-input">
-                            <span>/ <span id="pdfTotalPagesCount">0</span></span>
-                        </div>
-                        <button id="pdfNextBtn" class="pdf-btn" title="अगला पेज (Right Arrow)">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-
-                    <!-- Zoom Controls -->
-                    <div class="pdf-control-group">
-                        <button id="pdfZoomOutBtn" class="pdf-btn" title="ज़ूम आउट (-)">
-                            <i class="fas fa-search-minus"></i>
-                        </button>
-                        <span id="pdfZoomPercent" class="pdf-zoom-text">100%</span>
-                        <button id="pdfZoomInBtn" class="pdf-btn" title="ज़ूम इन (+)">
-                            <i class="fas fa-search-plus"></i>
-                        </button>
-                        <button id="pdfRotateBtn" class="pdf-btn" title="पेज 90° घुमाएं (Rotate)">
-                            <i class="fas fa-redo"></i>
-                        </button>
-                        <button id="pdfFullscreenBtn" class="pdf-btn" title="फुलस्क्रीन (Fullscreen)">
-                            <i class="fas fa-expand"></i>
-                        </button>
-                        <button id="pdfPrintBtn" class="pdf-btn" title="प्रिंट करें (Print)">
-                            <i class="fas fa-print"></i>
-                        </button>
-                    </div>
-
+                <div class="pdf-topbar-right">
+                    <!-- Fit Mode Toggle (Fit Width vs Fit Page) -->
+                    <button id="pdfFitModeBtn" class="pdf-icon-btn" title="चौड़ाई अनुसार फिट करें / पूरा पेज (Fit Width/Page)">
+                        <i class="fas fa-arrows-alt-h"></i>
+                        <span class="pdf-btn-label">चौड़ाई</span>
+                    </button>
+                    <!-- Rotate 90 deg -->
+                    <button id="pdfRotateBtn" class="pdf-icon-btn" title="90° घुमाएं (Rotate)">
+                        <i class="fas fa-redo-alt"></i>
+                    </button>
+                    <!-- Open in New Tab / Native Viewer -->
+                    <button id="pdfExternalBtn" class="pdf-icon-btn" title="नए टैब / फ़ोन व्यूअर में खोलें (Open in New Tab)">
+                        <i class="fas fa-external-link-alt"></i>
+                    </button>
+                    <!-- Fullscreen -->
+                    <button id="pdfFullscreenBtn" class="pdf-icon-btn pdf-btn-desktop-only" title="फुलस्क्रीन (Fullscreen)">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <!-- Print -->
+                    <button id="pdfPrintBtn" class="pdf-icon-btn pdf-btn-desktop-only" title="प्रिंट (Print)">
+                        <i class="fas fa-print"></i>
+                    </button>
                     <!-- Close -->
-                    <div class="pdf-control-group">
-                        <button id="pdfCloseBtn" class="pdf-btn pdf-btn--close" title="बंद करें (Esc)">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
+                    <button id="pdfCloseBtn" class="pdf-icon-btn pdf-btn--close" title="बंद करें (Esc)">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-            </div>
+            </header>
 
             <!-- PDF Canvas Viewport -->
-            <div class="pdf-viewport" id="pdfViewport">
+            <main class="pdf-viewport" id="pdfViewport" tabindex="0">
                 <div id="pdfLoadingIndicator" class="pdf-loading-overlay">
                     <div class="loading-spinner"></div>
-                    <p><i class="fas fa-cloud-download-alt"></i> PDF पेज लोड हो रहा है (Streaming)...</p>
+                    <p><i class="fas fa-bolt"></i> पेज लोड हो रहा है (Fast Stream)...</p>
                 </div>
                 <div class="pdf-canvas-wrapper" id="pdfCanvasWrapper">
                     <canvas id="pdfRenderCanvas"></canvas>
                 </div>
-            </div>
+            </main>
+
+            <!-- Floating Bottom Pill Dock -->
+            <nav class="pdf-bottom-dock" id="pdfBottomDock" aria-label="PDF Navigation">
+                <div class="pdf-dock-capsule">
+                    <!-- Prev Page -->
+                    <button id="pdfPrevBtn" class="pdf-dock-btn" title="पिछला पेज (Left Arrow)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+
+                    <!-- Page Indicator with Quick Input -->
+                    <div class="pdf-dock-page">
+                        <input type="number" id="pdfPageNumInput" value="1" min="1" class="pdf-dock-input" aria-label="पेज संख्या">
+                        <span class="pdf-dock-slash">/</span>
+                        <span id="pdfTotalPagesCount" class="pdf-dock-total">0</span>
+                    </div>
+
+                    <!-- Next Page -->
+                    <button id="pdfNextBtn" class="pdf-dock-btn" title="अगला पेज (Right Arrow)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+
+                    <span class="pdf-dock-divider"></span>
+
+                    <!-- Zoom Out -->
+                    <button id="pdfZoomOutBtn" class="pdf-dock-btn" title="ज़ूम आउट (-)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+
+                    <!-- Zoom % (Click to toggle/reset Fit Width) -->
+                    <button id="pdfZoomResetBtn" class="pdf-dock-zoom-btn" title="रीसेट ज़ूम">
+                        <span id="pdfZoomPercent">100%</span>
+                    </button>
+
+                    <!-- Zoom In -->
+                    <button id="pdfZoomInBtn" class="pdf-dock-btn" title="ज़ूम इन (+)">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </nav>
         </div>
     </div>
 
@@ -587,9 +613,9 @@
     <!-- PDF.js Library CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <!-- MVC Architecture Modules (Model, View, PDF Streaming Engine, Controller) -->
-    <script src="js/model.js?v=3.7"></script>
-    <script src="js/view.js?v=3.7"></script>
-    <script src="js/pdf-viewer.js?v=3.7"></script>
-    <script src="js/controller.js?v=3.7"></script>
+    <script src="js/model.js?v=3.8"></script>
+    <script src="js/view.js?v=3.8"></script>
+    <script src="js/pdf-viewer.js?v=3.8"></script>
+    <script src="js/controller.js?v=3.8"></script>
 </body>
 </html>

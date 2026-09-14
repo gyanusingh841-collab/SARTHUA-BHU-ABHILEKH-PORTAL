@@ -1,6 +1,7 @@
 /**
- * Sarthua Bhu-Abhilekh Portal - PDF Streaming & Viewer Engine
+ * Sarthua Bhu-Abhilekh Portal - Modern Slim PDF Streaming & Reader Engine
  * Range-request streaming via Cloudflare R2 / Worker with offscreen canvas double-buffering.
+ * Mobile-first touch gestures (pinch-zoom, double-tap), landscape auto-fit, and 1-tap external open.
  */
 
 // Configure PDF.js Worker
@@ -13,14 +14,24 @@ const PdfViewerEngine = {
         pdfDoc: null,
         currentPage: 1,
         totalPages: 0,
-        zoomScale: 0.5,
+        zoomScale: 1.0,
+        zoomMode: 'fit-width', // 'fit-width', 'fit-page', 'manual'
         rotation: 0,
         preRenderedCanvases: {},
         isRendering: false,
         currentRenderTask: null,
         pageNumPending: null,
         pdfUrl: '',
-        filename: ''
+        filename: '',
+        isLandscape: false,
+        touch: {
+            initialDist: 0,
+            initialScale: 1.0,
+            isPinching: false,
+            startX: 0,
+            startY: 0,
+            lastTapTime: 0
+        }
     },
 
     // Initialize Viewer DOM Listeners
@@ -29,12 +40,16 @@ const PdfViewerEngine = {
         const nextBtn = document.getElementById('pdfNextBtn');
         const zoomInBtn = document.getElementById('pdfZoomInBtn');
         const zoomOutBtn = document.getElementById('pdfZoomOutBtn');
+        const zoomResetBtn = document.getElementById('pdfZoomResetBtn');
+        const fitModeBtn = document.getElementById('pdfFitModeBtn');
+        const rotateBtn = document.getElementById('pdfRotateBtn');
+        const externalBtn = document.getElementById('pdfExternalBtn');
         const fullscreenBtn = document.getElementById('pdfFullscreenBtn');
+        const printBtn = document.getElementById('pdfPrintBtn');
         const closeBtn = document.getElementById('pdfCloseBtn');
         const pageInput = document.getElementById('pdfPageNumInput');
-        const rotateBtn = document.getElementById('pdfRotateBtn');
-        const printBtn = document.getElementById('pdfPrintBtn');
         const modal = document.getElementById('pdfViewerModal');
+        const viewport = document.getElementById('pdfViewport');
 
         // Prevent right click save in viewer
         if (modal) {
@@ -45,6 +60,20 @@ const PdfViewerEngine = {
         document.addEventListener('fullscreenchange', this.handleFullscreenChange.bind(this));
         document.addEventListener('webkitfullscreenchange', this.handleFullscreenChange.bind(this));
 
+        // Window resize debounced re-render for fit modes
+        let resizeTimer = null;
+        window.addEventListener('resize', () => {
+            if (!this.state.pdfDoc || (modal && modal.classList.contains('hidden'))) return;
+            if (this.state.zoomMode === 'fit-width' || this.state.zoomMode === 'fit-page') {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    this.state.preRenderedCanvases = {};
+                    this.renderPage(this.state.currentPage);
+                }, 200);
+            }
+        });
+
+        // Prev Page
         if (prevBtn) {
             prevBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -54,6 +83,7 @@ const PdfViewerEngine = {
             });
         }
 
+        // Next Page
         if (nextBtn) {
             nextBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -63,34 +93,86 @@ const PdfViewerEngine = {
             });
         }
 
+        // Zoom In
         if (zoomInBtn) {
             zoomInBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (this.state.zoomScale < 3.0) {
-                    this.state.zoomScale += 0.25;
+                if (this.state.zoomScale < 3.5) {
+                    this.state.zoomMode = 'manual';
+                    this.state.zoomScale = Math.min(3.5, Number((this.state.zoomScale + 0.25).toFixed(2)));
+                    this.state.preRenderedCanvases = {};
                     this.renderPage(this.state.currentPage);
                 }
             });
         }
 
+        // Zoom Out
         if (zoomOutBtn) {
             zoomOutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (this.state.zoomScale > 0.25) {
-                    this.state.zoomScale -= 0.25;
+                if (this.state.zoomScale > 0.3) {
+                    this.state.zoomMode = 'manual';
+                    this.state.zoomScale = Math.max(0.3, Number((this.state.zoomScale - 0.25).toFixed(2)));
+                    this.state.preRenderedCanvases = {};
                     this.renderPage(this.state.currentPage);
                 }
             });
         }
 
-        if (rotateBtn) {
-            rotateBtn.addEventListener('click', (e) => {
+        // Zoom Reset / Percent Click: Cycle between Fit-Width and 100%
+        if (zoomResetBtn) {
+            zoomResetBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.state.rotation = (this.state.rotation + 90) % 360;
+                if (this.state.zoomMode === 'fit-width') {
+                    this.state.zoomMode = 'manual';
+                    this.state.zoomScale = 1.0;
+                } else {
+                    this.state.zoomMode = 'fit-width';
+                }
+                this.state.preRenderedCanvases = {};
                 this.renderPage(this.state.currentPage);
             });
         }
 
+        // Fit Mode Toggle (Fit Width vs Fit Page)
+        if (fitModeBtn) {
+            fitModeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (this.state.zoomMode === 'fit-width') {
+                    this.state.zoomMode = 'fit-page';
+                    fitModeBtn.innerHTML = '<i class="fas fa-expand-arrows-alt"></i><span class="pdf-btn-label">पूरा पेज</span>';
+                    fitModeBtn.classList.add('active');
+                } else {
+                    this.state.zoomMode = 'fit-width';
+                    fitModeBtn.innerHTML = '<i class="fas fa-arrows-alt-h"></i><span class="pdf-btn-label">चौड़ाई</span>';
+                    fitModeBtn.classList.remove('active');
+                }
+                this.state.preRenderedCanvases = {};
+                this.renderPage(this.state.currentPage);
+            });
+        }
+
+        // Rotate 90 deg
+        if (rotateBtn) {
+            rotateBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.state.rotation = (this.state.rotation + 90) % 360;
+                this.state.preRenderedCanvases = {};
+                this.renderPage(this.state.currentPage);
+            });
+        }
+
+        // Open in New Tab / External Reader
+        if (externalBtn) {
+            externalBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (this.state.pdfUrl) {
+                    window.open(this.state.pdfUrl, '_blank');
+                }
+            });
+        }
+
+        // Print
         if (printBtn) {
             printBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -98,6 +180,7 @@ const PdfViewerEngine = {
             });
         }
 
+        // Fullscreen
         if (fullscreenBtn) {
             fullscreenBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -105,6 +188,7 @@ const PdfViewerEngine = {
             });
         }
 
+        // Close
         if (closeBtn) {
             closeBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -112,6 +196,7 @@ const PdfViewerEngine = {
             });
         }
 
+        // Page Input
         if (pageInput) {
             pageInput.addEventListener('change', (e) => {
                 let val = parseInt(e.target.value, 10);
@@ -122,31 +207,130 @@ const PdfViewerEngine = {
                 }
             });
         }
+
+        // Setup Touch Gestures & Immersive Reading Mode
+        this.setupTouchAndInteractions(viewport);
+    },
+
+    // Touch & Interactive Viewport Handling
+    setupTouchAndInteractions: function (viewport) {
+        if (!viewport) return;
+        const canvasWrapper = document.getElementById('pdfCanvasWrapper');
+        const container = document.querySelector('.pdf-modal-container');
+
+        // Touch gestures (Pinch-to-zoom, Double-tap, Immersive Tap)
+        viewport.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                // Two fingers: Pinch-to-zoom start
+                this.state.touch.isPinching = true;
+                this.state.touch.initialDist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                this.state.touch.initialScale = this.state.zoomScale;
+            } else if (e.touches.length === 1) {
+                this.state.touch.isPinching = false;
+                this.state.touch.startX = e.touches[0].pageX;
+                this.state.touch.startY = e.touches[0].pageY;
+            }
+        }, { passive: true });
+
+        viewport.addEventListener('touchmove', (e) => {
+            if (this.state.touch.isPinching && e.touches.length === 2 && canvasWrapper) {
+                const currentDist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                if (this.state.touch.initialDist > 0) {
+                    const pinchRatio = currentDist / this.state.touch.initialDist;
+                    canvasWrapper.style.transform = `scale(${pinchRatio})`;
+                }
+            }
+        }, { passive: true });
+
+        viewport.addEventListener('touchend', (e) => {
+            if (this.state.touch.isPinching) {
+                this.state.touch.isPinching = false;
+                if (canvasWrapper) {
+                    canvasWrapper.style.transform = 'none';
+                }
+                if (this.state.touch.initialDist > 0 && e.changedTouches.length > 0) {
+                    const currentDist = Math.hypot(
+                        e.changedTouches[0].pageX - (e.touches[0]?.pageX || this.state.touch.startX),
+                        e.changedTouches[0].pageY - (e.touches[0]?.pageY || this.state.touch.startY)
+                    );
+                    const pinchRatio = currentDist > 0 ? (currentDist / this.state.touch.initialDist) : 1;
+                    let targetScale = this.state.touch.initialScale * pinchRatio;
+                    targetScale = Math.min(3.5, Math.max(0.35, targetScale));
+                    this.state.zoomMode = 'manual';
+                    this.state.zoomScale = Number(targetScale.toFixed(2));
+                    this.state.preRenderedCanvases = {};
+                    this.renderPage(this.state.currentPage);
+                }
+            } else if (e.changedTouches.length === 1) {
+                const deltaX = Math.abs(e.changedTouches[0].pageX - this.state.touch.startX);
+                const deltaY = Math.abs(e.changedTouches[0].pageY - this.state.touch.startY);
+
+                // If it was a tap (not a scroll gesture)
+                if (deltaX < 12 && deltaY < 12) {
+                    const now = Date.now();
+                    if (now - this.state.touch.lastTapTime < 320) {
+                        // Double tap: toggle zoom
+                        if (this.state.zoomScale < 1.35) {
+                            this.state.zoomMode = 'manual';
+                            this.state.zoomScale = 1.75;
+                        } else {
+                            this.state.zoomMode = 'fit-width';
+                        }
+                        this.state.preRenderedCanvases = {};
+                        this.renderPage(this.state.currentPage);
+                        this.state.touch.lastTapTime = 0;
+                    } else {
+                        this.state.touch.lastTapTime = now;
+                        // Single tap: toggle immersive mode (bars hide/show)
+                        setTimeout(() => {
+                            if (this.state.touch.lastTapTime === now && container) {
+                                container.classList.toggle('pdf-immersive');
+                            }
+                        }, 260);
+                    }
+                }
+            }
+        }, { passive: true });
     },
 
     // Open PDF Viewer Modal
     open: function (pdfUrl, filename, fileSizeBytes) {
         if (!pdfUrl || pdfUrl === "DOC NOT FOUND") {
-            AppView.showAlert('यह दस्तावेज़ उपलब्ध नहीं है।', 'error');
+            if (typeof AppView !== 'undefined' && AppView.showAlert) {
+                AppView.showAlert('यह दस्तावेज़ उपलब्ध नहीं है।', 'error');
+            } else {
+                alert('यह दस्तावेज़ उपलब्ध नहीं है।');
+            }
             return;
         }
 
         // If OneDrive, open externally as OneDrive blocks browser Range / CORS headers
         if (pdfUrl.includes('1drv.ms') || pdfUrl.includes('onedrive')) {
-            AppView.showAlert('OneDrive PDF नए टैब में खोला जा रहा है...', 'info');
+            if (typeof AppView !== 'undefined' && AppView.showAlert) {
+                AppView.showAlert('OneDrive PDF नए टैब में खोला जा रहा है...', 'info');
+            }
             window.open(pdfUrl, '_blank');
             return;
         }
 
         const modal = document.getElementById('pdfViewerModal');
+        const container = document.querySelector('.pdf-modal-container');
         const titleEl = document.getElementById('pdfViewerTitle');
         const loadingOverlay = document.getElementById('pdfLoadingIndicator');
 
         if (!modal) return;
-        titleEl.textContent = filename || 'PDF Viewer';
+        if (titleEl) titleEl.textContent = filename || 'PDF Viewer';
+        if (container) container.classList.remove('pdf-immersive');
+
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
-        loadingOverlay.classList.remove('hidden');
+        if (loadingOverlay) loadingOverlay.classList.remove('hidden');
 
         // Reset state
         if (this.state.currentRenderTask) {
@@ -154,9 +338,9 @@ const PdfViewerEngine = {
             this.state.currentRenderTask = null;
         }
         this.state.pdfUrl = pdfUrl;
-        this.state.filename = filename;
+        this.state.filename = filename || '';
         this.state.currentPage = 1;
-        this.state.zoomScale = 0.5;
+        this.state.zoomMode = 'fit-width';
         this.state.rotation = 0;
         this.state.preRenderedCanvases = {};
         this.state.isRendering = false;
@@ -177,24 +361,32 @@ const PdfViewerEngine = {
             this.state.pdfDoc = pdf;
             this.state.totalPages = pdf.numPages;
 
-            document.getElementById('pdfTotalPagesCount').textContent = pdf.numPages;
-            document.getElementById('pdfPageNumInput').value = 1;
-            document.getElementById('pdfPageNumInput').max = pdf.numPages;
+            const totalEl = document.getElementById('pdfTotalPagesCount');
+            const pageInput = document.getElementById('pdfPageNumInput');
+            if (totalEl) totalEl.textContent = pdf.numPages;
+            if (pageInput) {
+                pageInput.value = 1;
+                pageInput.max = pdf.numPages;
+            }
 
-            loadingOverlay.classList.add('hidden');
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
             this.renderPage(this.state.currentPage);
         }).catch(() => {
-            loadingOverlay.classList.add('hidden');
-            if (window.location.protocol === 'file:') {
-                AppView.showAlert('Local File (file://) पर S3 PDF CORS ब्लॉक होता है। Live Server या Web Hosting से खोलें।', 'error');
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
+            const errorMsg = (window.location.protocol === 'file:')
+                ? 'Local File (file://) पर S3 PDF CORS ब्लॉक होता है। Live Server या Web Hosting से खोलें।'
+                : 'PDF लोड करने में समस्या आई। आप ऊपर दिए लिंक से इसे नए टैब में खोल सकते हैं।';
+
+            if (typeof AppView !== 'undefined' && AppView.showAlert) {
+                AppView.showAlert(errorMsg, 'error');
             } else {
-                AppView.showAlert('PDF लोड करने में समस्या आई।', 'error');
+                alert(errorMsg);
             }
             this.close();
         });
     },
 
-    // Render Target Page with Offscreen Double-Buffering (0 Latency & Zero Flicker)
+    // Render Target Page with Offscreen Double-Buffering & Smart Scale Calculation
     renderPage: function (pageNum) {
         if (!this.state.pdfDoc) return;
 
@@ -202,47 +394,79 @@ const PdfViewerEngine = {
         if (pageNum > this.state.totalPages) pageNum = this.state.totalPages;
         this.state.currentPage = pageNum;
 
-        // Immediate UI updates
         const pageInput = document.getElementById('pdfPageNumInput');
-        const zoomText = document.getElementById('pdfZoomPercent');
         const prevBtn = document.getElementById('pdfPrevBtn');
         const nextBtn = document.getElementById('pdfNextBtn');
+        const zoomText = document.getElementById('pdfZoomPercent');
 
         if (pageInput) pageInput.value = pageNum;
-        if (zoomText) zoomText.textContent = `${Math.round(this.state.zoomScale * 100)}%`;
         if (prevBtn) prevBtn.disabled = (pageNum <= 1);
         if (nextBtn) nextBtn.disabled = (pageNum >= this.state.totalPages);
 
         const canvas = document.getElementById('pdfRenderCanvas');
         if (!canvas) return;
 
-        // 🚀 1. Check Offscreen Buffer Cache
-        const cached = this.state.preRenderedCanvases[pageNum];
-        if (cached && cached.zoomScale === this.state.zoomScale && cached.rotation === this.state.rotation) {
-            canvas.width = cached.width;
-            canvas.height = cached.height;
-            canvas.style.width = cached.styleWidth;
-            canvas.style.height = cached.styleHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(cached.canvas, 0, 0);
-
-            this.schedulePreloadCanvases(pageNum);
-            return;
-        }
-
-        // 2. Offscreen Scratch Canvas Double Buffering
-        if (this.state.isRendering) {
-            this.state.pageNumPending = pageNum;
-            if (this.state.currentRenderTask) {
-                this.state.currentRenderTask.cancel();
-                this.state.currentRenderTask = null;
-            }
-            return;
-        }
-
-        this.state.isRendering = true;
-
+        // Fetch page to calculate natural aspect ratio & scale
         this.state.pdfDoc.getPage(pageNum).then(page => {
+            const unscaled = page.getViewport({ scale: 1.0, rotation: this.state.rotation });
+            this.state.isLandscape = unscaled.width > unscaled.height;
+
+            // Update badge
+            const badge = document.getElementById('pdfDocBadge');
+            if (badge) {
+                badge.textContent = this.state.isLandscape ? 'रजिस्टर (Landscape)' : 'पोर्ट्रेट';
+            }
+
+            // Calculate Scale if in Fit Mode
+            const viewportEl = document.getElementById('pdfViewport');
+            const isMobile = window.innerWidth <= 768;
+            const containerW = viewportEl ? (viewportEl.clientWidth - (isMobile ? 24 : 48)) : window.innerWidth;
+            const containerH = viewportEl ? (viewportEl.clientHeight - (isMobile ? 84 : 110)) : window.innerHeight;
+
+            if (this.state.zoomMode === 'fit-width') {
+                let targetW = containerW;
+                // For wide landscape land registers on mobile: ensure line length is readable without being microscopic!
+                if (this.state.isLandscape && isMobile) {
+                    targetW = Math.max(containerW, 680);
+                }
+                const calcScale = targetW / unscaled.width;
+                this.state.zoomScale = Number(calcScale.toFixed(2));
+            } else if (this.state.zoomMode === 'fit-page') {
+                const scaleW = containerW / unscaled.width;
+                const scaleH = containerH / unscaled.height;
+                const calcScale = Math.min(scaleW, scaleH);
+                this.state.zoomScale = Number(calcScale.toFixed(2));
+            }
+
+            if (zoomText) {
+                zoomText.textContent = `${Math.round(this.state.zoomScale * 100)}%`;
+            }
+
+            // Check Offscreen Buffer Cache
+            const cached = this.state.preRenderedCanvases[pageNum];
+            if (cached && cached.zoomScale === this.state.zoomScale && cached.rotation === this.state.rotation) {
+                canvas.width = cached.width;
+                canvas.height = cached.height;
+                canvas.style.width = cached.styleWidth;
+                canvas.style.height = cached.styleHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(cached.canvas, 0, 0);
+                this.schedulePreloadCanvases(pageNum);
+                return;
+            }
+
+            // Offscreen Double-Buffering Render Task
+            if (this.state.isRendering) {
+                this.state.pageNumPending = pageNum;
+                if (this.state.currentRenderTask) {
+                    this.state.currentRenderTask.cancel();
+                    this.state.currentRenderTask = null;
+                }
+                return;
+            }
+
+            this.state.isRendering = true;
+
             const viewport = page.getViewport({ scale: this.state.zoomScale, rotation: this.state.rotation });
             const outputScale = window.devicePixelRatio || 1;
 
@@ -303,7 +527,7 @@ const PdfViewerEngine = {
     // Background Offscreen Canvas Pre-Rendering
     schedulePreloadCanvases: function (currentNum) {
         if (!this.state.pdfDoc) return;
-        const queue = [currentNum + 1, currentNum + 2, currentNum - 1];
+        const queue = [currentNum + 1, currentNum - 1];
 
         queue.forEach(p => {
             if (p >= 1 && p <= this.state.totalPages && !this.state.preRenderedCanvases[p]) {
@@ -337,16 +561,16 @@ const PdfViewerEngine = {
                             };
                         }).catch(() => { });
                     }).catch(() => { });
-                }, 60);
+                }, 80);
             }
         });
 
-        // Prune distant canvases
+        // Prune distant canvases to conserve mobile RAM
         const cachedKeys = Object.keys(this.state.preRenderedCanvases);
-        if (cachedKeys.length > 5) {
+        if (cachedKeys.length > 4) {
             cachedKeys.forEach(k => {
                 const pageInt = parseInt(k, 10);
-                if (Math.abs(pageInt - currentNum) > 3) {
+                if (Math.abs(pageInt - currentNum) > 2) {
                     delete this.state.preRenderedCanvases[k];
                 }
             });
@@ -362,7 +586,9 @@ const PdfViewerEngine = {
             const dataUrl = canvas.toDataURL('image/png');
             const printWin = window.open('', '_blank');
             if (!printWin) {
-                AppView.showAlert('कृपया प्रिंट के लिए पॉपअप विंडो की अनुमति दें।', 'error');
+                if (typeof AppView !== 'undefined' && AppView.showAlert) {
+                    AppView.showAlert('कृपया प्रिंट के लिए पॉपअप विंडो की अनुमति दें।', 'error');
+                }
                 return;
             }
 
@@ -398,7 +624,9 @@ const PdfViewerEngine = {
             printWin.focus();
             setTimeout(() => printWin.print(), 500);
         } catch (e) {
-            AppView.showAlert('प्रिंट तैयार करने में त्रुटि आई।', 'error');
+            if (typeof AppView !== 'undefined' && AppView.showAlert) {
+                AppView.showAlert('प्रिंट तैयार करने में त्रुटि आई।', 'error');
+            }
         }
     },
 
@@ -435,9 +663,13 @@ const PdfViewerEngine = {
             else if (document.webkitExitFullscreen) document.webkitExitFullscreen().catch(() => { });
         }
         const modal = document.getElementById('pdfViewerModal');
+        const container = document.querySelector('.pdf-modal-container');
         if (modal) {
             modal.classList.add('hidden');
             document.body.style.overflow = 'auto';
+        }
+        if (container) {
+            container.classList.remove('pdf-immersive');
         }
         if (this.state.pdfDoc) {
             this.state.pdfDoc.destroy();
