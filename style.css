@@ -2099,6 +2099,7 @@ body {
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background-color: rgba(10, 15, 29, 0.92);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -2120,6 +2121,7 @@ body {
 .pdf-modal-container {
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background-color: #0b1120;
   display: flex;
   flex-direction: column;
@@ -2302,10 +2304,10 @@ body {
   pointer-events: none;
 }
 
-/* Floating Bottom Pill Dock (Permanently pinned & accessible) */
+/* Floating Bottom Pill Dock (Permanently pinned & lifted above Android nav keys) */
 .pdf-bottom-dock {
   position: fixed;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  bottom: max(24px, calc(16px + env(safe-area-inset-bottom, 0px)));
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
@@ -2317,13 +2319,13 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(15, 23, 42, 0.92);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 9999px;
-  padding: 5px 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 15px rgba(56, 189, 248, 0.1);
+  padding: 6px 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 15px rgba(56, 189, 248, 0.15);
 }
 
 .pdf-dock-btn {
@@ -2457,22 +2459,22 @@ body {
   }
 
   .pdf-viewport {
-    padding: 10px 10px 85px 10px;
+    padding: 10px 10px 110px 10px;
   }
 
   .pdf-bottom-dock {
-    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    bottom: max(28px, calc(20px + env(safe-area-inset-bottom, 0px)));
   }
 
   .pdf-dock-capsule {
-    padding: 4px 6px;
-    gap: 2px;
+    padding: 5px 8px;
+    gap: 3px;
   }
 
   .pdf-dock-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 0.8rem;
+    width: 34px;
+    height: 34px;
+    font-size: 0.85rem;
   }
 
   .pdf-dock-input {
