@@ -287,12 +287,6 @@ const PdfViewerEngine = {
                         this.state.touch.lastTapTime = 0;
                     } else {
                         this.state.touch.lastTapTime = now;
-                        // Single tap: toggle immersive mode (bars hide/show)
-                        setTimeout(() => {
-                            if (this.state.touch.lastTapTime === now && container) {
-                                container.classList.toggle('pdf-immersive');
-                            }
-                        }, 260);
                     }
                 }
             }
@@ -326,7 +320,6 @@ const PdfViewerEngine = {
 
         if (!modal) return;
         if (titleEl) titleEl.textContent = filename || 'PDF Viewer';
-        if (container) container.classList.remove('pdf-immersive');
 
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
@@ -667,9 +660,6 @@ const PdfViewerEngine = {
         if (modal) {
             modal.classList.add('hidden');
             document.body.style.overflow = 'auto';
-        }
-        if (container) {
-            container.classList.remove('pdf-immersive');
         }
         if (this.state.pdfDoc) {
             this.state.pdfDoc.destroy();

@@ -2302,15 +2302,14 @@ body {
   pointer-events: none;
 }
 
-/* Floating Bottom Pill Dock */
+/* Floating Bottom Pill Dock (Permanently pinned & accessible) */
 .pdf-bottom-dock {
-  position: absolute;
-  bottom: 20px;
+  position: fixed;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
-  z-index: 30;
+  z-index: 9999;
   pointer-events: none;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
 }
 
 .pdf-dock-capsule {
@@ -2425,19 +2424,6 @@ body {
   color: #38bdf8;
 }
 
-/* Immersive Fullscreen Reading Mode (Toolbars hidden) */
-.pdf-modal-container.pdf-immersive .pdf-topbar {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.pdf-modal-container.pdf-immersive .pdf-bottom-dock {
-  transform: translate(-50%, 140%);
-  opacity: 0;
-  pointer-events: none;
-}
-
 /* Mobile Responsiveness for Reader */
 @media (max-width: 768px) {
   .pdf-topbar {
@@ -2471,11 +2457,11 @@ body {
   }
 
   .pdf-viewport {
-    padding: 10px 10px 75px 10px;
+    padding: 10px 10px 85px 10px;
   }
 
   .pdf-bottom-dock {
-    bottom: 14px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
   .pdf-dock-capsule {
