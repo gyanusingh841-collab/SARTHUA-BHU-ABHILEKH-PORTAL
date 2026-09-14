@@ -1,7 +1,7 @@
 /**
  * Sarthua Bhu-Abhilekh Portal - Modern Slim PDF Streaming & Reader Engine
  * Range-request streaming via Cloudflare R2 / Worker with offscreen canvas double-buffering.
- * Mobile-first touch gestures (pinch-zoom, double-tap), landscape auto-fit, and 1-tap external open.
+ * Mobile-first touch gestures (pinch-zoom, double-tap), landscape auto-fit, and strict anti-download protection.
  */
 
 // Configure PDF.js Worker
@@ -43,18 +43,43 @@ const PdfViewerEngine = {
         const zoomResetBtn = document.getElementById('pdfZoomResetBtn');
         const fitModeBtn = document.getElementById('pdfFitModeBtn');
         const rotateBtn = document.getElementById('pdfRotateBtn');
-        const externalBtn = document.getElementById('pdfExternalBtn');
         const fullscreenBtn = document.getElementById('pdfFullscreenBtn');
-        const printBtn = document.getElementById('pdfPrintBtn');
         const closeBtn = document.getElementById('pdfCloseBtn');
         const pageInput = document.getElementById('pdfPageNumInput');
         const modal = document.getElementById('pdfViewerModal');
         const viewport = document.getElementById('pdfViewport');
+        const canvas = document.getElementById('pdfRenderCanvas');
 
-        // Prevent right click save in viewer
+        // 🔒 Strict Anti-Download / Anti-Copy / Anti-Save Protections
+        const preventSave = (e) => {
+            e.preventDefault();
+            return false;
+        };
+
         if (modal) {
-            modal.addEventListener('contextmenu', (e) => e.preventDefault());
+            modal.addEventListener('contextmenu', preventSave);
+            modal.addEventListener('dragstart', preventSave);
         }
+        if (viewport) {
+            viewport.addEventListener('contextmenu', preventSave);
+            viewport.addEventListener('dragstart', preventSave);
+        }
+        if (canvas) {
+            canvas.addEventListener('contextmenu', preventSave);
+            canvas.addEventListener('dragstart', preventSave);
+        }
+
+        // Block Ctrl+S, Ctrl+P, Ctrl+U, etc. keyboard shortcuts when viewer is active
+        window.addEventListener('keydown', (e) => {
+            const isModalOpen = modal && !modal.classList.contains('hidden');
+            if (!isModalOpen) return;
+
+            if ((e.ctrlKey || e.metaKey) && ['s', 'S', 'p', 'P', 'u', 'U'].includes(e.key)) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        }, true);
 
         // Fullscreen changes
         document.addEventListener('fullscreenchange', this.handleFullscreenChange.bind(this));
@@ -93,29 +118,19 @@ const PdfViewerEngine = {
             });
         }
 
-        // Zoom In
+        // Zoom In (+) with smooth stepping and center preservation
         if (zoomInBtn) {
             zoomInBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (this.state.zoomScale < 3.5) {
-                    this.state.zoomMode = 'manual';
-                    this.state.zoomScale = Math.min(3.5, Number((this.state.zoomScale + 0.25).toFixed(2)));
-                    this.state.preRenderedCanvases = {};
-                    this.renderPage(this.state.currentPage);
-                }
+                this.setZoom(this.state.zoomScale * 1.25);
             });
         }
 
-        // Zoom Out
+        // Zoom Out (-) with smooth stepping and center preservation
         if (zoomOutBtn) {
             zoomOutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (this.state.zoomScale > 0.3) {
-                    this.state.zoomMode = 'manual';
-                    this.state.zoomScale = Math.max(0.3, Number((this.state.zoomScale - 0.25).toFixed(2)));
-                    this.state.preRenderedCanvases = {};
-                    this.renderPage(this.state.currentPage);
-                }
+                this.setZoom(this.state.zoomScale / 1.25);
             });
         }
 
@@ -124,13 +139,12 @@ const PdfViewerEngine = {
             zoomResetBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (this.state.zoomMode === 'fit-width') {
-                    this.state.zoomMode = 'manual';
-                    this.state.zoomScale = 1.0;
+                    this.setZoom(1.0);
                 } else {
                     this.state.zoomMode = 'fit-width';
+                    this.state.preRenderedCanvases = {};
+                    this.renderPage(this.state.currentPage);
                 }
-                this.state.preRenderedCanvases = {};
-                this.renderPage(this.state.currentPage);
             });
         }
 
@@ -162,24 +176,6 @@ const PdfViewerEngine = {
             });
         }
 
-        // Open in New Tab / External Reader
-        if (externalBtn) {
-            externalBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (this.state.pdfUrl) {
-                    window.open(this.state.pdfUrl, '_blank');
-                }
-            });
-        }
-
-        // Print
-        if (printBtn) {
-            printBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.printCurrentView();
-            });
-        }
-
         // Fullscreen
         if (fullscreenBtn) {
             fullscreenBtn.addEventListener('click', (e) => {
@@ -208,17 +204,41 @@ const PdfViewerEngine = {
             });
         }
 
-        // Setup Touch Gestures & Immersive Reading Mode
+        // Setup Touch Gestures (Pinch-to-zoom, Double-tap)
         this.setupTouchAndInteractions(viewport);
+    },
+
+    // Set Zoom with Scroll Position & Focus Point Preservation
+    setZoom: function (targetScale, focusXRatio = 0.5, focusYRatio = 0.5) {
+        const clampedScale = Math.min(4.0, Math.max(0.3, Number(targetScale.toFixed(2))));
+        if (clampedScale === this.state.zoomScale && this.state.zoomMode === 'manual') return;
+
+        const viewportEl = document.getElementById('pdfViewport');
+        let focusX = 0.5, focusY = 0.5;
+        if (viewportEl && viewportEl.scrollWidth > 0) {
+            focusX = (viewportEl.scrollLeft + viewportEl.clientWidth * focusXRatio) / viewportEl.scrollWidth;
+            focusY = (viewportEl.scrollTop + viewportEl.clientHeight * focusYRatio) / viewportEl.scrollHeight;
+        }
+
+        this.state.zoomMode = 'manual';
+        this.state.zoomScale = clampedScale;
+        this.state.preRenderedCanvases = {};
+
+        this.renderPage(this.state.currentPage, () => {
+            // Restore scroll focus seamlessly so content doesn't jump
+            if (viewportEl && viewportEl.scrollWidth > 0) {
+                viewportEl.scrollLeft = Math.round((focusX * viewportEl.scrollWidth) - (viewportEl.clientWidth * focusXRatio));
+                viewportEl.scrollTop = Math.round((focusY * viewportEl.scrollHeight) - (viewportEl.clientHeight * focusYRatio));
+            }
+        });
     },
 
     // Touch & Interactive Viewport Handling
     setupTouchAndInteractions: function (viewport) {
         if (!viewport) return;
         const canvasWrapper = document.getElementById('pdfCanvasWrapper');
-        const container = document.querySelector('.pdf-modal-container');
 
-        // Touch gestures (Pinch-to-zoom, Double-tap, Immersive Tap)
+        // Touch gestures (Pinch-to-zoom, Double-tap)
         viewport.addEventListener('touchstart', (e) => {
             if (e.touches.length === 2) {
                 // Two fingers: Pinch-to-zoom start
@@ -260,12 +280,8 @@ const PdfViewerEngine = {
                         e.changedTouches[0].pageY - (e.touches[0]?.pageY || this.state.touch.startY)
                     );
                     const pinchRatio = currentDist > 0 ? (currentDist / this.state.touch.initialDist) : 1;
-                    let targetScale = this.state.touch.initialScale * pinchRatio;
-                    targetScale = Math.min(3.5, Math.max(0.35, targetScale));
-                    this.state.zoomMode = 'manual';
-                    this.state.zoomScale = Number(targetScale.toFixed(2));
-                    this.state.preRenderedCanvases = {};
-                    this.renderPage(this.state.currentPage);
+                    const targetScale = this.state.touch.initialScale * pinchRatio;
+                    this.setZoom(targetScale);
                 }
             } else if (e.changedTouches.length === 1) {
                 const deltaX = Math.abs(e.changedTouches[0].pageX - this.state.touch.startX);
@@ -275,15 +291,17 @@ const PdfViewerEngine = {
                 if (deltaX < 12 && deltaY < 12) {
                     const now = Date.now();
                     if (now - this.state.touch.lastTapTime < 320) {
-                        // Double tap: toggle zoom
+                        // Double tap: toggle zoom between 1.8x and Fit-Width
                         if (this.state.zoomScale < 1.35) {
-                            this.state.zoomMode = 'manual';
-                            this.state.zoomScale = 1.75;
+                            const rect = viewport.getBoundingClientRect();
+                            const tapXRatio = (e.changedTouches[0].clientX - rect.left) / (rect.width || 1);
+                            const tapYRatio = (e.changedTouches[0].clientY - rect.top) / (rect.height || 1);
+                            this.setZoom(1.8, tapXRatio, tapYRatio);
                         } else {
                             this.state.zoomMode = 'fit-width';
+                            this.state.preRenderedCanvases = {};
+                            this.renderPage(this.state.currentPage);
                         }
-                        this.state.preRenderedCanvases = {};
-                        this.renderPage(this.state.currentPage);
                         this.state.touch.lastTapTime = 0;
                     } else {
                         this.state.touch.lastTapTime = now;
@@ -304,17 +322,7 @@ const PdfViewerEngine = {
             return;
         }
 
-        // If OneDrive, open externally as OneDrive blocks browser Range / CORS headers
-        if (pdfUrl.includes('1drv.ms') || pdfUrl.includes('onedrive')) {
-            if (typeof AppView !== 'undefined' && AppView.showAlert) {
-                AppView.showAlert('OneDrive PDF नए टैब में खोला जा रहा है...', 'info');
-            }
-            window.open(pdfUrl, '_blank');
-            return;
-        }
-
         const modal = document.getElementById('pdfViewerModal');
-        const container = document.querySelector('.pdf-modal-container');
         const titleEl = document.getElementById('pdfViewerTitle');
         const loadingOverlay = document.getElementById('pdfLoadingIndicator');
 
@@ -368,7 +376,7 @@ const PdfViewerEngine = {
             if (loadingOverlay) loadingOverlay.classList.add('hidden');
             const errorMsg = (window.location.protocol === 'file:')
                 ? 'Local File (file://) पर S3 PDF CORS ब्लॉक होता है। Live Server या Web Hosting से खोलें।'
-                : 'PDF लोड करने में समस्या आई। आप ऊपर दिए लिंक से इसे नए टैब में खोल सकते हैं।';
+                : 'PDF लोड करने में समस्या आई।';
 
             if (typeof AppView !== 'undefined' && AppView.showAlert) {
                 AppView.showAlert(errorMsg, 'error');
@@ -380,7 +388,7 @@ const PdfViewerEngine = {
     },
 
     // Render Target Page with Offscreen Double-Buffering & Smart Scale Calculation
-    renderPage: function (pageNum) {
+    renderPage: function (pageNum, onRenderComplete) {
         if (!this.state.pdfDoc) return;
 
         if (pageNum < 1) pageNum = 1;
@@ -445,6 +453,7 @@ const PdfViewerEngine = {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(cached.canvas, 0, 0);
                 this.schedulePreloadCanvases(pageNum);
+                if (typeof onRenderComplete === 'function') onRenderComplete();
                 return;
             }
 
@@ -502,6 +511,8 @@ const PdfViewerEngine = {
                 };
 
                 this.schedulePreloadCanvases(pageNum);
+
+                if (typeof onRenderComplete === 'function') onRenderComplete();
 
                 if (this.state.pageNumPending !== null) {
                     const nextPending = this.state.pageNumPending;
@@ -570,59 +581,6 @@ const PdfViewerEngine = {
         }
     },
 
-    // Print Current View
-    printCurrentView: function () {
-        const canvas = document.getElementById('pdfRenderCanvas');
-        if (!canvas) return;
-
-        try {
-            const dataUrl = canvas.toDataURL('image/png');
-            const printWin = window.open('', '_blank');
-            if (!printWin) {
-                if (typeof AppView !== 'undefined' && AppView.showAlert) {
-                    AppView.showAlert('कृपया प्रिंट के लिए पॉपअप विंडो की अनुमति दें।', 'error');
-                }
-                return;
-            }
-
-            printWin.document.write(`
-                <!DOCTYPE html>
-                <html lang="hi">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>प्रिंट - ${this.state.filename || 'सरथुआ भू-अभिलेख'} (पेज ${this.state.currentPage})</title>
-                    <style>
-                        body { margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; }
-                        .print-header { width: 100%; text-align: center; margin-bottom: 12px; border-bottom: 2px solid #333; padding-bottom: 8px; }
-                        .print-header h2 { margin: 0 0 4px 0; font-size: 16px; color: #1e3a8a; }
-                        .print-header p { margin: 0; font-size: 12px; color: #555; }
-                        img { max-width: 100%; height: auto; }
-                        .print-footer { margin-top: 15px; font-size: 10px; color: #777; text-align: center; }
-                        @media print { body { padding: 0; } img { max-height: 95vh; } }
-                    </style>
-                </head>
-                <body>
-                    <div class="print-header">
-                        <h2>सरथुआ भू-अभिलेख पोर्टल | ग्राम: सरथुआ, थाना: 218, भोजपुर (बिहार)</h2>
-                        <p>दस्तावेज़: <strong>${this.state.filename || ''}</strong> | पेज संख्या: <strong>${this.state.currentPage} / ${this.state.totalPages}</strong></p>
-                    </div>
-                    <img src="${dataUrl}" alt="Land Record Page" />
-                    <div class="print-footer">
-                        * यह प्रतिलिपि केवल जन-सूचना एवं अध्ययन हेतु है। विधिक प्रमाण हेतु अंचल कार्यालय से प्रमाणित प्रतिलिपि प्राप्त करें।
-                    </div>
-                </body>
-                </html>
-            `);
-            printWin.document.close();
-            printWin.focus();
-            setTimeout(() => printWin.print(), 500);
-        } catch (e) {
-            if (typeof AppView !== 'undefined' && AppView.showAlert) {
-                AppView.showAlert('प्रिंट तैयार करने में त्रुटि आई।', 'error');
-            }
-        }
-    },
-
     // Fullscreen Toggle
     toggleFullscreen: function () {
         const modal = document.getElementById('pdfViewerModal');
@@ -656,7 +614,6 @@ const PdfViewerEngine = {
             else if (document.webkitExitFullscreen) document.webkitExitFullscreen().catch(() => { });
         }
         const modal = document.getElementById('pdfViewerModal');
-        const container = document.querySelector('.pdf-modal-container');
         if (modal) {
             modal.classList.add('hidden');
             document.body.style.overflow = 'auto';

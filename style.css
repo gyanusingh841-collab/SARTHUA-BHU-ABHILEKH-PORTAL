@@ -2278,7 +2278,12 @@ body {
   box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
   border-radius: 4px;
   background-color: #ffffff;
-  /* CRITICAL: Do NOT set max-width: 100% or height: auto here; JS controls dimensions to prevent landscape line-length squishing */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+  pointer-events: auto;
 }
 
 /* Loading Overlay */
