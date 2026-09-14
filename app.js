@@ -18,11 +18,11 @@ const portalData = {
         "whatsapp": "9006035986"
     },
     "jamabandi_panji": [
-        { "sr_no": 1, "volume": "VOL-01", "total_pages": 8, "filename": "Sarthua_Vol_01_1970.pdf", "file_size_mb": 2.14, "pdf_link": "https://talentwale-875180007571-ap-south-1-an.s3.ap-south-1.amazonaws.com/Sarthua_bhuAbhilekh/jamabandi_panji/Sarthua_Vol_01_1970.pdf" },
-        { "sr_no": 2, "volume": "VOL-02", "total_pages": 256, "filename": "Sarthua_Vol_02_1970.pdf", "file_size_mb": 76.54, "pdf_link": "https://talentwale-875180007571-ap-south-1-an.s3.ap-south-1.amazonaws.com/Sarthua_bhuAbhilekh/jamabandi_panji/Sarthua_Vol_02_1970.pdf" },
+        { "sr_no": 1, "volume": "VOL-01", "total_pages": 8, "filename": "Sarthua_Vol_01_1970.pdf", "file_size_mb": 2.14, "pdf_link": "https://sarthua-docs.gyanusingh841.workers.dev/jamabandi_panji/Sarthua_Vol_01_1970.pdf" },
+        { "sr_no": 2, "volume": "VOL-02", "total_pages": 256, "filename": "Sarthua_Vol_02_1970.pdf", "file_size_mb": 76.54, "pdf_link": "https://sarthua-docs.gyanusingh841.workers.dev/jamabandi_panji/Sarthua_Vol_02_1970.pdf" },
         { "sr_no": 3, "volume": "VOL-03", "total_pages": 0, "filename": "DOC NOT FOUND", "file_size_mb": 0, "pdf_link": "DOC NOT FOUND" },
-        { "sr_no": 4, "volume": "VOL-04", "total_pages": 193, "filename": "Sarthua_Vol_04_1970.pdf", "file_size_mb": 53.02, "pdf_link": "https://talentwale-875180007571-ap-south-1-an.s3.ap-south-1.amazonaws.com/Sarthua_bhuAbhilekh/jamabandi_panji/Sarthua_Vol_04_1970.pdf" },
-        { "sr_no": 5, "volume": "VOL-05", "total_pages": 167, "filename": "Sarthua_Vol_05_1970.pdf", "file_size_mb": 46.01, "pdf_link": "https://talentwale-875180007571-ap-south-1-an.s3.ap-south-1.amazonaws.com/Sarthua_bhuAbhilekh/jamabandi_panji/Sarthua_Vol_05_1970.pdf" },
+        { "sr_no": 4, "volume": "VOL-04", "total_pages": 193, "filename": "Sarthua_Vol_04_1970.pdf", "file_size_mb": 53.02, "pdf_link": "https://sarthua-docs.gyanusingh841.workers.dev/jamabandi_panji/Sarthua_Vol_04_1970.pdf" },
+        { "sr_no": 5, "volume": "VOL-05", "total_pages": 167, "filename": "Sarthua_Vol_05_1970.pdf", "file_size_mb": 46.01, "pdf_link": "https://sarthua-docs.gyanusingh841.workers.dev/jamabandi_panji/Sarthua_Vol_05_1970.pdf" },
         { "sr_no": 6, "volume": "VOL-06", "total_pages": 151, "filename": "Sarthua_Vol_06_1970.pdf", "file_size_mb": 40.97, "pdf_link": "https://1drv.ms/b/c/98cca50e3110828e/ERx5RtK91T1IvIVtw3-MQ8QBIUWZIZGkyr2BTYTFJtkq_g" },
         { "sr_no": 7, "volume": "VOL-07", "total_pages": 211, "filename": "Sarthua_Vol_07_1970.pdf", "file_size_mb": 64.51, "pdf_link": "https://1drv.ms/b/c/98cca50e3110828e/EdGco6yoRNpAl36HKe51ZdEBIKSdOMfYiMBYCqIH9bZlQQ" },
         { "sr_no": 8, "volume": "VOL-08", "total_pages": 4, "filename": "Sarthua_Vol_08_1970.pdf", "file_size_mb": 1, "pdf_link": "https://1drv.ms/b/c/98cca50e3110828e/Ecc3jRWKx3NAioBHPLtWi10BiPUvm2EtFshxIntl13Zbmw" },
@@ -93,6 +93,9 @@ function initializeApp() {
 
     // Setup PDF viewer controls
     setupPdfViewerControls();
+
+    // Initialize UI/UX Accessibility, Date, and Theme
+    initAccessibilityAndTheme();
 }
 
 // Setup search functionality
@@ -297,8 +300,9 @@ function createActionButtons(item) {
         `;
     }
 
+    const fileSizeBytes = Math.round((item.file_size_mb || 0) * 1024 * 1024);
     return `
-        <button class="btn btn--view" onclick="viewPDF('${item.pdf_link}', '${item.filename}')">
+        <button class="btn btn--view" onclick="viewPDF('${item.pdf_link}', '${item.filename}', ${fileSizeBytes})">
             <i class="fas fa-eye"></i>
             PDF देखें
         </button>
@@ -316,6 +320,8 @@ const pdfState = {
     currentPage: 1,
     totalPages: 0,
     zoomScale: 0.5,
+    rotation: 0, // 0, 90, 180, 270 degrees
+    preRenderedCanvases: {}, // Offscreen canvases pre-rendered in background
     isRendering: false,
     currentRenderTask: null,
     pageNumPending: null,
@@ -324,13 +330,13 @@ const pdfState = {
 };
 
 // View PDF function - Opens embedded PDF.js Viewer for S3/Direct PDF links
-function viewPDF(pdfLink, filename) {
+function viewPDF(pdfLink, filename, fileSizeBytes) {
     if (!pdfLink || pdfLink === "DOC NOT FOUND") {
         showAlert('यह दस्तावेज़ उपलब्ध नहीं है।', 'error');
         return;
     }
 
-    const isDirectPdf = pdfLink.toLowerCase().includes('.pdf') || pdfLink.includes('amazonaws.com');
+    const isDirectPdf = pdfLink.toLowerCase().includes('.pdf') || pdfLink.includes('amazonaws.com') || pdfLink.includes('workers.dev');
     const isOneDrive = pdfLink.includes('1drv.ms') || pdfLink.includes('onedrive');
 
     if (isOneDrive) {
@@ -340,12 +346,12 @@ function viewPDF(pdfLink, filename) {
         return;
     }
 
-    // Open embedded PDF.js viewer modal for AWS S3 and direct PDF links
-    openPdfModal(pdfLink, filename);
+    // Open embedded PDF.js viewer modal for Cloudflare / S3 direct PDF links
+    openPdfModal(pdfLink, filename, fileSizeBytes);
 }
 
 // Open PDF Viewer Modal & Stream PDF via Range Requests
-function openPdfModal(pdfUrl, filename) {
+function openPdfModal(pdfUrl, filename, fileSizeBytes) {
     const modal = document.getElementById('pdfViewerModal');
     const titleEl = document.getElementById('pdfViewerTitle');
     const loadingOverlay = document.getElementById('pdfLoadingIndicator');
@@ -368,16 +374,23 @@ function openPdfModal(pdfUrl, filename) {
     pdfState.filename = filename;
     pdfState.currentPage = 1;
     pdfState.zoomScale = 0.5;
+    pdfState.rotation = 0;
+    pdfState.preRenderedCanvases = {};
     pdfState.isRendering = false;
     pdfState.pageNumPending = null;
 
-    // Load PDF using PDF.js Byte-Range Request Streaming
-    pdfjsLib.getDocument({
+    // Load PDF using PDF.js Byte-Range Request Streaming (Strict On-Demand Chunks)
+    const docParams = {
         url: pdfUrl,
         disableRange: false,
-        disableStream: false,
-        disableAutoFetch: false
-    }).promise.then(pdf => {
+        disableStream: true,
+        disableAutoFetch: true
+    };
+    if (fileSizeBytes && fileSizeBytes > 0) {
+        docParams.length = fileSizeBytes;
+    }
+
+    pdfjsLib.getDocument(docParams).promise.then(pdf => {
         pdfState.pdfDoc = pdf;
         pdfState.totalPages = pdf.numPages;
 
@@ -400,7 +413,7 @@ function openPdfModal(pdfUrl, filename) {
     });
 }
 
-// Render PDF Page onto HTML5 Canvas
+// Render PDF Page onto HTML5 Canvas with Offscreen Double-Buffering (No White Screen Flash)
 function renderPdfPage(pageNum) {
     if (!pdfState.pdfDoc) return;
 
@@ -420,7 +433,26 @@ function renderPdfPage(pageNum) {
     if (prevBtn) prevBtn.disabled = (pageNum <= 1);
     if (nextBtn) nextBtn.disabled = (pageNum >= pdfState.totalPages);
 
-    // If currently rendering a page, set pending target and cancel in-progress render task
+    const canvas = document.getElementById('pdfRenderCanvas');
+    if (!canvas) return;
+
+    // 🚀 1. Check if page is ALREADY pre-rendered in offscreen buffer!
+    const cached = pdfState.preRenderedCanvases[pageNum];
+    if (cached && cached.zoomScale === pdfState.zoomScale && cached.rotation === pdfState.rotation) {
+        // INSTANT 0-MS DISPLAY: Copy pre-rendered image to visible canvas in 1 frame (No Network & No White Flash!)
+        canvas.width = cached.width;
+        canvas.height = cached.height;
+        canvas.style.width = cached.styleWidth;
+        canvas.style.height = cached.styleHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(cached.canvas, 0, 0);
+
+        // Preload next pages in background
+        schedulePreloadCanvases(pageNum);
+        return;
+    }
+
+    // 2. If not yet pre-rendered, render with Double Buffering to eliminate white flash
     if (pdfState.isRendering) {
         pdfState.pageNumPending = pageNum;
         if (pdfState.currentRenderTask) {
@@ -433,25 +465,19 @@ function renderPdfPage(pageNum) {
     pdfState.isRendering = true;
 
     pdfState.pdfDoc.getPage(pageNum).then(page => {
-        const canvas = document.getElementById('pdfRenderCanvas');
-        if (!canvas) {
-            pdfState.isRendering = false;
-            return;
-        }
-
-        const ctx = canvas.getContext('2d');
-        const viewport = page.getViewport({ scale: pdfState.zoomScale });
-
+        const viewport = page.getViewport({ scale: pdfState.zoomScale, rotation: pdfState.rotation });
         const outputScale = window.devicePixelRatio || 1;
-        canvas.width = Math.floor(viewport.width * outputScale);
-        canvas.height = Math.floor(viewport.height * outputScale);
-        canvas.style.width = Math.floor(viewport.width) + "px";
-        canvas.style.height = Math.floor(viewport.height) + "px";
+
+        // Render onto off-screen scratch canvas first (User still sees previous page, NO white screen flash!)
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = Math.floor(viewport.width * outputScale);
+        offCanvas.height = Math.floor(viewport.height * outputScale);
+        const offCtx = offCanvas.getContext('2d');
 
         const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
 
         const renderContext = {
-            canvasContext: ctx,
+            canvasContext: offCtx,
             transform: transform,
             viewport: viewport
         };
@@ -462,6 +488,28 @@ function renderPdfPage(pageNum) {
         const handleRenderFinish = () => {
             pdfState.isRendering = false;
             pdfState.currentRenderTask = null;
+
+            // Swap off-screen canvas to visible canvas in 1 single frame!
+            canvas.width = offCanvas.width;
+            canvas.height = offCanvas.height;
+            canvas.style.width = Math.floor(viewport.width) + "px";
+            canvas.style.height = Math.floor(viewport.height) + "px";
+            const mainCtx = canvas.getContext('2d');
+            mainCtx.drawImage(offCanvas, 0, 0);
+
+            // Save in cache
+            pdfState.preRenderedCanvases[pageNum] = {
+                canvas: offCanvas,
+                width: offCanvas.width,
+                height: offCanvas.height,
+                styleWidth: canvas.style.width,
+                styleHeight: canvas.style.height,
+                zoomScale: pdfState.zoomScale,
+                rotation: pdfState.rotation
+            };
+
+            // Pre-render adjacent 2-3 pages in background
+            schedulePreloadCanvases(pageNum);
 
             // Render queued page if any
             if (pdfState.pageNumPending !== null) {
@@ -509,6 +557,62 @@ function closePdfModal() {
     if (pdfState.pdfDoc) {
         pdfState.pdfDoc.destroy();
         pdfState.pdfDoc = null;
+    }
+    pdfState.preRenderedCanvases = {};
+}
+
+// Pre-render adjacent pages onto offscreen canvases in background
+function schedulePreloadCanvases(currentNum) {
+    if (!pdfState.pdfDoc) return;
+
+    // Rolling window buffer: Next 2 pages and previous 1 page
+    const queue = [currentNum + 1, currentNum + 2, currentNum - 1];
+
+    queue.forEach(p => {
+        if (p >= 1 && p <= pdfState.totalPages && !pdfState.preRenderedCanvases[p]) {
+            setTimeout(() => {
+                if (!pdfState.pdfDoc || pdfState.preRenderedCanvases[p]) return;
+
+                pdfState.pdfDoc.getPage(p).then(pageObj => {
+                    const viewport = pageObj.getViewport({ scale: pdfState.zoomScale, rotation: pdfState.rotation });
+                    const outputScale = window.devicePixelRatio || 1;
+                    const offCanvas = document.createElement('canvas');
+                    offCanvas.width = Math.floor(viewport.width * outputScale);
+                    offCanvas.height = Math.floor(viewport.height * outputScale);
+                    const offCtx = offCanvas.getContext('2d');
+
+                    const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
+                    const task = pageObj.render({
+                        canvasContext: offCtx,
+                        transform: transform,
+                        viewport: viewport
+                    });
+
+                    task.promise.then(() => {
+                        pdfState.preRenderedCanvases[p] = {
+                            canvas: offCanvas,
+                            width: offCanvas.width,
+                            height: offCanvas.height,
+                            styleWidth: Math.floor(viewport.width) + "px",
+                            styleHeight: Math.floor(viewport.height) + "px",
+                            zoomScale: pdfState.zoomScale,
+                            rotation: pdfState.rotation
+                        };
+                    }).catch(() => { });
+                }).catch(() => { });
+            }, 60);
+        }
+    });
+
+    // Prune distant canvases to keep memory light (< 15 MB)
+    const cachedKeys = Object.keys(pdfState.preRenderedCanvases);
+    if (cachedKeys.length > 5) {
+        cachedKeys.forEach(k => {
+            const pageInt = parseInt(k, 10);
+            if (Math.abs(pageInt - currentNum) > 3) {
+                delete pdfState.preRenderedCanvases[k];
+            }
+        });
     }
 }
 
@@ -637,6 +741,102 @@ function setupPdfViewerControls() {
             }
         });
     }
+
+    const rotateBtn = document.getElementById('pdfRotateBtn');
+    const printBtn = document.getElementById('pdfPrintBtn');
+
+    if (rotateBtn) {
+        rotateBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            pdfState.rotation = (pdfState.rotation + 90) % 360;
+            renderPdfPage(pdfState.currentPage);
+        });
+    }
+
+    if (printBtn) {
+        printBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            printPdfCurrentView();
+        });
+    }
+}
+
+// Print Current PDF Page Canvas View
+function printPdfCurrentView() {
+    const canvas = document.getElementById('pdfRenderCanvas');
+    if (!canvas) return;
+
+    try {
+        const dataUrl = canvas.toDataURL('image/png');
+        const printWin = window.open('', '_blank');
+        if (!printWin) {
+            showAlert('कृपया प्रिंट के लिए पॉपअप विंडो की अनुमति दें।', 'error');
+            return;
+        }
+
+        printWin.document.write(`
+            <!DOCTYPE html>
+            <html lang="hi">
+            <head>
+                <meta charset="UTF-8">
+                <title>प्रिंट - ${pdfState.filename || 'सरथुआ भू-अभिलेख'} (पेज ${pdfState.currentPage})</title>
+                <style>
+                    body {
+                        margin: 0;
+                        padding: 20px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        font-family: system-ui, -apple-system, sans-serif;
+                    }
+                    .print-header {
+                        width: 100%;
+                        text-align: center;
+                        margin-bottom: 12px;
+                        padding-bottom: 8px;
+                        border-bottom: 2px solid #333;
+                    }
+                    .print-header h2 { margin: 0 0 4px 0; font-size: 16px; color: #1e3a8a; }
+                    .print-header p { margin: 0; font-size: 12px; color: #555; }
+                    img {
+                        max-width: 100%;
+                        height: auto;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                    }
+                    .print-footer {
+                        margin-top: 15px;
+                        font-size: 10px;
+                        color: #777;
+                        text-align: center;
+                    }
+                    @media print {
+                        body { padding: 0; }
+                        .print-header { border-bottom: 1px solid #666; }
+                        img { box-shadow: none; max-height: 95vh; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="print-header">
+                    <h2>सरथुआ भू-अभिलेख पोर्टल | ग्राम: सरथुआ, थाना: 218, भोजपुर (बिहार)</h2>
+                    <p>दस्तावेज़: <strong>${pdfState.filename || ''}</strong> | पेज संख्या: <strong>${pdfState.currentPage} / ${pdfState.totalPages}</strong></p>
+                </div>
+                <img src="${dataUrl}" alt="Land Record Page" />
+                <div class="print-footer">
+                    * यह प्रतिलिपि केवल जन-सूचना एवं अध्ययन हेतु है। विधिक प्रमाण हेतु अंचल कार्यालय से प्रमाणित प्रतिलिपि प्राप्त करें।
+                </div>
+            </body>
+            </html>
+        `);
+
+        printWin.document.close();
+        printWin.focus();
+        setTimeout(() => {
+            printWin.print();
+        }, 500);
+    } catch (err) {
+        showAlert('प्रिंट तैयार करने में त्रुटि आई।', 'error');
+    }
 }
 
 // Alert function for better user feedback
@@ -704,97 +904,158 @@ function hideLoadingModal() {
     document.body.style.overflow = 'auto';
 }
 
-// Enhanced search functionality
-function searchRecords() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+// Helper: Check if searched Khata number falls within range strings (e.g. "1-178", "1-25, 651-915")
+function isKhataMatch(cleanSearch, khataRangeStr) {
+    if (!khataRangeStr || khataRangeStr === "undefined") return false;
 
-    if (!searchTerm) {
-        showAlert('कृपया खोज के लिए कुछ टाइप करें।', 'info');
+    // Substring match
+    if (khataRangeStr.toLowerCase().includes(cleanSearch.toLowerCase())) {
+        return true;
+    }
+
+    const searchNum = parseInt(cleanSearch, 10);
+    if (isNaN(searchNum)) return false;
+
+    // Comma-separated segments e.g. "1-25, 651-915"
+    const segments = khataRangeStr.split(',');
+    for (const segment of segments) {
+        const trimmed = segment.trim();
+        if (trimmed.includes('-')) {
+            const parts = trimmed.split('-');
+            const start = parseInt(parts[0].trim(), 10);
+            const end = parseInt(parts[1].trim(), 10);
+            if (!isNaN(start) && !isNaN(end)) {
+                if (searchNum >= Math.min(start, end) && searchNum <= Math.max(start, end)) {
+                    return true;
+                }
+            }
+        } else {
+            const single = parseInt(trimmed, 10);
+            if (!isNaN(single) && single === searchNum) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+// Update count badge on tab button
+function updateTabBadge(badgeId, count) {
+    const badge = document.getElementById(badgeId);
+    if (!badge) return;
+    if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+// Enhanced smart search functionality with range parsing
+function searchRecords() {
+    const searchInput = document.getElementById('searchInput');
+    const rawTerm = searchInput.value.trim();
+
+    if (!rawTerm) {
+        showAlert('कृपया खोज के लिए कुछ टाइप करें (जैसे: खाता संख्या या वॉल्यूम)।', 'info');
         return;
     }
+
+    const termLower = rawTerm.toLowerCase();
+    // Strip common Hindi & English query words: e.g. "खाता 50", "vol 2", "book 1"
+    const cleanNum = rawTerm.replace(/^(खाता|खतियान|वॉल्यूम|किताब|रजिस्टर|vol|volume|book|khata|no|नं|नंबर)\s*[-:]?\s*/i, '').trim();
 
     // Clear previous highlights
     clearSearchHighlights();
 
-    // Search across all data types
-    let foundResults = false;
-    let totalFound = 0;
-
     // Search in Jamabandi
     const jamabandiResults = portalData.jamabandi_panji.filter(item =>
-        item.volume.toLowerCase().includes(searchTerm) ||
-        item.sr_no.toString().includes(searchTerm) ||
-        item.filename.toLowerCase().includes(searchTerm)
+        item.volume.toLowerCase().includes(termLower) ||
+        (cleanNum && item.volume.toLowerCase().includes(cleanNum.toLowerCase())) ||
+        (cleanNum && item.sr_no.toString() === cleanNum) ||
+        item.filename.toLowerCase().includes(termLower)
     );
 
     // Search in Revisional
     const revisionalResults = portalData.revisional_survey.filter(item =>
-        item.register_no.toLowerCase().includes(searchTerm) ||
-        item.khata_numbers.toLowerCase().includes(searchTerm) ||
-        item.sr_no.toString().includes(searchTerm) ||
-        item.filename.toLowerCase().includes(searchTerm)
+        item.register_no.toLowerCase().includes(termLower) ||
+        (cleanNum && item.register_no.toLowerCase().includes(cleanNum.toLowerCase())) ||
+        (cleanNum && item.sr_no.toString() === cleanNum) ||
+        (cleanNum && isKhataMatch(cleanNum, item.khata_numbers)) ||
+        item.khata_numbers.toLowerCase().includes(termLower) ||
+        item.filename.toLowerCase().includes(termLower)
     );
 
     // Search in Cadastral
     const cadastralResults = portalData.cadastral_survey.filter(item =>
-        item.register_no.toLowerCase().includes(searchTerm) ||
-        (item.khata_numbers !== "undefined" && item.khata_numbers.toLowerCase().includes(searchTerm)) ||
-        item.sr_no.toString().includes(searchTerm) ||
-        item.filename.toLowerCase().includes(searchTerm)
+        item.register_no.toLowerCase().includes(termLower) ||
+        (cleanNum && item.register_no.toLowerCase().includes(cleanNum.toLowerCase())) ||
+        (cleanNum && item.sr_no.toString() === cleanNum) ||
+        (cleanNum && isKhataMatch(cleanNum, item.khata_numbers)) ||
+        (item.khata_numbers !== "undefined" && item.khata_numbers.toLowerCase().includes(termLower)) ||
+        item.filename.toLowerCase().includes(termLower)
     );
 
-    // Show results with priority
-    if (jamabandiResults.length > 0) {
-        highlightSearchResults('jamabandi', jamabandiResults);
-        showTab('jamabandi');
-        foundResults = true;
-        totalFound += jamabandiResults.length;
-    } else if (revisionalResults.length > 0) {
-        highlightSearchResults('revisional', revisionalResults);
-        showTab('revisional');
-        foundResults = true;
-        totalFound += revisionalResults.length;
-    } else if (cadastralResults.length > 0) {
-        highlightSearchResults('cadastral', cadastralResults);
-        showTab('cadastral');
-        foundResults = true;
-        totalFound += cadastralResults.length;
-    }
+    const totalFound = jamabandiResults.length + revisionalResults.length + cadastralResults.length;
 
-    if (foundResults) {
-        showAlert(`${totalFound} परिणाम मिले "${searchTerm}" के लिए`, 'success');
+    // Update tab badges with count of matches in each tab
+    updateTabBadge('jamabandi-badge', jamabandiResults.length);
+    updateTabBadge('revisional-badge', revisionalResults.length);
+    updateTabBadge('cadastral-badge', cadastralResults.length);
+
+    if (totalFound > 0) {
+        // Highlight in all matching tables
+        if (jamabandiResults.length > 0) {
+            highlightSearchResults('jamabandi', jamabandiResults);
+        }
+        if (revisionalResults.length > 0) {
+            highlightSearchResults('revisional', revisionalResults);
+        }
+        if (cadastralResults.length > 0) {
+            highlightSearchResults('cadastral', cadastralResults);
+        }
+
+        // Switch to the first tab that has results
+        if (jamabandiResults.length > 0) {
+            showTab('jamabandi');
+        } else if (revisionalResults.length > 0) {
+            showTab('revisional');
+        } else if (cadastralResults.length > 0) {
+            showTab('cadastral');
+        }
+
+        showAlert(`${totalFound} रिकॉर्ड मिले "${rawTerm}" के लिए`, 'success');
     } else {
-        showAlert('कोई परिणाम नहीं मिला। कृपया अन्य खोज शब्द का प्रयास करें।', 'error');
+        showAlert('कोई रिकॉर्ड नहीं मिला। कृपया अन्य खाता संख्या या वॉल्यूम डालकर खोजें।', 'error');
     }
 }
 
-// Clear search highlights
+// Clear search highlights and badges
 function clearSearchHighlights() {
     document.querySelectorAll('.modern-table tr').forEach(row => {
         row.style.background = '';
         row.style.border = '';
     });
+
+    updateTabBadge('jamabandi-badge', 0);
+    updateTabBadge('revisional-badge', 0);
+    updateTabBadge('cadastral-badge', 0);
 }
 
 // Highlight search results with modern styling
 function highlightSearchResults(tabType, results) {
     const tbody = document.getElementById(tabType + '-tbody');
+    if (!tbody) return;
     const rows = tbody.getElementsByTagName('tr');
-
-    // Reset all row highlights
-    Array.from(rows).forEach(row => {
-        row.style.background = '';
-        row.style.border = '';
-    });
 
     // Highlight matching rows with modern style
     results.forEach(result => {
         const targetRow = Array.from(rows).find(row =>
-            row.cells[0].textContent.trim() == result.sr_no.toString()
+            row.cells[0] && row.cells[0].textContent.trim() == result.sr_no.toString()
         );
         if (targetRow) {
-            targetRow.style.background = 'linear-gradient(135deg, rgba(30, 64, 175, 0.1), rgba(5, 150, 105, 0.1))';
-            targetRow.style.border = '2px solid rgba(30, 64, 175, 0.3)';
+            targetRow.style.background = 'linear-gradient(135deg, rgba(30, 64, 175, 0.12), rgba(5, 150, 105, 0.12))';
+            targetRow.style.border = '2px solid rgba(30, 64, 175, 0.4)';
             targetRow.style.borderRadius = '8px';
             targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
@@ -932,3 +1193,243 @@ function loadMoreRows(button) {
 
 // Make loadMoreRows globally available
 window.loadMoreRows = loadMoreRows;
+
+// ==========================================================================
+// PROFESSIONAL UI/UX & ACCESSIBILITY ENHANCEMENTS
+// ==========================================================================
+
+// 1. Accessibility & Theme Initialization
+function initAccessibilityAndTheme() {
+    // Restore Saved Theme
+    const savedTheme = localStorage.getItem('sarthua_theme') || 'light';
+    applyTheme(savedTheme);
+
+    // Restore Saved Font Size
+    const savedFontSize = localStorage.getItem('sarthua_font_size') || 'md';
+    applyFontSize(savedFontSize);
+
+    // Display Hindi Date
+    updateLiveDateDisplay();
+
+    // Global Escape Key Handler for Modals
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeRequestModal();
+            closeGlossaryModal();
+        }
+    });
+}
+
+function updateLiveDateDisplay() {
+    const liveDateEl = document.getElementById('liveDateText');
+    if (!liveDateEl) return;
+    try {
+        const now = new Date();
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        const hindiDate = now.toLocaleDateString('hi-IN', options);
+        liveDateEl.innerHTML = `<i class="far fa-calendar-alt"></i> ${hindiDate} | मौजा: सरथुआ (थाना 218)`;
+    } catch (e) {
+        // Fallback
+    }
+}
+
+// 2. Font Size Scaling
+function adjustFontSize(delta) {
+    let newSize = 'md';
+    if (delta === -1) newSize = 'sm';
+    else if (delta === 1) newSize = 'lg';
+    applyFontSize(newSize);
+    localStorage.setItem('sarthua_font_size', newSize);
+}
+
+function applyFontSize(size) {
+    if (size === 'sm') {
+        document.documentElement.setAttribute('data-font-size', 'sm');
+    } else if (size === 'lg') {
+        document.documentElement.setAttribute('data-font-size', 'lg');
+    } else {
+        document.documentElement.removeAttribute('data-font-size');
+    }
+
+    // Update active button indicator
+    const fontBtns = document.querySelectorAll('.font-zoom-ctrl .font-btn');
+    fontBtns.forEach(btn => btn.classList.remove('active'));
+    if (size === 'sm' && fontBtns[0]) fontBtns[0].classList.add('active');
+    else if (size === 'md' && fontBtns[1]) fontBtns[1].classList.add('active');
+    else if (size === 'lg' && fontBtns[2]) fontBtns[2].classList.add('active');
+}
+
+// 3. Theme Toggle (Dark / Light)
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(newTheme);
+    localStorage.setItem('sarthua_theme', newTheme);
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const themeIcon = document.getElementById('themeIcon');
+    if (themeIcon) {
+        if (theme === 'dark') {
+            themeIcon.className = 'fas fa-sun';
+            themeIcon.style.color = '#f59e0b';
+        } else {
+            themeIcon.className = 'fas fa-moon';
+            themeIcon.style.color = '';
+        }
+    }
+}
+
+// 4. Voice Search (Web Speech API)
+let speechRecognition = null;
+function startVoiceSearch() {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) {
+        alert('आपके ब्राउज़र में वॉइस सर्च समर्थित नहीं है। कृपया गूगल क्रोम (Google Chrome) या माइक्रोसॉफ्ट एज (Edge) का उपयोग करें।');
+        return;
+    }
+
+    const micBtn = document.getElementById('voiceSearchBtn');
+    const searchInput = document.getElementById('searchInput');
+
+    if (speechRecognition) {
+        try { speechRecognition.stop(); } catch (e) {}
+        speechRecognition = null;
+        if (micBtn) micBtn.classList.remove('listening');
+        return;
+    }
+
+    speechRecognition = new SpeechRec();
+    speechRecognition.lang = 'hi-IN';
+    speechRecognition.continuous = false;
+    speechRecognition.interimResults = false;
+
+    if (micBtn) micBtn.classList.add('listening');
+
+    speechRecognition.onstart = function () {
+        if (searchInput) searchInput.placeholder = '🎙️ बोलिए... (उदा. खाता 50 या VOL-02)';
+    };
+
+    speechRecognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        if (searchInput) {
+            searchInput.value = transcript.trim();
+            handleSearchInputChange(searchInput);
+            searchRecords();
+        }
+    };
+
+    speechRecognition.onerror = function (event) {
+        console.warn('Voice search error:', event.error);
+        if (micBtn) micBtn.classList.remove('listening');
+        if (searchInput) searchInput.placeholder = 'खाता संख्या (उदा. 50), वॉल्यूम (VOL-01), या बुक खोजें...';
+        speechRecognition = null;
+    };
+
+    speechRecognition.onend = function () {
+        if (micBtn) micBtn.classList.remove('listening');
+        if (searchInput) searchInput.placeholder = 'खाता संख्या (उदा. 50), वॉल्यूम (VOL-01), या बुक खोजें...';
+        speechRecognition = null;
+    };
+
+    try {
+        speechRecognition.start();
+    } catch (err) {
+        console.error('Speech recognition start failed:', err);
+        if (micBtn) micBtn.classList.remove('listening');
+    }
+}
+
+// 5. Search Input Helpers & Quick Chips
+function handleSearchInputChange(input) {
+    const clearBtn = document.getElementById('clearSearchBtn');
+    if (clearBtn) {
+        clearBtn.style.display = input.value.trim() ? 'block' : 'none';
+    }
+}
+
+function clearSearchInput() {
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    if (searchInput) {
+        searchInput.value = '';
+        searchInput.focus();
+    }
+    if (clearBtn) clearBtn.style.display = 'none';
+    searchRecords();
+}
+
+function applyQuickSearch(term) {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = term;
+        handleSearchInputChange(searchInput);
+        searchRecords();
+        // Smooth scroll down to records table
+        const nav = document.querySelector('.modern-tab-nav');
+        if (nav) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// 6. Interactive WhatsApp Request Modal
+function openRequestModal(serviceName) {
+    const modal = document.getElementById('requestModal');
+    const serviceInput = document.getElementById('reqServiceType');
+    if (serviceInput) serviceInput.value = serviceName || 'भू-अभिलेख दस्तावेज़ अनुरोध';
+    if (modal) modal.classList.remove('hidden');
+}
+
+function closeRequestModal() {
+    const modal = document.getElementById('requestModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function handleRequestSubmit(event) {
+    event.preventDefault();
+    const service = document.getElementById('reqServiceType')?.value || '';
+    const name = document.getElementById('reqFullName')?.value.trim() || '';
+    const phone = document.getElementById('reqPhone')?.value.trim() || '';
+    const khata = document.getElementById('reqKhata')?.value.trim() || 'उल्लेखित नहीं';
+    const volume = document.getElementById('reqVolume')?.value.trim() || 'उल्लेखित नहीं';
+    const remarks = document.getElementById('reqRemarks')?.value.trim() || 'कोई नहीं';
+
+    const message = `*सरथुआ भू-अभिलेख पोर्टल - सेवा अनुरोध*\n` +
+                    `--------------------------------\n` +
+                    `📌 *सेवा:* ${service}\n` +
+                    `👤 *आवेदक का नाम:* ${name}\n` +
+                    `📞 *मोबाइल नंबर:* ${phone}\n` +
+                    `📜 *खाता/खेसरा:* ${khata}\n` +
+                    `📚 *वॉल्यूम/रजिस्टर:* ${volume}\n` +
+                    `💬 *विशेष विवरण:* ${remarks}\n` +
+                    `--------------------------------\n` +
+                    `_मौजा: सरथुआ, थाना: 218, भोजपुर_`;
+
+    const waUrl = `https://wa.me/919006035986?text=${encodeURIComponent(message)}`;
+    window.open(waUrl, '_blank');
+    closeRequestModal();
+}
+
+// 7. Revenue Glossary Modal
+function openGlossaryModal() {
+    const modal = document.getElementById('glossaryModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function closeGlossaryModal() {
+    const modal = document.getElementById('glossaryModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+// Expose globally for inline event handlers
+window.adjustFontSize = adjustFontSize;
+window.toggleTheme = toggleTheme;
+window.startVoiceSearch = startVoiceSearch;
+window.handleSearchInputChange = handleSearchInputChange;
+window.clearSearchInput = clearSearchInput;
+window.applyQuickSearch = applyQuickSearch;
+window.openRequestModal = openRequestModal;
+window.closeRequestModal = closeRequestModal;
+window.handleRequestSubmit = handleRequestSubmit;
+window.openGlossaryModal = openGlossaryModal;
+window.closeGlossaryModal = closeGlossaryModal;

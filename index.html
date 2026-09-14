@@ -1,113 +1,86 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="hi" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>सरथुआ भू-अभिलेख पोर्टल - आधुनिक डिजिटल पोर्टल</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>सरथुआ भू-अभिलेख पोर्टल | मौजा: सरथुआ, थाना: 218 (भोजपुर, बिहार)</title>
+    <link rel="stylesheet" href="style.css?v=3.7">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Header Section -->
-    <header class="modern-header">
+    <!-- Top Indian Tricolor Ribbon -->
+    <div class="gov-tricolor-ribbon"></div>
+
+    <!-- Unified Modern Navbar -->
+    <header class="portal-navbar">
         <div class="container">
-            <div class="header-content">
-                <div class="header-icon">
-                    <i class="fas fa-landmark"></i>
-                </div>
-                <h1 class="village-title">सरथुआ भू-अभिलेख पोर्टल</h1>
-                <p class="header-subtitle">आधुनिक डिजिटल भूमि अभिलेख प्रणाली</p>
-                <div class="village-details">
-                    <div class="village-info">
-                        <span class="info-item"><i class="fas fa-map-marker-alt"></i> <strong>जिला:</strong> भोजपुर</span>
-                        <span class="info-item"><i class="fas fa-building"></i> <strong>प्रखंड:</strong> उदवंतनगर</span>
-                        <span class="info-item"><i class="fas fa-flag"></i> <strong>राज्य:</strong> बिहार</span>
-                        <span class="info-item"><i class="fas fa-hashtag"></i> <strong>थाना:</strong> 218</span>
+            <div class="navbar-inner">
+                <!-- Brand / Crest -->
+                <div class="navbar-brand">
+                    <div class="brand-crest">
+                        <i class="fas fa-landmark"></i>
                     </div>
+                    <div class="brand-info">
+                        <div class="brand-title">सरथुआ भू-अभिलेख पोर्टल</div>
+                        <div class="brand-meta">
+                            <span>मौजा: सरथुआ</span> <span class="meta-sep">•</span>
+                            <span>थाना नं: 218</span> <span class="meta-sep">•</span>
+                            <span>उदवंतनगर (भोजपुर)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Utility & Navigation Actions -->
+                <div class="navbar-actions">
+                    <!-- Kaithi Guide Button -->
+                    <a href="https://1drv.ms/b/c/98cca50e3110828e/EWrev9st8N1Mqz73a9DVcJcBRYd3vZh5yQvYXwG3tenBZw" 
+                       target="_blank" class="nav-btn nav-btn--accent" title="कैथी से देवनागरी रूपांतरण गाइड">
+                        <i class="fas fa-book-open"></i> <span>कैथी गाइड</span>
+                    </a>
+
+                    <!-- Revenue Glossary Modal Trigger -->
+                    <button class="nav-btn nav-btn--outline" onclick="openGlossaryModal()" title="भू-राजस्व शब्दावली">
+                        <i class="fas fa-info-circle"></i> <span>राजस्व शब्दावली</span>
+                    </button>
+
+                    <!-- Accessibility Font Zoom -->
+                    <div class="nav-font-ctrl" title="फॉन्ट आकार">
+                        <button class="font-btn" onclick="adjustFontSize(-1)">A-</button>
+                        <button class="font-btn active" id="fontResetBtn" onclick="adjustFontSize(0)">A</button>
+                        <button class="font-btn" onclick="adjustFontSize(1)">A+</button>
+                    </div>
+
+                    <!-- Dark Mode Toggle -->
+                    <button class="nav-btn nav-btn--icon" id="themeToggleBtn" onclick="toggleTheme()" title="थीम बदलें">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Support E-Book Section -->
-    <section class="support-ebook">
+    <!-- Streamlined Modern Search Bar -->
+    <section class="portal-search-hub">
         <div class="container">
-            <div class="ebook-card">
-                <div class="ebook-icon">
-                    <i class="fas fa-book-open"></i>
-                </div>
-                <div class="ebook-content">
-                    <h3>कैथी से देवनागरी रूपांतरण गाइड</h3>
-                    <p>पुराने कैथी लिपि दस्तावेज़ों को समझने के लिए विशेष सहायता पुस्तिका</p>
-                    <a href="https://1drv.ms/b/c/98cca50e3110828e/EWrev9st8N1Mqz73a9DVcJcBRYd3vZh5yQvYXwG3tenBZw" 
-                       target="_blank" class="btn btn--ebook">
-                        <i class="fas fa-external-link-alt"></i>
-                        सहायता पुस्तिका देखें
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Dashboard Section -->
-    <section class="modern-dashboard">
-        <div class="container">
-            <h2 class="section-title">
-                <i class="fas fa-chart-bar"></i>
-                डैशबोर्ड अवलोकन
-            </h2>
-            <div class="stats-grid">
-                <div class="stat-card stat-card--primary">
-                    <div class="stat-icon">
-                        <i class="fas fa-folder"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number" id="totalVolumes">33</div>
-                        <div class="stat-label">कुल दस्तावेज़</div>
-                    </div>
-                </div>
-                <div class="stat-card stat-card--success">
-                    <div class="stat-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number" id="totalPages">5,956</div>
-                        <div class="stat-label">कुल पेज</div>
-                    </div>
-                </div>
-                <div class="stat-card stat-card--info">
-                    <div class="stat-icon">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number" id="totalSize">1.8 GB</div>
-                        <div class="stat-label">कुल डेटा</div>
-                    </div>
-                </div>
-                <div class="stat-card stat-card--warning">
-                    <div class="stat-icon">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number">24/7</div>
-                        <div class="stat-label">सहायता सेवा</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Search Section -->
-            <div class="modern-search">
-                <div class="search-container">
-                    <div class="search-input-wrapper">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="searchInput" placeholder="वॉल्यूम नंबर या खाता संख्या खोजें..." class="modern-search-input">
-                    </div>
-                    <button onclick="searchRecords()" class="btn btn--search">
-                        <i class="fas fa-search"></i>
-                        खोजें
-                    </button>
-                </div>
+            <!-- Sleek Search Input Bar -->
+            <div class="search-bar-unified">
+                <i class="fas fa-search search-input-icon"></i>
+                <input type="text" id="searchInput" 
+                       placeholder="खाता संख्या (उदा. 50), खेसरा, या वॉल्यूम (VOL-01) खोजें..." 
+                       class="search-input-field" 
+                       oninput="handleSearchInputChange(this)"
+                       autocomplete="off">
+                <button id="clearSearchBtn" class="search-clear-btn" onclick="clearSearchInput()" title="साफ़ करें" style="display: none;">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+                <button id="voiceSearchBtn" class="search-mic-btn" onclick="startVoiceSearch()" title="बोलकर खोजें (Voice Search)">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button onclick="searchRecords()" class="btn btn--search-primary">
+                    <i class="fas fa-search"></i>
+                    <span>खोजें</span>
+                </button>
             </div>
         </div>
     </section>
@@ -120,37 +93,49 @@
                 <button class="modern-tab-btn active" onclick="showTab('jamabandi')">
                     <i class="fas fa-book"></i>
                     <span>जमाबंदी पंजी (1970)</span>
+                    <span class="tab-badge" id="jamabandi-badge" style="display: none;">0</span>
                 </button>
                 <button class="modern-tab-btn" onclick="showTab('revisional')">
                     <i class="fas fa-history"></i>
                     <span>Revisional Survey (1970)</span>
+                    <span class="tab-badge" id="revisional-badge" style="display: none;">0</span>
                 </button>
                 <button class="modern-tab-btn" onclick="showTab('cadastral')">
                     <i class="fas fa-map"></i>
                     <span>Cadastral Survey (1911)</span>
+                    <span class="tab-badge" id="cadastral-badge" style="display: none;">0</span>
                 </button>
                 <button class="modern-tab-btn" onclick="showTab('services')">
-                    <i class="fas fa-phone"></i>
-                    <span>संपर्क सेवाएं</span>
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>ई-सेवाएं व सहायता</span>
                 </button>
             </nav>
 
             <!-- Jamabandi Panji Section -->
             <div id="jamabandi" class="tab-content active">
                 <div class="modern-section-header">
-                    <h3><i class="fas fa-book"></i> जमाबंदी पंजी (रजिस्टर 2) - 1970 से वर्तमान तक</h3>
-                    <p>कुल वॉल्यूम: 22 | सभी दस्तावेज़ केवल देखने के लिए उपलब्ध हैं</p>
+                    <div class="msh-left">
+                        <div class="msh-icon"><i class="fas fa-book"></i></div>
+                        <div class="msh-info">
+                            <h3>जमाबंदी पंजी (रजिस्टर 2)</h3>
+                            <span class="msh-period">1970 से वर्तमान तक • मौजा: सरथुआ, थाना: 218</span>
+                        </div>
+                    </div>
+                    <div class="msh-badges">
+                        <span class="msh-pill"><i class="fas fa-layer-group"></i> कुल वॉल्यूम: <strong>22</strong></span>
+                        <span class="msh-pill msh-pill--status"><i class="fas fa-shield-alt"></i> डिजिटल प्रतिलिपि</span>
+                    </div>
                 </div>
                 <div class="modern-table-container">
                     <div class="table-responsive">
                         <table class="modern-table">
                             <thead>
                                 <tr>
-                                    <th><i class="fas fa-hashtag"></i> क्र. सं.</th>
+                                    <th class="col-sr"># क्र. सं.</th>
                                     <th><i class="fas fa-folder-open"></i> वॉल्यूम</th>
                                     <th><i class="fas fa-file-alt"></i> कुल पेज</th>
-                                    <th><i class="fas fa-weight"></i> फाइल साइज़</th>
-                                    <th><i class="fas fa-cogs"></i> कार्य</th>
+                                    <th><i class="fas fa-weight-hanging"></i> फाइल साइज़</th>
+                                    <th class="col-action text-right"><i class="fas fa-cogs"></i> कार्य</th>
                                 </tr>
                             </thead>
                             <tbody id="jamabandi-tbody">
@@ -164,20 +149,29 @@
             <!-- Revisional Survey Section -->
             <div id="revisional" class="tab-content">
                 <div class="modern-section-header">
-                    <h3><i class="fas fa-history"></i> Revisional Survey Khatiyan (1970)</h3>
-                    <p>कुल पुस्तकें: 9 | संशोधित सर्वेक्षण अभिलेख</p>
+                    <div class="msh-left">
+                        <div class="msh-icon msh-icon--revisional"><i class="fas fa-history"></i></div>
+                        <div class="msh-info">
+                            <h3>Revisional Survey Khatiyan (1970)</h3>
+                            <span class="msh-period">संशोधित सर्वेक्षण अभिलेख • उदवंतनगर (भोजपुर)</span>
+                        </div>
+                    </div>
+                    <div class="msh-badges">
+                        <span class="msh-pill"><i class="fas fa-book"></i> कुल पुस्तकें: <strong>9</strong></span>
+                        <span class="msh-pill msh-pill--status"><i class="fas fa-check-circle"></i> सत्यापित खतियान</span>
+                    </div>
                 </div>
                 <div class="modern-table-container">
                     <div class="table-responsive">
                         <table class="modern-table">
                             <thead>
                                 <tr>
-                                    <th><i class="fas fa-hashtag"></i> क्र. सं.</th>
+                                    <th class="col-sr"># क्र. सं.</th>
                                     <th><i class="fas fa-book"></i> रजिस्टर नं.</th>
                                     <th><i class="fas fa-list-ol"></i> खाता संख्या</th>
                                     <th><i class="fas fa-file-alt"></i> कुल पेज</th>
-                                    <th><i class="fas fa-weight"></i> फाइल साइज़</th>
-                                    <th><i class="fas fa-cogs"></i> कार्य</th>
+                                    <th><i class="fas fa-weight-hanging"></i> फाइल साइज़</th>
+                                    <th class="col-action text-right"><i class="fas fa-cogs"></i> कार्य</th>
                                 </tr>
                             </thead>
                             <tbody id="revisional-tbody">
@@ -191,20 +185,29 @@
             <!-- Cadastral Survey Section -->
             <div id="cadastral" class="tab-content">
                 <div class="modern-section-header">
-                    <h3><i class="fas fa-map"></i> Cadastral Survey Khatiyan (1911)</h3>
-                    <p>कुल पुस्तकें: 2 | मूल भूकर सर्वेक्षण अभिलेख</p>
+                    <div class="msh-left">
+                        <div class="msh-icon msh-icon--cadastral"><i class="fas fa-map"></i></div>
+                        <div class="msh-info">
+                            <h3>Cadastral Survey Khatiyan (1911)</h3>
+                            <span class="msh-period">मूल कैडस्ट्रल सर्वेक्षण • ब्रिटिश कालीन ऐतिहासिक अभिलेख</span>
+                        </div>
+                    </div>
+                    <div class="msh-badges">
+                        <span class="msh-pill"><i class="fas fa-book"></i> कुल पुस्तकें: <strong>2</strong></span>
+                        <span class="msh-pill msh-pill--status"><i class="fas fa-landmark"></i> मूल खतियान</span>
+                    </div>
                 </div>
                 <div class="modern-table-container">
                     <div class="table-responsive">
                         <table class="modern-table">
                             <thead>
                                 <tr>
-                                    <th><i class="fas fa-hashtag"></i> क्र. सं.</th>
+                                    <th class="col-sr"># क्र. सं.</th>
                                     <th><i class="fas fa-book"></i> रजिस्टर नं.</th>
                                     <th><i class="fas fa-list-ol"></i> खाता संख्या</th>
                                     <th><i class="fas fa-file-alt"></i> कुल पेज</th>
-                                    <th><i class="fas fa-weight"></i> फाइल साइज़</th>
-                                    <th><i class="fas fa-cogs"></i> कार्य</th>
+                                    <th><i class="fas fa-weight-hanging"></i> फाइल साइज़</th>
+                                    <th class="col-action text-right"><i class="fas fa-cogs"></i> कार्य</th>
                                 </tr>
                             </thead>
                             <tbody id="cadastral-tbody">
@@ -215,12 +218,22 @@
                 </div>
             </div>
 
-            <!-- Contact Services Section -->
+            <!-- Consolidated Services Tab (Both WhatsApp Support & Bihar Govt Portals) -->
             <div id="services" class="tab-content">
                 <div class="modern-section-header">
-                    <h3><i class="fas fa-phone"></i> संपर्क सेवाएं</h3>
-                    <p>त्वरित सहायता और WhatsApp सपोर्ट</p>
+                    <div class="msh-left">
+                        <div class="msh-icon msh-icon--services"><i class="fas fa-hands-helping"></i></div>
+                        <div class="msh-info">
+                            <h3>सहायता एवं आधिकारिक सरकारी ई-सेवाएं</h3>
+                            <span class="msh-period">दस्तावेज़ सहायता एवं बिहार सरकार के राजस्व व भूमि सुधार पोर्टल लिंक</span>
+                        </div>
+                    </div>
+                    <div class="msh-badges">
+                        <span class="msh-pill msh-pill--status"><i class="fas fa-bolt"></i> त्वरित ई-सेवाएं</span>
+                    </div>
                 </div>
+
+                <!-- 1. Village Support Cards -->
                 <div class="modern-services-grid">
                     <div class="modern-service-card">
                         <div class="service-icon service-icon--primary">
@@ -230,26 +243,21 @@
                             <h4>मूल प्रति का अनुरोध</h4>
                             <span class="service-code">SRV001</span>
                         </div>
-                        <p class="service-description">गांव के भू-अभिलेख की मूल प्रति प्राप्त करने के लिए त्वरित सेवा</p>
+                        <p class="service-description">सरथुआ ग्राम के भू-अभिलेख की मूल प्रति प्राप्त करने हेतु त्वरित सहायता</p>
                         <div class="service-details">
-                            <div class="service-detail">
-                                <i class="fas fa-clock"></i>
-                                <span><strong>समय सीमा:</strong> तत्काल</span>
-                            </div>
-                            <div class="service-detail">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <span><strong>शुल्क:</strong> निःशुल्क</span>
-                            </div>
-                            <div class="service-detail">
-                                <i class="fas fa-calendar-check"></i>
-                                <span><strong>उपलब्धता:</strong> 24/7</span>
-                            </div>
+                            <div class="service-detail"><i class="fas fa-clock"></i> <span><strong>समय:</strong> तत्काल</span></div>
+                            <div class="service-detail"><i class="fas fa-money-bill-wave"></i> <span><strong>शुल्क:</strong> निःशुल्क</span></div>
+                            <div class="service-detail"><i class="fas fa-calendar-check"></i> <span><strong>उपलब्धता:</strong> 24/7</span></div>
                         </div>
-                        <a href="https://wa.me/919006035986?text=नमस्कार! मैं सरथुआ गांव के भू-अभिलेख की मूल प्रति चाहता हूं।" 
-                           target="_blank" class="btn btn--whatsapp">
-                            <i class="fab fa-whatsapp"></i>
-                            WhatsApp पर संपर्क करें
-                        </a>
+                        <div class="service-actions-group">
+                            <button onclick="openRequestModal('मूल प्रति का अनुरोध')" class="btn btn--primary btn--full">
+                                <i class="fas fa-edit"></i> अनुरोध फॉर्म भरें
+                            </button>
+                            <a href="https://wa.me/919006035986?text=नमस्कार! मैं सरथुआ गांव के भू-अभिलेख की मूल प्रति चाहता हूं।" 
+                               target="_blank" class="btn btn--whatsapp btn--outline">
+                                <i class="fab fa-whatsapp"></i> सीधा WhatsApp
+                            </a>
+                        </div>
                     </div>
 
                     <div class="modern-service-card">
@@ -260,26 +268,21 @@
                             <h4>खतियान की प्रतिलिपि</h4>
                             <span class="service-code">SRV002</span>
                         </div>
-                        <p class="service-description">विशिष्ट खाता संख्या की खतियान की डिजिटल प्रतिलिपि</p>
+                        <p class="service-description">विशिष्ट खाता संख्या की खतियान की डिजिटल प्रतिलिपि प्राप्त करें</p>
                         <div class="service-details">
-                            <div class="service-detail">
-                                <i class="fas fa-clock"></i>
-                                <span><strong>समय सीमा:</strong> 1 दिन</span>
-                            </div>
-                            <div class="service-detail">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <span><strong>शुल्क:</strong> निःशुल्क</span>
-                            </div>
-                            <div class="service-detail">
-                                <i class="fas fa-calendar-check"></i>
-                                <span><strong>उपलब्धता:</strong> 24/7</span>
-                            </div>
+                            <div class="service-detail"><i class="fas fa-clock"></i> <span><strong>समय:</strong> 1 दिन</span></div>
+                            <div class="service-detail"><i class="fas fa-money-bill-wave"></i> <span><strong>शुल्क:</strong> निःशुल्क</span></div>
+                            <div class="service-detail"><i class="fas fa-calendar-check"></i> <span><strong>उपलब्धता:</strong> 24/7</span></div>
                         </div>
-                        <a href="https://wa.me/919006035986?text=नमस्कार! मुझे खतियान की प्रतिलिपि चाहिए।" 
-                           target="_blank" class="btn btn--whatsapp">
-                            <i class="fab fa-whatsapp"></i>
-                            WhatsApp पर संपर्क करें
-                        </a>
+                        <div class="service-actions-group">
+                            <button onclick="openRequestModal('खतियान की प्रतिलिपि')" class="btn btn--primary btn--full">
+                                <i class="fas fa-edit"></i> अनुरोध फॉर्म भरें
+                            </button>
+                            <a href="https://wa.me/919006035986?text=नमस्कार! मुझे खतियान की प्रतिलिपि चाहिए।" 
+                               target="_blank" class="btn btn--whatsapp btn--outline">
+                                <i class="fab fa-whatsapp"></i> सीधा WhatsApp
+                            </a>
+                        </div>
                     </div>
 
                     <div class="modern-service-card">
@@ -290,25 +293,70 @@
                             <h4>तकनीकी सहायता</h4>
                             <span class="service-code">SRV003</span>
                         </div>
-                        <p class="service-description">डिजिटल फाइल एक्सेस और तकनीकी समस्याओं का समाधान</p>
+                        <p class="service-description">पोर्टल एक्सेस, फाइल डाउनलोड अथवा त्रुटि समाधान हेतु सहायता</p>
                         <div class="service-details">
-                            <div class="service-detail">
-                                <i class="fas fa-clock"></i>
-                                <span><strong>समय सीमा:</strong> तत्काल</span>
-                            </div>
-                            <div class="service-detail">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <span><strong>शुल्क:</strong> निःशुल्क</span>
-                            </div>
-                            <div class="service-detail">
-                                <i class="fas fa-calendar-check"></i>
-                                <span><strong>उपलब्धता:</strong> 24/7</span>
-                            </div>
+                            <div class="service-detail"><i class="fas fa-clock"></i> <span><strong>समय:</strong> तत्काल</span></div>
+                            <div class="service-detail"><i class="fas fa-money-bill-wave"></i> <span><strong>शुल्क:</strong> निःशुल्क</span></div>
+                            <div class="service-detail"><i class="fas fa-calendar-check"></i> <span><strong>उपलब्धता:</strong> 24/7</span></div>
                         </div>
-                        <a href="https://wa.me/919006035986?text=नमस्कार! मुझे तकनीकी सहायता चाहिए।" 
-                           target="_blank" class="btn btn--whatsapp">
-                            <i class="fab fa-whatsapp"></i>
-                            WhatsApp पर संपर्क करें
+                        <div class="service-actions-group">
+                            <button onclick="openRequestModal('तकनीकी सहायता')" class="btn btn--primary btn--full">
+                                <i class="fas fa-edit"></i> अनुरोध फॉर्म भरें
+                            </button>
+                            <a href="https://wa.me/919006035986?text=नमस्कार! मुझे तकनीकी सहायता चाहिए।" 
+                               target="_blank" class="btn btn--whatsapp btn--outline">
+                                <i class="fab fa-whatsapp"></i> सीधा WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Official Bihar Government Portal Direct Links Grid -->
+                <div class="govt-portal-services" style="margin-top: 28px; border-top: 1px dashed var(--color-border); padding-top: 20px;">
+                    <div class="modern-section-header" style="margin-bottom: 14px;">
+                        <h3><i class="fas fa-external-link-alt"></i> बिहार सरकार आधिकारिक राजस्व सेवाएं</h3>
+                        <p>दाखिल-खारिज, ऑनलाइन लगान रसीद और भू-नक्शा के लिए आधिकारिक पोर्टल्स</p>
+                    </div>
+                    <div class="govt-services-grid">
+                        <a href="http://biharbhumi.bihar.gov.in/Biharbhumi/" target="_blank" rel="noopener noreferrer" class="govt-card">
+                            <div class="govt-card-icon" style="background: rgba(59, 130, 246, 0.12); color: #2563eb;">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                            <div class="govt-card-content">
+                                <h4>ऑनलाइन दाखिल-खारिज (Mutation)</h4>
+                                <p>नया म्यूटेशन आवेदन करें एवं आवेदन स्थिति देखें</p>
+                            </div>
+                            <i class="fas fa-chevron-right govt-arrow"></i>
+                        </a>
+                        <a href="http://biharbhumi.bihar.gov.in/Biharbhumi/" target="_blank" rel="noopener noreferrer" class="govt-card">
+                            <div class="govt-card-icon" style="background: rgba(16, 185, 129, 0.12); color: #059669;">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+                            <div class="govt-card-content">
+                                <h4>ऑनलाइन भू-लगान (रसीद)</h4>
+                                <p>जमीन का ऑनलाइन लगान भुगतान करें एवं रसीद काटें</p>
+                            </div>
+                            <i class="fas fa-chevron-right govt-arrow"></i>
+                        </a>
+                        <a href="http://biharbhumi.bihar.gov.in/Biharbhumi/" target="_blank" rel="noopener noreferrer" class="govt-card">
+                            <div class="govt-card-icon" style="background: rgba(245, 158, 11, 0.12); color: #d97706;">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <div class="govt-card-content">
+                                <h4>परिमार्जन पोर्टल (Parimarjan)</h4>
+                                <p>डिजिटल जमाबंदी में खाता, खेसरा या नाम सुधार का आवेदन</p>
+                            </div>
+                            <i class="fas fa-chevron-right govt-arrow"></i>
+                        </a>
+                        <a href="https://bhunaksha.bihar.gov.in/" target="_blank" rel="noopener noreferrer" class="govt-card">
+                            <div class="govt-card-icon" style="background: rgba(139, 92, 246, 0.12); color: #7c3aed;">
+                                <i class="fas fa-map-marked-alt"></i>
+                            </div>
+                            <div class="govt-card-content">
+                                <h4>भू-नक्शा बिहार (Bhu-Naksha)</h4>
+                                <p>मौजा सरथुआ का डिजिटल भू-नक्शा और प्लॉट सीमांकन</p>
+                            </div>
+                            <i class="fas fa-chevron-right govt-arrow"></i>
                         </a>
                     </div>
                 </div>
@@ -316,28 +364,31 @@
         </div>
     </main>
 
-    <!-- Admin Footer -->
-    <footer class="admin-footer">
+    <!-- Modern Compact Footer & Legal Disclaimer -->
+    <footer class="portal-footer">
         <div class="container">
-            <div class="admin-info">
-                <div class="admin-card">
-                    <div class="admin-icon">
-                        <i class="fas fa-user-shield"></i>
-                    </div>
-                    <div class="admin-content">
-                        <h4>पोर्टल व्यवस्थापक</h4>
-                        <p class="admin-name">This Website Owned By <strong>Gyanu Kumar</strong></p>
-                        <div class="admin-contact">
-                            <a href="https://wa.me/919006035986" target="_blank" class="admin-whatsapp">
-                                <i class="fab fa-whatsapp"></i>
-                                <span>WhatsApp: +91 9006035986</span>
-                            </a>
-                        </div>
-                    </div>
+            <!-- Inline Legal Disclaimer Strip -->
+            <div class="footer-disclaimer-strip">
+                <i class="fas fa-balance-scale disclaimer-strip-icon"></i>
+                <div class="disclaimer-strip-text">
+                    <strong>विधिक सूचना एवं अस्वीकरण:</strong> यह पोर्टल सरथुआ ग्राम के डिजिटल संरक्षण, जन-जागरूकता एवं ऐतिहासिक अध्ययन हेतु है। विधिक प्रमाणित प्रतिलिपि (Certified Copy) हेतु कृपया अंचल कार्यालय (उदवंतनगर, भोजपुर) से विधिवत नकल प्राप्त करें।
                 </div>
-                <div class="footer-credits">
-                    <p>&copy; 2025 सरथुआ भू-अभिलेख पोर्टल | आधुनिक डिजिटल भारत की पहल</p>
-                    <p class="tech-credits">Powered by Modern Web Technologies</p>
+            </div>
+
+            <!-- Compact Admin & Copyright Bar -->
+            <div class="footer-bottom-bar">
+                <div class="footer-admin-info">
+                    <span class="admin-badge"><i class="fas fa-user-shield"></i> व्यवस्थापक</span>
+                    <span class="admin-owner">This Website Owned By <strong>Gyanu Kumar</strong></span>
+                    <a href="https://wa.me/919006035986" target="_blank" class="footer-wa-pill" title="WhatsApp पर संदेश भेजें">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>+91 9006035986</span>
+                    </a>
+                </div>
+
+                <div class="footer-copyright">
+                    <p>&copy; 2025 सरथुआ भू-अभिलेख पोर्टल • मौजा: सरथुआ, थाना: 218</p>
+                    <span class="footer-sub">उदवंतनगर, भोजपुर (बिहार)</span>
                 </div>
             </div>
         </div>
@@ -386,8 +437,14 @@
                         <button id="pdfZoomInBtn" class="pdf-btn" title="ज़ूम इन (+)">
                             <i class="fas fa-search-plus"></i>
                         </button>
+                        <button id="pdfRotateBtn" class="pdf-btn" title="पेज 90° घुमाएं (Rotate)">
+                            <i class="fas fa-redo"></i>
+                        </button>
                         <button id="pdfFullscreenBtn" class="pdf-btn" title="फुलस्क्रीन (Fullscreen)">
                             <i class="fas fa-expand"></i>
+                        </button>
+                        <button id="pdfPrintBtn" class="pdf-btn" title="प्रिंट करें (Print)">
+                            <i class="fas fa-print"></i>
                         </button>
                     </div>
 
@@ -413,8 +470,125 @@
         </div>
     </div>
 
+    <!-- Request Document Modal -->
+    <div id="requestModal" class="interactive-modal hidden">
+        <div class="interactive-modal-overlay" onclick="closeRequestModal()"></div>
+        <div class="interactive-modal-container">
+            <div class="interactive-modal-header">
+                <div class="modal-title-wrap">
+                    <i class="fas fa-file-signature modal-header-icon"></i>
+                    <div>
+                        <h3 class="modal-title">भू-अभिलेख दस्तावेज़ अनुरोध</h3>
+                        <p class="modal-subtitle">मौजा: सरथुआ (थाना 218) | त्वरित WhatsApp सेवा</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeRequestModal()" title="बंद करें">&times;</button>
+            </div>
+            <form id="requestForm" onsubmit="handleRequestSubmit(event)" class="interactive-modal-body">
+                <div class="form-group">
+                    <label for="reqServiceType"><i class="fas fa-tag"></i> सेवा का प्रकार</label>
+                    <input type="text" id="reqServiceType" readonly class="form-control-static">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="reqFullName"><i class="fas fa-user"></i> आपका पूरा नाम <span class="required">*</span></label>
+                        <input type="text" id="reqFullName" required placeholder="उदा. रामेश्वर सिंह" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="reqPhone"><i class="fas fa-phone-alt"></i> मोबाइल नंबर <span class="required">*</span></label>
+                        <input type="tel" id="reqPhone" required pattern="[0-9]{10}" placeholder="10 अंकों का नंबर" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="reqKhata"><i class="fas fa-list-ol"></i> खाता संख्या / खेसरा संख्या</label>
+                        <input type="text" id="reqKhata" placeholder="उदा. खाता 45, खेसरा 120" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="reqVolume"><i class="fas fa-book"></i> वॉल्यूम या बुक (यदि ज्ञात हो)</label>
+                        <input type="text" id="reqVolume" placeholder="उदा. VOL-02 या BOOK-1" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="reqRemarks"><i class="fas fa-comment-dots"></i> अतिरिक्त जानकारी / विशेष नोट</label>
+                    <textarea id="reqRemarks" rows="2" placeholder="कोई अतिरिक्त विवरण जो आप देना चाहें..." class="form-control"></textarea>
+                </div>
+                <div class="modal-info-banner">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>फॉर्म सबमिट करने पर विवरण WhatsApp पर ऑटो-फॉर्मेट होकर व्यवस्थापक को भेजा जाएगा।</span>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" onclick="closeRequestModal()" class="btn btn--secondary">रद्द करें</button>
+                    <button type="submit" class="btn btn--whatsapp">
+                        <i class="fab fa-whatsapp"></i> WhatsApp पर भेजें
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Revenue Glossary Modal -->
+    <div id="glossaryModal" class="interactive-modal hidden">
+        <div class="interactive-modal-overlay" onclick="closeGlossaryModal()"></div>
+        <div class="interactive-modal-container glossary-container">
+            <div class="interactive-modal-header">
+                <div class="modal-title-wrap">
+                    <i class="fas fa-book-reader modal-header-icon"></i>
+                    <div>
+                        <h3 class="modal-title">भू-राजस्व शब्दावली एवं मार्गदर्शिका</h3>
+                        <p class="modal-subtitle">बिहार भूमि अभिलेख में प्रयुक्त महत्वपूर्ण शब्दों का सरल अर्थ</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeGlossaryModal()" title="बंद करें">&times;</button>
+            </div>
+            <div class="interactive-modal-body glossary-body">
+                <div class="glossary-grid">
+                    <div class="glossary-card">
+                        <div class="glossary-term"><i class="fas fa-file-contract"></i> खतियान (Khatiyan)</div>
+                        <p class="glossary-desc">भूमि सर्वेक्षण के दौरान तैयार किया गया मूल अधिकार अभिलेख जिसमें रैयत (मालिक) का नाम, पिता का नाम, जाति, निवास, खाता संख्या, खेसरा, रकबा और लगान दर्ज होता है।</p>
+                    </div>
+                    <div class="glossary-card">
+                        <div class="glossary-term"><i class="fas fa-th-large"></i> खेसरा / प्लॉट (Khesra)</div>
+                        <p class="glossary-desc">जमीन के प्रत्येक अलग टुकड़े या भूखंड को दिया गया एक विशिष्ट पहचान संख्या। नक्शे में हर खेत या जमीन का खेसरा नंबर अंकित रहता है।</p>
+                    </div>
+                    <div class="glossary-card">
+                        <div class="glossary-term"><i class="fas fa-book-open"></i> जमाबंदी पंजी (Register II)</div>
+                        <p class="glossary-desc">अंचल कार्यालय में संधारित मुख्य रजिस्टर जिसमें प्रत्येक रैयत का खाता और उस पर देय सरकारी मालगुजारी (लगान) का हिसाब रखा जाता है।</p>
+                    </div>
+                    <div class="glossary-card">
+                        <div class="glossary-term"><i class="fas fa-ruler-combined"></i> रकबा (Area)</div>
+                        <p class="glossary-desc">जमीन का क्षेत्रफल या नाप। बिहार में यह आमतौर पर एकड़, डिसमिल, बीघा, कट्ठा और धुर में मापा जाता है (1 एकड़ = 100 डिसमिल)।</p>
+                    </div>
+                    <div class="glossary-card">
+                        <div class="glossary-term"><i class="fas fa-compass"></i> चौहद्दी (Chouhaddi)</div>
+                        <p class="glossary-desc">किसी प्लॉट या खेत के चारों दिशाओं (उत्तर, दक्षिण, पूर्व, पश्चिम) में स्थित पड़ोसियों के नाम, सड़क या नदी-नाले का विवरण।</p>
+                    </div>
+                    <div class="glossary-card">
+                        <div class="glossary-term"><i class="fas fa-pen-fancy"></i> कैथी लिपि (Kaithi Script)</div>
+                        <p class="glossary-desc">उत्तर भारत एवं बिहार के पुराने राजस्व और न्यायिक अभिलेखों में प्रयुक्त होने वाली ऐतिहासिक हस्तलिखित लिपि। 1911 कैडस्ट्रल खतियान अधिकांशतः कैथी में लिखे गए हैं।</p>
+                    </div>
+                    <div class="glossary-card">
+                        <div class="glossary-term"><i class="fas fa-history"></i> कैडस्ट्रल सर्वे (1911)</div>
+                        <p class="glossary-desc">ब्रिटिश काल में वर्ष 1905-1915 के दौरान बिहार में किया गया पहला वैज्ञानिक भूमि सर्वेक्षण। इसे CS (Cadastral Survey) या 'बाप-दादा' का खतियान भी कहा जाता है।</p>
+                    </div>
+                    <div class="glossary-card">
+                        <div class="glossary-term"><i class="fas fa-sync-alt"></i> रिविजनल सर्वे (1970)</div>
+                        <p class="glossary-desc">स्वतंत्रता पश्चात 1965-1975 में पुराने कैडस्ट्रल खतियान को अद्यतन (Update) करने हेतु किया गया संशोधित सर्वेक्षण। इसे RS (Revisional Survey) कहा जाता है।</p>
+                    </div>
+                </div>
+            </div>
+            <div class="interactive-modal-footer">
+                <button type="button" onclick="closeGlossaryModal()" class="btn btn--primary">समझ गया, बंद करें</button>
+            </div>
+        </div>
+    </div>
+
     <!-- PDF.js Library CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="app.js"></script>
+    <!-- MVC Architecture Modules (Model, View, PDF Streaming Engine, Controller) -->
+    <script src="js/model.js?v=3.7"></script>
+    <script src="js/view.js?v=3.7"></script>
+    <script src="js/pdf-viewer.js?v=3.7"></script>
+    <script src="js/controller.js?v=3.7"></script>
 </body>
 </html>
