@@ -308,13 +308,121 @@ const AppController = {
         AppView.showAlert('अनुरोध WhatsApp पर प्रेषित किया जा रहा है।', 'success');
     },
 
-    // Delegate PDF View Action
+    // Delegate PDF View Action (Protected by 1st-Time Cloudflare Turnstile Challenge)
     viewPDF: function (url, filename, size) {
-        PdfViewerEngine.open(url, filename, size);
+        if (TurnstileSecurity.isVerified()) {
+            PdfViewerEngine.open(url, filename, size);
+        } else {
+            TurnstileSecurity.requestVerification(url, filename, size);
+        }
+    }
+};
+
+// ==========================================================================
+// Cloudflare Turnstile 1st-Time Security Challenge Engine
+// ==========================================================================
+const TurnstileSecurity = {
+    // 💡 Cloudflare Turnstile Production Sitekey
+    siteKey: '0x4AAAAAAE1YZgLnOa6zSIiq',
+    widgetId: null,
+    pendingAction: null,
+
+    isVerified: function () {
+        return sessionStorage.getItem('cf_turnstile_verified') === 'true';
+    },
+
+    setVerified: function () {
+        sessionStorage.setItem('cf_turnstile_verified', 'true');
+    },
+
+    requestVerification: function (url, filename, size) {
+        this.pendingAction = { url, filename, size };
+        const modal = document.getElementById('cfTurnstileModal');
+        if (!modal) {
+            PdfViewerEngine.open(url, filename, size);
+            return;
+        }
+
+        const statusEl = document.getElementById('cfTurnstileStatus');
+        if (statusEl) {
+            statusEl.innerHTML = '<i class="fas fa-lock"></i> यह सत्यापन केवल एक बार (Session Check) होता है।';
+        }
+
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        this.renderWidget();
+    },
+
+    renderWidget: function () {
+        const container = document.getElementById('cfTurnstileWidget');
+        if (!container) return;
+
+        // Wait if Turnstile library is not yet loaded
+        if (typeof turnstile === 'undefined') {
+            const statusEl = document.getElementById('cfTurnstileStatus');
+            if (statusEl) statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cloudflare लोड हो रहा है...';
+            setTimeout(() => this.renderWidget(), 300);
+            return;
+        }
+
+        // Reset if already rendered
+        if (this.widgetId !== null) {
+            try {
+                turnstile.reset(this.widgetId);
+            } catch (e) { }
+            return;
+        }
+
+        try {
+            this.widgetId = turnstile.render(container, {
+                sitekey: this.siteKey,
+                theme: 'dark',
+                callback: (token) => {
+                    this.handleSuccess(token);
+                },
+                'error-callback': () => {
+                    const statusEl = document.getElementById('cfTurnstileStatus');
+                    if (statusEl) {
+                        statusEl.innerHTML = '<span style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> सत्यापन में समस्या आई। पुनः प्रयास करें।</span>';
+                    }
+                }
+            });
+        } catch (e) {
+            console.error('Turnstile render error:', e);
+            this.handleSuccess('fallback_bypass');
+        }
+    },
+
+    handleSuccess: function (token) {
+        this.setVerified();
+        const statusEl = document.getElementById('cfTurnstileStatus');
+        if (statusEl) {
+            statusEl.innerHTML = '<span style="color:#22c55e; font-weight:600;"><i class="fas fa-check-circle"></i> सत्यापन सफल! दस्तावेज़ खोला जा रहा है...</span>';
+        }
+
+        setTimeout(() => {
+            const action = this.pendingAction;
+            this.closeModal();
+            if (action) {
+                PdfViewerEngine.open(action.url, action.filename, action.size);
+            }
+        }, 550);
+    },
+
+    closeModal: function () {
+        const modal = document.getElementById('cfTurnstileModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+        this.pendingAction = null;
     }
 };
 
 // Global Exposes for HTML inline onclick and form handlers
+window.TurnstileSecurity = TurnstileSecurity;
+window.closeCfChallengeModal = function () { TurnstileSecurity.closeModal(); };
 window.AppController = AppController;
 window.showTab = function (tabName, evt) { AppController.switchTab(tabName, evt); };
 window.searchRecords = function () {
