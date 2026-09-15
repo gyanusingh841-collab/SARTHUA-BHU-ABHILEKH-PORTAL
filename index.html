@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>सरथुआ भू-अभिलेख पोर्टल | मौजा: सरथुआ, थाना: 218 (भोजपुर, बिहार)</title>
-    <link rel="stylesheet" href="style.css?v=4.4">
+    <link rel="stylesheet" href="style.css?v=4.8">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Cloudflare Turnstile Smart Challenge API -->
@@ -498,24 +498,49 @@
     <!-- Cloudflare Turnstile Security Challenge Modal -->
     <div id="cfTurnstileModal" class="interactive-modal hidden" aria-modal="true" role="dialog">
         <div class="interactive-modal-overlay" onclick="closeCfChallengeModal()"></div>
-        <div class="interactive-modal-container cf-challenge-container">
+        <div class="interactive-modal-container cf-security-modal">
+            <!-- Modern Absolute Top-Right Close Button -->
+            <button class="cf-modal-close-btn" onclick="closeCfChallengeModal()" title="बंद करें" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+
             <div class="cf-challenge-header">
                 <div class="cf-shield-icon">
                     <i class="fas fa-shield-alt"></i>
                 </div>
-                <h3 class="cf-challenge-title">सुरक्षा सत्यापन (Cloudflare Check)</h3>
-                <p class="cf-challenge-subtitle">सरथुआ भू-अभिलेख देखने के लिए कृपया 1-बार सत्यापन पूरा करें।</p>
+                <h3 class="cf-challenge-title">सुरक्षा एवं ब्राउज़र सत्यापन</h3>
+                <p class="cf-challenge-subtitle">
+                    डिजिटल राजस्व अभिलेखों (100MB+ खतियान एवं पंजी) को बॉट हमलों व अनधिकृत डाउनलोड से सुरक्षित रखने हेतु स्वचालित क्लाउडफ्लेयर सुरक्षा जांच।
+                </p>
+            </div>
+
+            <!-- Security Trust Pillars / Specs -->
+            <div class="cf-security-specs">
+                <div class="cf-spec-item">
+                    <i class="fas fa-lock text-cyan"></i>
+                    <span>256-Bit SSL</span>
+                </div>
+                <div class="cf-spec-item">
+                    <i class="fas fa-shield-virus text-cyan"></i>
+                    <span>DDoS Shield</span>
+                </div>
+                <div class="cf-spec-item">
+                    <i class="fas fa-bolt text-warning"></i>
+                    <span>Edge Protected</span>
+                </div>
             </div>
             
             <div class="cf-challenge-body">
-                <div id="cfTurnstileWidget" class="cf-turnstile-box"></div>
+                <div class="cf-turnstile-frame">
+                    <div id="cfTurnstileWidget" class="cf-turnstile-box"></div>
+                </div>
                 <div id="cfTurnstileStatus" class="cf-status-text">
-                    <i class="fas fa-lock"></i> यह सत्यापन केवल एक बार (Session Check) होता है।
+                    <i class="fas fa-shield-alt text-cyan"></i> सुरक्षा सत्यापन एवं बॉट फिल्टर सक्रिय है...
                 </div>
             </div>
 
-            <div class="cf-challenge-footer">
-                <button type="button" class="btn btn--outline" onclick="closeCfChallengeModal()">रद्द करें</button>
+            <div class="cf-security-footer">
+                <i class="fas fa-fingerprint"></i> Cloudflare Smart Challenge & Edge CDN Protection
             </div>
         </div>
     </div>
@@ -636,9 +661,9 @@
     <!-- PDF.js Library CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <!-- MVC Architecture Modules (Model, View, PDF Streaming Engine, Controller) -->
-    <script src="js/model.js?v=4.4"></script>
-    <script src="js/view.js?v=4.4"></script>
-    <script src="js/pdf-viewer.js?v=4.4"></script>
-    <script src="js/controller.js?v=4.4"></script>
+    <script src="js/model.js?v=4.8"></script>
+    <script src="js/view.js?v=4.8"></script>
+    <script src="js/pdf-viewer.js?v=4.8"></script>
+    <script src="js/controller.js?v=4.8"></script>
 </body>
 </html>
