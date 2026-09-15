@@ -379,26 +379,43 @@ const TurnstileSecurity = {
                 sitekey: this.siteKey,
                 theme: 'dark',
                 callback: (token) => {
-                    this.handleSuccess(token);
+                    if (token && typeof token === 'string' && token.length > 5) {
+                        this.handleSuccess(token);
+                    }
                 },
                 'error-callback': () => {
                     const statusEl = document.getElementById('cfTurnstileStatus');
                     if (statusEl) {
-                        statusEl.innerHTML = '<span style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> सुरक्षा सत्यापन में समस्या आई। <button onclick="TurnstileSecurity.retryOrBypass()" class="cf-retry-btn">पुनः प्रयास / बायपास</button></span>';
+                        statusEl.innerHTML = '<span style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> सुरक्षा सत्यापन विफल। <button onclick="TurnstileSecurity.retry()" class="cf-retry-btn"><i class="fas fa-redo"></i> पुनः प्रयास करें</button></span>';
                     }
                 }
             });
         } catch (e) {
             console.error('Turnstile render error:', e);
-            this.handleSuccess('fallback_bypass');
+            const statusEl = document.getElementById('cfTurnstileStatus');
+            if (statusEl) {
+                statusEl.innerHTML = '<span style="color:#ef4444;"><i class="fas fa-shield-alt"></i> सुरक्षा सत्यापन अनिवार्य है। <button onclick="TurnstileSecurity.retry()" class="cf-retry-btn"><i class="fas fa-redo"></i> लोड करें</button></span>';
+            }
         }
     },
 
-    retryOrBypass: function () {
-        this.handleSuccess('manual_verified');
+    retry: function () {
+        const statusEl = document.getElementById('cfTurnstileStatus');
+        if (statusEl) {
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin text-cyan"></i> सुरक्षा सत्यापन पुनः कनेक्ट हो रहा है...';
+        }
+        if (this.widgetId !== null && typeof turnstile !== 'undefined') {
+            try {
+                turnstile.reset(this.widgetId);
+                return;
+            } catch (e) { }
+        }
+        this.widgetId = null;
+        this.renderWidget();
     },
 
     handleSuccess: function (token) {
+        if (!token || typeof token !== 'string') return;
         this.setVerified();
         const statusEl = document.getElementById('cfTurnstileStatus');
         if (statusEl) {
