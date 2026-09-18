@@ -1,7 +1,10 @@
 /**
- * Sarthua Bhu-Abhilekh Portal - Modern Slim PDF Streaming & Reader Engine
- * Range-request streaming via Cloudflare R2 / Worker with offscreen canvas double-buffering.
- * Mobile-first touch gestures (pinch-zoom, double-tap), landscape auto-fit, and strict anti-download protection.
+ * Sarthua Bhu-Abhilekh Portal - Continuous Vertical Scrolling PDF Streaming & Reader Engine
+ * - Continuous infinite/lazy-loading scroll (like Google Chrome / Acrobat) for 200+ page land records
+ * - Virtualized rendering via IntersectionObserver & memory eviction to prevent browser crashes
+ * - Synchronized floating dock page indicators (Page X / Total) and jump-to-page navigation
+ * - Responsive zoom (Fit Width, Fit Page, Zoom In/Out, Pinch-to-zoom) and 90° rotation
+ * - Strict anti-download and single-page official printing
  */
 
 // Configure PDF.js Worker
@@ -17,13 +20,18 @@ const PdfViewerEngine = {
         zoomScale: 1.0,
         zoomMode: 'fit-width', // 'fit-width', 'fit-page', 'manual'
         rotation: 0,
-        preRenderedCanvases: {},
-        isRendering: false,
-        currentRenderTask: null,
-        pageNumPending: null,
+        baseWidth: 0,
+        baseHeight: 0,
+        isLandscape: false,
+        renderedPages: new Set(),
+        renderingPages: new Set(),
+        renderTasks: {},
+        maxActiveCanvases: 14, // Keep memory optimal for 200-page files
         pdfUrl: '',
         filename: '',
-        isLandscape: false,
+        observer: null,
+        scrollRafId: null,
+        isProgrammaticScroll: false,
         touch: {
             initialDist: 0,
             initialScale: 1.0,
@@ -49,9 +57,8 @@ const PdfViewerEngine = {
         const pageInput = document.getElementById('pdfPageNumInput');
         const modal = document.getElementById('pdfViewerModal');
         const viewport = document.getElementById('pdfViewport');
-        const canvas = document.getElementById('pdfRenderCanvas');
 
-        // 🔒 Strict Anti-Download / Anti-Copy / Anti-Save Protections
+        // 🔒 Strict Anti-Download / Anti-Copy Protections
         const preventSave = (e) => {
             e.preventDefault();
             return false;
@@ -64,10 +71,6 @@ const PdfViewerEngine = {
         if (viewport) {
             viewport.addEventListener('contextmenu', preventSave);
             viewport.addEventListener('dragstart', preventSave);
-        }
-        if (canvas) {
-            canvas.addEventListener('contextmenu', preventSave);
-            canvas.addEventListener('dragstart', preventSave);
         }
 
         // Block Ctrl+S, Ctrl+U, etc., and let Ctrl+P trigger single-page official print
@@ -93,40 +96,39 @@ const PdfViewerEngine = {
         document.addEventListener('fullscreenchange', this.handleFullscreenChange.bind(this));
         document.addEventListener('webkitfullscreenchange', this.handleFullscreenChange.bind(this));
 
-        // Window resize debounced re-render for fit modes
+        // Window resize debounced re-calculation for fit modes
         let resizeTimer = null;
         window.addEventListener('resize', () => {
             if (!this.state.pdfDoc || (modal && modal.classList.contains('hidden'))) return;
             if (this.state.zoomMode === 'fit-width' || this.state.zoomMode === 'fit-page') {
                 clearTimeout(resizeTimer);
                 resizeTimer = setTimeout(() => {
-                    this.state.preRenderedCanvases = {};
-                    this.renderPage(this.state.currentPage);
+                    this.recalculateAndApplyZoom();
                 }, 200);
             }
         });
 
-        // Prev Page
+        // Prev Page (Scrolls smoothly to previous page)
         if (prevBtn) {
             prevBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (this.state.currentPage > 1) {
-                    this.renderPage(this.state.currentPage - 1);
+                    this.scrollToPage(this.state.currentPage - 1);
                 }
             });
         }
 
-        // Next Page
+        // Next Page (Scrolls smoothly to next page)
         if (nextBtn) {
             nextBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 if (this.state.currentPage < this.state.totalPages) {
-                    this.renderPage(this.state.currentPage + 1);
+                    this.scrollToPage(this.state.currentPage + 1);
                 }
             });
         }
 
-        // Zoom In (+) with smooth stepping and center preservation
+        // Zoom In (+)
         if (zoomInBtn) {
             zoomInBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -134,7 +136,7 @@ const PdfViewerEngine = {
             });
         }
 
-        // Zoom Out (-) with smooth stepping and center preservation
+        // Zoom Out (-)
         if (zoomOutBtn) {
             zoomOutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -150,8 +152,7 @@ const PdfViewerEngine = {
                     this.setZoom(1.0);
                 } else {
                     this.state.zoomMode = 'fit-width';
-                    this.state.preRenderedCanvases = {};
-                    this.renderPage(this.state.currentPage);
+                    this.recalculateAndApplyZoom();
                 }
             });
         }
@@ -169,8 +170,7 @@ const PdfViewerEngine = {
                     fitModeBtn.innerHTML = '<i class="fas fa-arrows-alt-h"></i><span class="pdf-btn-label">चौड़ाई</span>';
                     fitModeBtn.classList.remove('active');
                 }
-                this.state.preRenderedCanvases = {};
-                this.renderPage(this.state.currentPage);
+                this.recalculateAndApplyZoom();
             });
         }
 
@@ -178,9 +178,7 @@ const PdfViewerEngine = {
         if (rotateBtn) {
             rotateBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                this.state.rotation = (this.state.rotation + 90) % 360;
-                this.state.preRenderedCanvases = {};
-                this.renderPage(this.state.currentPage);
+                this.rotate();
             });
         }
 
@@ -208,53 +206,42 @@ const PdfViewerEngine = {
             });
         }
 
-        // Page Input
+        // Page Input Jump
         if (pageInput) {
             pageInput.addEventListener('change', (e) => {
                 let val = parseInt(e.target.value, 10);
                 if (!isNaN(val) && val >= 1 && val <= this.state.totalPages) {
-                    this.renderPage(val);
+                    this.scrollToPage(val);
                 } else {
                     e.target.value = this.state.currentPage;
                 }
             });
+            pageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    pageInput.blur();
+                }
+            });
+        }
+
+        // Viewport scroll listener for active page tracking
+        if (viewport) {
+            viewport.addEventListener('scroll', () => {
+                if (this.state.isProgrammaticScroll) return;
+                if (this.state.scrollRafId) cancelAnimationFrame(this.state.scrollRafId);
+                this.state.scrollRafId = requestAnimationFrame(() => {
+                    this.handleViewportScroll();
+                });
+            }, { passive: true });
         }
 
         // Setup Touch Gestures (Pinch-to-zoom, Double-tap)
         this.setupTouchAndInteractions(viewport);
     },
 
-    // Set Zoom with Scroll Position & Focus Point Preservation
-    setZoom: function (targetScale, focusXRatio = 0.5, focusYRatio = 0.5) {
-        const clampedScale = Math.min(4.0, Math.max(0.3, Number(targetScale.toFixed(2))));
-        if (clampedScale === this.state.zoomScale && this.state.zoomMode === 'manual') return;
-
-        const viewportEl = document.getElementById('pdfViewport');
-        let focusX = 0.5, focusY = 0.5;
-        if (viewportEl && viewportEl.scrollWidth > 0) {
-            focusX = (viewportEl.scrollLeft + viewportEl.clientWidth * focusXRatio) / viewportEl.scrollWidth;
-            focusY = (viewportEl.scrollTop + viewportEl.clientHeight * focusYRatio) / viewportEl.scrollHeight;
-        }
-
-        this.state.zoomMode = 'manual';
-        this.state.zoomScale = clampedScale;
-        this.state.preRenderedCanvases = {};
-
-        this.renderPage(this.state.currentPage, () => {
-            // Restore scroll focus seamlessly so content doesn't jump
-            if (viewportEl && viewportEl.scrollWidth > 0) {
-                viewportEl.scrollLeft = Math.round((focusX * viewportEl.scrollWidth) - (viewportEl.clientWidth * focusXRatio));
-                viewportEl.scrollTop = Math.round((focusY * viewportEl.scrollHeight) - (viewportEl.clientHeight * focusYRatio));
-            }
-        });
-    },
-
-    // Touch & Interactive Viewport Handling
+    // Setup Touch & Interactive Viewport Handling
     setupTouchAndInteractions: function (viewport) {
         if (!viewport) return;
-        const canvasWrapper = document.getElementById('pdfCanvasWrapper');
 
-        // Touch gestures (Pinch-to-zoom, Double-tap)
         viewport.addEventListener('touchstart', (e) => {
             if (e.touches.length === 2) {
                 // Two fingers: Pinch-to-zoom start
@@ -271,25 +258,9 @@ const PdfViewerEngine = {
             }
         }, { passive: true });
 
-        viewport.addEventListener('touchmove', (e) => {
-            if (this.state.touch.isPinching && e.touches.length === 2 && canvasWrapper) {
-                const currentDist = Math.hypot(
-                    e.touches[0].pageX - e.touches[1].pageX,
-                    e.touches[0].pageY - e.touches[1].pageY
-                );
-                if (this.state.touch.initialDist > 0) {
-                    const pinchRatio = currentDist / this.state.touch.initialDist;
-                    canvasWrapper.style.transform = `scale(${pinchRatio})`;
-                }
-            }
-        }, { passive: true });
-
         viewport.addEventListener('touchend', (e) => {
             if (this.state.touch.isPinching) {
                 this.state.touch.isPinching = false;
-                if (canvasWrapper) {
-                    canvasWrapper.style.transform = 'none';
-                }
                 if (this.state.touch.initialDist > 0 && e.changedTouches.length > 0) {
                     const currentDist = Math.hypot(
                         e.changedTouches[0].pageX - (e.touches[0]?.pageX || this.state.touch.startX),
@@ -303,20 +274,15 @@ const PdfViewerEngine = {
                 const deltaX = Math.abs(e.changedTouches[0].pageX - this.state.touch.startX);
                 const deltaY = Math.abs(e.changedTouches[0].pageY - this.state.touch.startY);
 
-                // If it was a tap (not a scroll gesture)
+                // Double tap: toggle zoom between 1.8x and Fit-Width
                 if (deltaX < 12 && deltaY < 12) {
                     const now = Date.now();
                     if (now - this.state.touch.lastTapTime < 320) {
-                        // Double tap: toggle zoom between 1.8x and Fit-Width
                         if (this.state.zoomScale < 1.35) {
-                            const rect = viewport.getBoundingClientRect();
-                            const tapXRatio = (e.changedTouches[0].clientX - rect.left) / (rect.width || 1);
-                            const tapYRatio = (e.changedTouches[0].clientY - rect.top) / (rect.height || 1);
-                            this.setZoom(1.8, tapXRatio, tapYRatio);
+                            this.setZoom(1.8);
                         } else {
                             this.state.zoomMode = 'fit-width';
-                            this.state.preRenderedCanvases = {};
-                            this.renderPage(this.state.currentPage);
+                            this.recalculateAndApplyZoom();
                         }
                         this.state.touch.lastTapTime = 0;
                     } else {
@@ -327,7 +293,7 @@ const PdfViewerEngine = {
         }, { passive: true });
     },
 
-    // Open PDF Viewer Modal
+    // Open PDF Viewer Modal with Continuous Scroll Loading
     open: function (pdfUrl, filename, fileSizeBytes) {
         if (!pdfUrl || pdfUrl === "DOC NOT FOUND") {
             if (typeof AppView !== 'undefined' && AppView.showAlert) {
@@ -341,6 +307,7 @@ const PdfViewerEngine = {
         const modal = document.getElementById('pdfViewerModal');
         const titleEl = document.getElementById('pdfViewerTitle');
         const loadingOverlay = document.getElementById('pdfLoadingIndicator');
+        const viewport = document.getElementById('pdfViewport');
 
         if (!modal) return;
         if (titleEl) titleEl.textContent = filename || 'PDF Viewer';
@@ -350,18 +317,21 @@ const PdfViewerEngine = {
         if (loadingOverlay) loadingOverlay.classList.remove('hidden');
 
         // Reset state
-        if (this.state.currentRenderTask) {
-            this.state.currentRenderTask.cancel();
-            this.state.currentRenderTask = null;
-        }
+        this.cleanup();
         this.state.pdfUrl = pdfUrl;
         this.state.filename = filename || '';
         this.state.currentPage = 1;
         this.state.zoomMode = 'fit-width';
         this.state.rotation = 0;
-        this.state.preRenderedCanvases = {};
-        this.state.isRendering = false;
-        this.state.pageNumPending = null;
+
+        // Reset dock indicators
+        const totalEl = document.getElementById('pdfTotalPagesCount');
+        const pageInput = document.getElementById('pdfPageNumInput');
+        if (totalEl) totalEl.textContent = '...';
+        if (pageInput) {
+            pageInput.value = 1;
+            pageInput.max = 1;
+        }
 
         // Byte-Range streaming parameters
         const docParams = {
@@ -374,21 +344,45 @@ const PdfViewerEngine = {
             docParams.length = fileSizeBytes;
         }
 
-        pdfjsLib.getDocument(docParams).promise.then(pdf => {
+        pdfjsLib.getDocument(docParams).promise.then(async (pdf) => {
             this.state.pdfDoc = pdf;
             this.state.totalPages = pdf.numPages;
 
-            const totalEl = document.getElementById('pdfTotalPagesCount');
-            const pageInput = document.getElementById('pdfPageNumInput');
             if (totalEl) totalEl.textContent = pdf.numPages;
             if (pageInput) {
                 pageInput.value = 1;
                 pageInput.max = pdf.numPages;
             }
 
+            // Fetch Page 1 to inspect base aspect ratio
+            const firstPage = await pdf.getPage(1);
+            const unscaled = firstPage.getViewport({ scale: 1.0, rotation: 0 });
+            this.state.baseWidth = unscaled.width;
+            this.state.baseHeight = unscaled.height;
+            this.state.isLandscape = unscaled.width > unscaled.height;
+
+            const badge = document.getElementById('pdfDocBadge');
+            if (badge) {
+                badge.textContent = this.state.isLandscape ? 'रजिस्टर (Landscape)' : 'पोर्ट्रेट';
+            }
+
+            // Calculate initial zoom scale
+            this.calculateScale();
+
+            // Build all page placeholders for 1..totalPages
+            this.buildPageCards();
+
+            // Initialize IntersectionObserver for progressive on-demand page loading
+            this.setupObserver();
+
             if (loadingOverlay) loadingOverlay.classList.add('hidden');
-            this.renderPage(this.state.currentPage);
-        }).catch(() => {
+
+            // Scroll viewport to top
+            if (viewport) viewport.scrollTop = 0;
+            this.updateDockState();
+
+        }).catch((err) => {
+            console.error('PDF load error:', err);
             if (loadingOverlay) loadingOverlay.classList.add('hidden');
             const errorMsg = (window.location.protocol === 'file:')
                 ? 'Local File (file://) पर S3 PDF CORS ब्लॉक होता है। Live Server या Web Hosting से खोलें।'
@@ -403,254 +397,453 @@ const PdfViewerEngine = {
         });
     },
 
-    // Render Target Page with Offscreen Double-Buffering & Smart Scale Calculation
-    renderPage: function (pageNum, onRenderComplete) {
-        if (!this.state.pdfDoc) return;
+    // Calculate Scale based on Viewport & Fit Mode
+    calculateScale: function () {
+        const viewport = document.getElementById('pdfViewport');
+        if (!viewport || !this.state.baseWidth) return;
 
-        if (pageNum < 1) pageNum = 1;
-        if (pageNum > this.state.totalPages) pageNum = this.state.totalPages;
-        this.state.currentPage = pageNum;
+        const isMobile = window.innerWidth <= 768;
+        const padX = isMobile ? 24 : 48;
+        const padY = isMobile ? 84 : 110;
+        const containerW = Math.max(300, viewport.clientWidth - padX);
+        const containerH = Math.max(300, viewport.clientHeight - padY);
 
-        const pageInput = document.getElementById('pdfPageNumInput');
-        const prevBtn = document.getElementById('pdfPrevBtn');
-        const nextBtn = document.getElementById('pdfNextBtn');
+        const isRotated90 = (this.state.rotation === 90 || this.state.rotation === 270);
+        const naturalW = isRotated90 ? this.state.baseHeight : this.state.baseWidth;
+        const naturalH = isRotated90 ? this.state.baseWidth : this.state.baseHeight;
+
+        if (this.state.zoomMode === 'fit-width') {
+            let targetW = containerW;
+            if (this.state.isLandscape && isMobile) {
+                targetW = Math.max(containerW, 680);
+            }
+            const calcScale = targetW / naturalW;
+            this.state.zoomScale = Math.min(4.0, Math.max(0.3, Number(calcScale.toFixed(2))));
+        } else if (this.state.zoomMode === 'fit-page') {
+            const scaleW = containerW / naturalW;
+            const scaleH = containerH / naturalH;
+            const calcScale = Math.min(scaleW, scaleH);
+            this.state.zoomScale = Math.min(4.0, Math.max(0.3, Number(calcScale.toFixed(2))));
+        }
+
         const zoomText = document.getElementById('pdfZoomPercent');
+        if (zoomText) {
+            zoomText.textContent = `${Math.round(this.state.zoomScale * 100)}%`;
+        }
+    },
 
-        if (pageInput) pageInput.value = pageNum;
-        if (prevBtn) prevBtn.disabled = (pageNum <= 1);
-        if (nextBtn) nextBtn.disabled = (pageNum >= this.state.totalPages);
+    // Build Page Card Elements for all Pages (Continuous Vertical Flow)
+    buildPageCards: function () {
+        const container = document.getElementById('pdfPagesContainer');
+        if (!container || !this.state.totalPages) return;
 
-        const canvas = document.getElementById('pdfRenderCanvas');
-        if (!canvas) return;
+        container.innerHTML = '';
 
-        // Fetch page to calculate natural aspect ratio & scale
+        const isRotated90 = (this.state.rotation === 90 || this.state.rotation === 270);
+        const naturalW = isRotated90 ? this.state.baseHeight : this.state.baseWidth;
+        const naturalH = isRotated90 ? this.state.baseWidth : this.state.baseHeight;
+
+        const cardWidth = Math.floor(naturalW * this.state.zoomScale);
+        const cardHeight = Math.floor(naturalH * this.state.zoomScale);
+
+        const fragment = document.createDocumentFragment();
+
+        for (let p = 1; p <= this.state.totalPages; p++) {
+            const card = document.createElement('div');
+            card.className = 'pdf-page-card';
+            card.id = `pdf-page-${p}`;
+            card.dataset.page = p;
+            card.style.width = `${cardWidth}px`;
+            card.style.height = `${cardHeight}px`;
+            card.style.minHeight = `${cardHeight}px`;
+
+            // Page Number Badge at Top-Right
+            const badge = document.createElement('div');
+            badge.className = 'pdf-page-badge';
+            badge.textContent = `पेज ${p} / ${this.state.totalPages}`;
+
+            // Skeleton Placeholder
+            const skeleton = document.createElement('div');
+            skeleton.className = 'pdf-page-skeleton';
+            skeleton.id = `pdf-skeleton-${p}`;
+            skeleton.innerHTML = `
+                <div class="spinner-mini"></div>
+                <span>पेज ${p} लोड हो रहा है...</span>
+            `;
+
+            card.appendChild(badge);
+            card.appendChild(skeleton);
+            fragment.appendChild(card);
+        }
+
+        container.appendChild(fragment);
+    },
+
+    // Setup Virtualized IntersectionObserver for Continuous Scroll Lazy-Loading
+    setupObserver: function () {
+        if (this.state.observer) {
+            this.state.observer.disconnect();
+        }
+
+        const viewport = document.getElementById('pdfViewport');
+        if (!viewport) return;
+
+        // RootMargin: preload pages 800px ahead in both scroll directions
+        const observerOptions = {
+            root: viewport,
+            rootMargin: '800px 0px 800px 0px',
+            threshold: 0.01
+        };
+
+        this.state.observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const pageNum = parseInt(entry.target.dataset.page, 10);
+                if (isNaN(pageNum)) return;
+
+                if (entry.isIntersecting) {
+                    // Page is in or near viewport -> Render page canvas
+                    this.renderPageCard(pageNum);
+                } else {
+                    // Page is far away -> Evict distant canvas to preserve RAM on mobile
+                    if (Math.abs(pageNum - this.state.currentPage) > 5 &&
+                        this.state.renderedPages.size > this.state.maxActiveCanvases) {
+                        this.unloadPageCard(pageNum);
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all page cards
+        const cards = document.querySelectorAll('.pdf-page-card');
+        cards.forEach(card => this.state.observer.observe(card));
+    },
+
+    // Render a Single Page inside its Card Container
+    renderPageCard: function (pageNum) {
+        if (!this.state.pdfDoc) return;
+        if (this.state.renderedPages.has(pageNum) || this.state.renderingPages.has(pageNum)) return;
+
+        const card = document.getElementById(`pdf-page-${pageNum}`);
+        if (!card) return;
+
+        this.state.renderingPages.add(pageNum);
+
         this.state.pdfDoc.getPage(pageNum).then(page => {
-            const unscaled = page.getViewport({ scale: 1.0, rotation: this.state.rotation });
-            this.state.isLandscape = unscaled.width > unscaled.height;
-
-            // Update badge
-            const badge = document.getElementById('pdfDocBadge');
-            if (badge) {
-                badge.textContent = this.state.isLandscape ? 'रजिस्टर (Landscape)' : 'पोर्ट्रेट';
-            }
-
-            // Calculate Scale if in Fit Mode
-            const viewportEl = document.getElementById('pdfViewport');
-            const isMobile = window.innerWidth <= 768;
-            const containerW = viewportEl ? (viewportEl.clientWidth - (isMobile ? 24 : 48)) : window.innerWidth;
-            const containerH = viewportEl ? (viewportEl.clientHeight - (isMobile ? 84 : 110)) : window.innerHeight;
-
-            if (this.state.zoomMode === 'fit-width') {
-                let targetW = containerW;
-                // For wide landscape land registers on mobile: ensure line length is readable without being microscopic!
-                if (this.state.isLandscape && isMobile) {
-                    targetW = Math.max(containerW, 680);
-                }
-                const calcScale = targetW / unscaled.width;
-                this.state.zoomScale = Number(calcScale.toFixed(2));
-            } else if (this.state.zoomMode === 'fit-page') {
-                const scaleW = containerW / unscaled.width;
-                const scaleH = containerH / unscaled.height;
-                const calcScale = Math.min(scaleW, scaleH);
-                this.state.zoomScale = Number(calcScale.toFixed(2));
-            }
-
-            if (zoomText) {
-                zoomText.textContent = `${Math.round(this.state.zoomScale * 100)}%`;
-            }
-
-            // Check Offscreen Buffer Cache
-            const cached = this.state.preRenderedCanvases[pageNum];
-            if (cached && cached.zoomScale === this.state.zoomScale && cached.rotation === this.state.rotation) {
-                canvas.width = cached.width;
-                canvas.height = cached.height;
-                canvas.style.width = cached.styleWidth;
-                canvas.style.height = cached.styleHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(cached.canvas, 0, 0);
-                this.schedulePreloadCanvases(pageNum);
-                if (typeof onRenderComplete === 'function') onRenderComplete();
-                return;
-            }
-
-            // Offscreen Double-Buffering Render Task
-            if (this.state.isRendering) {
-                this.state.pageNumPending = pageNum;
-                if (this.state.currentRenderTask) {
-                    this.state.currentRenderTask.cancel();
-                    this.state.currentRenderTask = null;
-                }
-                return;
-            }
-
-            this.state.isRendering = true;
-
             const viewport = page.getViewport({ scale: this.state.zoomScale, rotation: this.state.rotation });
-            const outputScale = window.devicePixelRatio || 1;
+            const outputScale = Math.min(2.0, window.devicePixelRatio || 1); // Cap at 2 for performance
 
-            const offCanvas = document.createElement('canvas');
-            offCanvas.width = Math.floor(viewport.width * outputScale);
-            offCanvas.height = Math.floor(viewport.height * outputScale);
-            const offCtx = offCanvas.getContext('2d');
+            // Ensure card matches exact rendered dimensions
+            const styledW = Math.floor(viewport.width);
+            const styledH = Math.floor(viewport.height);
+            card.style.width = `${styledW}px`;
+            card.style.height = `${styledH}px`;
+            card.style.minHeight = `${styledH}px`;
 
+            // Reuse or create canvas element
+            let canvas = card.querySelector('canvas.pdf-page-canvas');
+            if (!canvas) {
+                canvas = document.createElement('canvas');
+                canvas.className = 'pdf-page-canvas';
+                card.appendChild(canvas);
+
+                // Anti-save / Anti-drag on canvas
+                canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+                canvas.addEventListener('dragstart', (e) => e.preventDefault());
+            }
+
+            canvas.width = Math.floor(viewport.width * outputScale);
+            canvas.height = Math.floor(viewport.height * outputScale);
+            canvas.style.width = `${styledW}px`;
+            canvas.style.height = `${styledH}px`;
+
+            const ctx = canvas.getContext('2d');
             const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-            const renderContext = {
-                canvasContext: offCtx,
+
+            const renderTask = page.render({
+                canvasContext: ctx,
                 transform: transform,
                 viewport: viewport
-            };
+            });
 
-            const renderTask = page.render(renderContext);
-            this.state.currentRenderTask = renderTask;
+            this.state.renderTasks[pageNum] = renderTask;
 
-            const handleFinish = () => {
-                this.state.isRendering = false;
-                this.state.currentRenderTask = null;
+            renderTask.promise.then(() => {
+                delete this.state.renderTasks[pageNum];
+                this.state.renderingPages.delete(pageNum);
+                this.state.renderedPages.add(pageNum);
 
-                // Swap offscreen canvas onto visible canvas in 1 frame
-                canvas.width = offCanvas.width;
-                canvas.height = offCanvas.height;
-                canvas.style.width = Math.floor(viewport.width) + "px";
-                canvas.style.height = Math.floor(viewport.height) + "px";
-                const mainCtx = canvas.getContext('2d');
-                mainCtx.drawImage(offCanvas, 0, 0);
+                // Hide skeleton
+                const skeleton = document.getElementById(`pdf-skeleton-${pageNum}`);
+                if (skeleton) skeleton.classList.add('hidden');
 
-                // Cache in memory
-                this.state.preRenderedCanvases[pageNum] = {
-                    canvas: offCanvas,
-                    width: offCanvas.width,
-                    height: offCanvas.height,
-                    styleWidth: canvas.style.width,
-                    styleHeight: canvas.style.height,
-                    zoomScale: this.state.zoomScale,
-                    rotation: this.state.rotation
-                };
-
-                this.schedulePreloadCanvases(pageNum);
-
-                if (typeof onRenderComplete === 'function') onRenderComplete();
-
-                if (this.state.pageNumPending !== null) {
-                    const nextPending = this.state.pageNumPending;
-                    this.state.pageNumPending = null;
-                    this.renderPage(nextPending);
+                // Check and enforce memory limit
+                if (this.state.renderedPages.size > this.state.maxActiveCanvases) {
+                    this.evictDistantPages();
                 }
-            };
-
-            renderTask.promise.then(handleFinish).catch(handleFinish);
+            }).catch((err) => {
+                delete this.state.renderTasks[pageNum];
+                this.state.renderingPages.delete(pageNum);
+                if (err?.name !== 'RenderingCancelledException') {
+                    console.warn(`Render cancelled/failed for page ${pageNum}`);
+                }
+            });
         }).catch(() => {
-            this.state.isRendering = false;
-            this.state.currentRenderTask = null;
+            this.state.renderingPages.delete(pageNum);
         });
     },
 
-    // Background Offscreen Canvas Pre-Rendering
-    schedulePreloadCanvases: function (currentNum) {
-        if (!this.state.pdfDoc) return;
-        const queue = [currentNum + 1, currentNum - 1];
+    // Unload Canvas from Card (Preserves placeholder dimensions and scroll stability)
+    unloadPageCard: function (pageNum) {
+        if (!this.state.renderedPages.has(pageNum)) return;
 
-        queue.forEach(p => {
-            if (p >= 1 && p <= this.state.totalPages && !this.state.preRenderedCanvases[p]) {
-                setTimeout(() => {
-                    if (!this.state.pdfDoc || this.state.preRenderedCanvases[p]) return;
+        const card = document.getElementById(`pdf-page-${pageNum}`);
+        if (!card) return;
 
-                    this.state.pdfDoc.getPage(p).then(pageObj => {
-                        const viewport = pageObj.getViewport({ scale: this.state.zoomScale, rotation: this.state.rotation });
-                        const outputScale = window.devicePixelRatio || 1;
-                        const offCanvas = document.createElement('canvas');
-                        offCanvas.width = Math.floor(viewport.width * outputScale);
-                        offCanvas.height = Math.floor(viewport.height * outputScale);
-                        const offCtx = offCanvas.getContext('2d');
+        const canvas = card.querySelector('canvas.pdf-page-canvas');
+        if (canvas) {
+            canvas.width = 1;
+            canvas.height = 1;
+            canvas.remove();
+        }
 
-                        const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-                        const task = pageObj.render({
-                            canvasContext: offCtx,
-                            transform: transform,
-                            viewport: viewport
-                        });
+        const skeleton = document.getElementById(`pdf-skeleton-${pageNum}`);
+        if (skeleton) skeleton.classList.remove('hidden');
 
-                        task.promise.then(() => {
-                            this.state.preRenderedCanvases[p] = {
-                                canvas: offCanvas,
-                                width: offCanvas.width,
-                                height: offCanvas.height,
-                                styleWidth: Math.floor(viewport.width) + "px",
-                                styleHeight: Math.floor(viewport.height) + "px",
-                                zoomScale: this.state.zoomScale,
-                                rotation: this.state.rotation
-                            };
-                        }).catch(() => { });
-                    }).catch(() => { });
-                }, 80);
+        this.state.renderedPages.delete(pageNum);
+    },
+
+    // Evict Distant Pages to keep RAM bounded on 200-page files
+    evictDistantPages: function () {
+        const pages = Array.from(this.state.renderedPages);
+        pages.sort((a, b) => {
+            return Math.abs(b - this.state.currentPage) - Math.abs(a - this.state.currentPage);
+        });
+
+        while (pages.length > 0 && this.state.renderedPages.size > this.state.maxActiveCanvases) {
+            const furthest = pages.shift();
+            if (Math.abs(furthest - this.state.currentPage) > 3) {
+                this.unloadPageCard(furthest);
+            } else {
+                break;
+            }
+        }
+    },
+
+    // Track Visible Page from Viewport Scroll Position
+    handleViewportScroll: function () {
+        const viewport = document.getElementById('pdfViewport');
+        if (!viewport || !this.state.totalPages) return;
+
+        const viewportRect = viewport.getBoundingClientRect();
+        const viewportMidY = viewportRect.top + viewportRect.height * 0.35;
+
+        // Find which page is at the reading line
+        const cards = document.querySelectorAll('.pdf-page-card');
+        let closestPage = this.state.currentPage;
+        let minDistance = Infinity;
+
+        cards.forEach(card => {
+            const rect = card.getBoundingClientRect();
+            // Distance from card center to viewport reading line
+            const cardMidY = (rect.top + rect.bottom) / 2;
+            const dist = Math.abs(cardMidY - viewportMidY);
+
+            if (dist < minDistance) {
+                minDistance = dist;
+                closestPage = parseInt(card.dataset.page, 10);
             }
         });
 
-        // Prune distant canvases to conserve mobile RAM
-        const cachedKeys = Object.keys(this.state.preRenderedCanvases);
-        if (cachedKeys.length > 4) {
-            cachedKeys.forEach(k => {
-                const pageInt = parseInt(k, 10);
-                if (Math.abs(pageInt - currentNum) > 2) {
-                    delete this.state.preRenderedCanvases[k];
+        if (closestPage !== this.state.currentPage && closestPage >= 1 && closestPage <= this.state.totalPages) {
+            this.state.currentPage = closestPage;
+            this.updateDockState();
+        }
+    },
+
+    // Update Bottom Dock Inputs and Buttons
+    updateDockState: function () {
+        const pageInput = document.getElementById('pdfPageNumInput');
+        const prevBtn = document.getElementById('pdfPrevBtn');
+        const nextBtn = document.getElementById('pdfNextBtn');
+
+        if (pageInput && document.activeElement !== pageInput) {
+            pageInput.value = this.state.currentPage;
+        }
+        if (prevBtn) prevBtn.disabled = (this.state.currentPage <= 1);
+        if (nextBtn) nextBtn.disabled = (this.state.currentPage >= this.state.totalPages);
+    },
+
+    // Smoothly Scroll to Specified Page
+    scrollToPage: function (pageNum, behavior = 'smooth') {
+        if (!this.state.totalPages) return;
+        if (pageNum < 1) pageNum = 1;
+        if (pageNum > this.state.totalPages) pageNum = this.state.totalPages;
+
+        const card = document.getElementById(`pdf-page-${pageNum}`);
+        if (!card) return;
+
+        this.state.currentPage = pageNum;
+        this.updateDockState();
+
+        this.state.isProgrammaticScroll = true;
+        card.scrollIntoView({ behavior: behavior, block: 'start' });
+
+        // Temporarily ignore scroll event updates during smooth animation
+        setTimeout(() => {
+            this.state.isProgrammaticScroll = false;
+        }, 450);
+    },
+
+    // Alias for controller backwards compatibility
+    renderPage: function (pageNum) {
+        if (pageNum && !isNaN(pageNum)) {
+            this.scrollToPage(pageNum);
+        }
+    },
+
+    // Set Zoom with Current Reading Anchor Preservation
+    setZoom: function (targetScale) {
+        const clampedScale = Math.min(4.0, Math.max(0.3, Number(targetScale.toFixed(2))));
+        if (clampedScale === this.state.zoomScale && this.state.zoomMode === 'manual') return;
+
+        this.state.zoomMode = 'manual';
+        this.state.zoomScale = clampedScale;
+
+        const fitModeBtn = document.getElementById('pdfFitModeBtn');
+        if (fitModeBtn) fitModeBtn.classList.remove('active');
+
+        this.applyZoomToAllCards();
+    },
+
+    // Recalculate Zoom for Fit-Width / Fit-Page and Apply
+    recalculateAndApplyZoom: function () {
+        this.calculateScale();
+        this.applyZoomToAllCards();
+    },
+
+    // Apply New Scale to All Cards and Re-Render
+    applyZoomToAllCards: function () {
+        const zoomText = document.getElementById('pdfZoomPercent');
+        if (zoomText) {
+            zoomText.textContent = `${Math.round(this.state.zoomScale * 100)}%`;
+        }
+
+        const isRotated90 = (this.state.rotation === 90 || this.state.rotation === 270);
+        const naturalW = isRotated90 ? this.state.baseHeight : this.state.baseWidth;
+        const naturalH = isRotated90 ? this.state.baseWidth : this.state.baseHeight;
+
+        const cardWidth = Math.floor(naturalW * this.state.zoomScale);
+        const cardHeight = Math.floor(naturalH * this.state.zoomScale);
+
+        // Cancel running render tasks
+        Object.keys(this.state.renderTasks).forEach(p => {
+            try { this.state.renderTasks[p]?.cancel(); } catch (_) { }
+        });
+        this.state.renderTasks = {};
+        this.state.renderingPages.clear();
+        this.state.renderedPages.clear();
+
+        // Update dimensions of all cards
+        const cards = document.querySelectorAll('.pdf-page-card');
+        cards.forEach(card => {
+            card.style.width = `${cardWidth}px`;
+            card.style.height = `${cardHeight}px`;
+            card.style.minHeight = `${cardHeight}px`;
+
+            const canvas = card.querySelector('canvas.pdf-page-canvas');
+            if (canvas) canvas.remove();
+
+            const skeleton = card.querySelector('.pdf-page-skeleton');
+            if (skeleton) skeleton.classList.remove('hidden');
+        });
+
+        // Re-align to current reading page smoothly
+        this.scrollToPage(this.state.currentPage, 'auto');
+
+        // Trigger observer to re-render pages now in view
+        setTimeout(() => {
+            this.setupObserver();
+        }, 50);
+    },
+
+    // Rotate 90 Degrees Clockwise
+    rotate: function () {
+        this.state.rotation = (this.state.rotation + 90) % 360;
+        this.applyZoomToAllCards();
+    },
+
+    // Print Active Page with Official Watermark Header & Footer
+    printCurrentView: function () {
+        const currentCard = document.getElementById(`pdf-page-${this.state.currentPage}`);
+        let canvas = currentCard ? currentCard.querySelector('canvas.pdf-page-canvas') : null;
+
+        const doPrint = (canvasEl) => {
+            try {
+                const dataUrl = canvasEl.toDataURL('image/png');
+                const printWin = window.open('', '_blank');
+                if (!printWin) {
+                    if (typeof AppView !== 'undefined' && AppView.showAlert) {
+                        AppView.showAlert('कृपया प्रिंट के लिए पॉपअप विंडो की अनुमति दें।', 'error');
+                    }
+                    return;
                 }
+
+                printWin.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="hi">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>प्रिंट - ${this.state.filename || 'सरथुआ भू-अभिलेख'} (पेज ${this.state.currentPage})</title>
+                        <style>
+                            body { margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; }
+                            .print-header { width: 100%; text-align: center; margin-bottom: 12px; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; }
+                            .print-header h2 { margin: 0 0 4px 0; font-size: 16px; color: #1e3a8a; }
+                            .print-header p { margin: 0; font-size: 12px; color: #555; }
+                            img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+                            .print-footer { margin-top: 15px; font-size: 10px; color: #777; text-align: center; }
+                            @media print { body { padding: 0; } img { max-height: 94vh; } }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="print-header">
+                            <h2>सरथुआ भू-अभिलेख पोर्टल | ग्राम: सरथुआ, थाना: 218, भोजपुर (बिहार)</h2>
+                            <p>दस्तावेज़: <strong>${this.state.filename || ''}</strong> | पेज संख्या: <strong>${this.state.currentPage} / ${this.state.totalPages}</strong></p>
+                        </div>
+                        <img src="${dataUrl}" alt="Land Record Page" />
+                        <div class="print-footer">
+                            * यह प्रतिलिपि केवल जन-सूचना एवं अध्ययन हेतु है। विधिक प्रमाण हेतु अंचल कार्यालय से प्रमाणित प्रतिलिपि प्राप्त करें।
+                        </div>
+                    </body>
+                    </html>
+                `);
+                printWin.document.close();
+                printWin.focus();
+                setTimeout(() => printWin.print(), 500);
+            } catch (e) {
+                if (typeof AppView !== 'undefined' && AppView.showAlert) {
+                    AppView.showAlert('प्रिंट तैयार करने में त्रुटि आई।', 'error');
+                }
+            }
+        };
+
+        if (canvas) {
+            doPrint(canvas);
+        } else if (this.state.pdfDoc) {
+            // Render active page offscreen if not yet loaded
+            this.state.pdfDoc.getPage(this.state.currentPage).then(page => {
+                const viewport = page.getViewport({ scale: 2.0, rotation: this.state.rotation });
+                const offCanvas = document.createElement('canvas');
+                offCanvas.width = viewport.width;
+                offCanvas.height = viewport.height;
+                const ctx = offCanvas.getContext('2d');
+                page.render({ canvasContext: ctx, viewport: viewport }).promise.then(() => {
+                    doPrint(offCanvas);
+                });
             });
         }
     },
 
-    // Print Single Active Page with Official Watermark Header/Footer
-    printCurrentView: function () {
-        const canvas = document.getElementById('pdfRenderCanvas');
-        if (!canvas) return;
-
-        try {
-            const dataUrl = canvas.toDataURL('image/png');
-            const printWin = window.open('', '_blank');
-            if (!printWin) {
-                if (typeof AppView !== 'undefined' && AppView.showAlert) {
-                    AppView.showAlert('कृपया प्रिंट के लिए पॉपअप विंडो की अनुमति दें।', 'error');
-                }
-                return;
-            }
-
-            printWin.document.write(`
-                <!DOCTYPE html>
-                <html lang="hi">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>प्रिंट - ${this.state.filename || 'सरथुआ भू-अभिलेख'} (पेज ${this.state.currentPage})</title>
-                    <style>
-                        body { margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; }
-                        .print-header { width: 100%; text-align: center; margin-bottom: 12px; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; }
-                        .print-header h2 { margin: 0 0 4px 0; font-size: 16px; color: #1e3a8a; }
-                        .print-header p { margin: 0; font-size: 12px; color: #555; }
-                        img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
-                        .print-footer { margin-top: 15px; font-size: 10px; color: #777; text-align: center; }
-                        @media print { body { padding: 0; } img { max-height: 94vh; } }
-                    </style>
-                </head>
-                <body>
-                    <div class="print-header">
-                        <h2>सरथुआ भू-अभिलेख पोर्टल | ग्राम: सरथुआ, थाना: 218, भोजपुर (बिहार)</h2>
-                        <p>दस्तावेज़: <strong>${this.state.filename || ''}</strong> | पेज संख्या: <strong>${this.state.currentPage} / ${this.state.totalPages}</strong></p>
-                    </div>
-                    <img src="${dataUrl}" alt="Land Record Page" />
-                    <div class="print-footer">
-                        * यह प्रतिलिपि केवल जन-सूचना एवं अध्ययन हेतु है। विधिक प्रमाण हेतु अंचल कार्यालय से प्रमाणित प्रतिलिपि प्राप्त करें।
-                    </div>
-                </body>
-                </html>
-            `);
-            printWin.document.close();
-            printWin.focus();
-            setTimeout(() => printWin.print(), 500);
-        } catch (e) {
-            if (typeof AppView !== 'undefined' && AppView.showAlert) {
-                AppView.showAlert('प्रिंट तैयार करने में त्रुटि आई।', 'error');
-            }
-        }
-    },
-
-    // Fullscreen Toggle
+    // Toggle Fullscreen Mode
     toggleFullscreen: function () {
         const modal = document.getElementById('pdfViewerModal');
         if (!modal) return;
@@ -676,6 +869,27 @@ const PdfViewerEngine = {
         }
     },
 
+    // Cleanup resources
+    cleanup: function () {
+        if (this.state.observer) {
+            this.state.observer.disconnect();
+            this.state.observer = null;
+        }
+        if (this.state.scrollRafId) {
+            cancelAnimationFrame(this.state.scrollRafId);
+            this.state.scrollRafId = null;
+        }
+        Object.keys(this.state.renderTasks).forEach(p => {
+            try { this.state.renderTasks[p]?.cancel(); } catch (_) { }
+        });
+        this.state.renderTasks = {};
+        this.state.renderedPages.clear();
+        this.state.renderingPages.clear();
+
+        const container = document.getElementById('pdfPagesContainer');
+        if (container) container.innerHTML = '';
+    },
+
     // Close Viewer
     close: function () {
         if (document.fullscreenElement || document.webkitFullscreenElement) {
@@ -687,11 +901,11 @@ const PdfViewerEngine = {
             modal.classList.add('hidden');
             document.body.style.overflow = 'auto';
         }
+        this.cleanup();
         if (this.state.pdfDoc) {
-            this.state.pdfDoc.destroy();
+            try { this.state.pdfDoc.destroy(); } catch (_) { }
             this.state.pdfDoc = null;
         }
-        this.state.preRenderedCanvases = {};
     }
 };
 
