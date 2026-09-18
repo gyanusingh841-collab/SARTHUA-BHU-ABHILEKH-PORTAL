@@ -1,0 +1,15 @@
+# Robots.txt for Sarthua Bhu-Abhilekh Portal
+# Official URL: https://sarthua.gyanu.online/
+
+User-agent: *
+Allow: /
+Allow: /favicon.ico
+Allow: /favicon.svg
+Allow: /style.css
+Allow: /js/
+
+# Crawl-delay
+Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://sarthua.gyanu.online/sitemap.xml
