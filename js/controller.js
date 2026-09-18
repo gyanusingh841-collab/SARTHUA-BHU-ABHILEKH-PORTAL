@@ -296,13 +296,9 @@ const AppController = {
         AppView.showAlert('अनुरोध WhatsApp पर प्रेषित किया जा रहा है।', 'success');
     },
 
-    // Delegate PDF View Action (Protected by 1st-Time Cloudflare Turnstile Challenge)
+    // Directly open PDF View Action
     viewPDF: function (url, filename, size) {
-        if (TurnstileSecurity.isVerified()) {
-            PdfViewerEngine.open(url, filename, size);
-        } else {
-            TurnstileSecurity.requestVerification(url, filename, size);
-        }
+        PdfViewerEngine.open(url, filename, size);
     }
 };
 
