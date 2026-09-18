@@ -61,18 +61,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
-    <!-- Core Portal Stylesheet -->
-    <link rel="stylesheet" href="style.css?v=5.8">
+    <!-- Minified Core Portal Stylesheet -->
+    <link rel="stylesheet" href="style.min.css?v=5.8">
 
-    <!-- Optimized Google Web Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
+    <!-- Non-Blocking Google Web Fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"></noscript>
 
     <!-- Non-Blocking FontAwesome 6 Icon Font -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
-
-    <!-- Cloudflare Turnstile Smart Challenge API -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
 <body>
     <!-- Top Indian Tricolor Ribbon -->
@@ -973,12 +971,12 @@
         </div>
     </div>
 
-    <!-- PDF.js Library CDN - Deferred to eliminate render-blocking and legacy JS penalties -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
     <!-- MVC Architecture Modules (Model, View, PDF Streaming Engine, Controller) -->
     <script src="js/model.js?v=5.8" defer></script>
     <script src="js/view.js?v=5.8" defer></script>
     <script src="js/pdf-viewer.js?v=5.8" defer></script>
     <script src="js/controller.js?v=5.8" defer></script>
+    <!-- Cloudflare Turnstile Smart Challenge API (deferred so it never blocks mobile page load) -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </body>
 </html>

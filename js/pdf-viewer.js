@@ -477,25 +477,38 @@ const PdfViewerEngine = {
         }, { passive: true });
     },
 
+    _pdfJsLoadingPromise: null,
+
+    // On-Demand PDF.js Library Loader (Zero Unused JS on Initial Page Load)
+    loadPdfJsLib: function () {
+        if (typeof pdfjsLib !== 'undefined') return Promise.resolve();
+        if (this._pdfJsLoadingPromise) return this._pdfJsLoadingPromise;
+
+        this._pdfJsLoadingPromise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+            script.onload = () => {
+                if (window.pdfjsLib) {
+                    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                }
+                resolve();
+            };
+            script.onerror = (err) => {
+                this._pdfJsLoadingPromise = null;
+                reject(err);
+            };
+            document.head.appendChild(script);
+        });
+        return this._pdfJsLoadingPromise;
+    },
+
     // Open PDF Viewer Modal with Continuous Scroll Loading
-    open: function (pdfUrl, filename, fileSizeBytes) {
+    open: async function (pdfUrl, filename, fileSizeBytes) {
         if (!pdfUrl || pdfUrl === "DOC NOT FOUND") {
             if (typeof AppView !== 'undefined' && AppView.showAlert) {
                 AppView.showAlert('यह दस्तावेज़ उपलब्ध नहीं है।', 'error');
             } else {
                 alert('यह दस्तावेज़ उपलब्ध नहीं है।');
-            }
-            return;
-        }
-
-        console.log('[PdfViewerEngine] open() called:', { pdfUrl, filename, fileSizeBytes });
-
-        if (typeof pdfjsLib === 'undefined') {
-            console.error('[PdfViewerEngine] pdfjsLib is undefined! PDF.js failed to load.');
-            if (typeof AppView !== 'undefined' && AppView.showAlert) {
-                AppView.showAlert('PDF.js लाइब्रेरी लोड नहीं हो सकी। कृपया पेज रीफ़्रेश करें।', 'error');
-            } else {
-                alert('PDF.js लाइब्रेरी लोड नहीं हो सकी। कृपया पेज रीफ़्रेश करें।');
             }
             return;
         }
@@ -511,6 +524,20 @@ const PdfViewerEngine = {
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
         if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+
+        // Dynamically load PDF.js if not yet loaded (eliminates unused initial JS on mobile)
+        if (typeof pdfjsLib === 'undefined') {
+            try {
+                await this.loadPdfJsLib();
+            } catch (err) {
+                console.error('[PdfViewerEngine] PDF.js failed to load on-demand:', err);
+                if (loadingOverlay) loadingOverlay.classList.add('hidden');
+                if (typeof AppView !== 'undefined' && AppView.showAlert) {
+                    AppView.showAlert('PDF.js लाइब्रेरी लोड नहीं हो सकी। कृपया इंटरनेट कनेक्शन जांचें।', 'error');
+                }
+                return;
+            }
+        }
 
         // Reset state
         this.cleanup();
@@ -1256,3 +1283,19 @@ const PdfViewerEngine = {
 };
 
 window.PdfViewerEngine = PdfViewerEngine;
+
+// Preload PDF.js during idle time after 3.5s so opening PDF is instant without blocking initial page load
+if (typeof window !== 'undefined') {
+    const scheduleIdlePreload = () => {
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => PdfViewerEngine.loadPdfJsLib(), { timeout: 4500 });
+        } else {
+            setTimeout(() => PdfViewerEngine.loadPdfJsLib(), 3500);
+        }
+    };
+    if (document.readyState === 'complete') {
+        scheduleIdlePreload();
+    } else {
+        window.addEventListener('load', scheduleIdlePreload, { once: true });
+    }
+}
