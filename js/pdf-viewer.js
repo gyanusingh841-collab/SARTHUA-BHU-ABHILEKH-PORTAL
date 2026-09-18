@@ -25,8 +25,8 @@ const PdfViewerEngine = {
         isLandscape: false,
         renderedPages: new Set(),
         renderingPages: new Set(),
-        renderTasks: {},
-        maxActiveCanvases: 14, // Keep memory optimal for 200-page files
+        maxActiveCanvases: 18, // Optimal RAM limit while holding 5-page lookahead buffer
+        bufferAheadCount: 5,   // Always keep 5 pages ahead preloaded in buffer
         pdfUrl: '',
         filename: '',
         observer: null,
@@ -378,9 +378,14 @@ const PdfViewerEngine = {
 
             if (loadingOverlay) loadingOverlay.classList.add('hidden');
 
-            // Scroll viewport to top
+            // Scroll viewport to top and start 5-page lookahead buffer
             if (viewport) viewport.scrollTop = 0;
             this.updateDockState();
+
+            // Immediately render Page 1 and preload next 5 pages in buffer
+            this.renderPageCard(1, () => {
+                this.preloadBuffer(1);
+            });
 
         }).catch((err) => {
             console.error('PDF load error:', err);
@@ -520,9 +525,13 @@ const PdfViewerEngine = {
     },
 
     // Render a Single Page inside its Card Container
-    renderPageCard: function (pageNum) {
+    renderPageCard: function (pageNum, onComplete) {
         if (!this.state.pdfDoc) return;
-        if (this.state.renderedPages.has(pageNum) || this.state.renderingPages.has(pageNum)) return;
+        if (this.state.renderedPages.has(pageNum)) {
+            if (typeof onComplete === 'function') onComplete();
+            return;
+        }
+        if (this.state.renderingPages.has(pageNum)) return;
 
         const card = document.getElementById(`pdf-page-${pageNum}`);
         if (!card) return;
@@ -581,16 +590,51 @@ const PdfViewerEngine = {
                 if (this.state.renderedPages.size > this.state.maxActiveCanvases) {
                     this.evictDistantPages();
                 }
+
+                if (typeof onComplete === 'function') onComplete();
             }).catch((err) => {
                 delete this.state.renderTasks[pageNum];
                 this.state.renderingPages.delete(pageNum);
                 if (err?.name !== 'RenderingCancelledException') {
                     console.warn(`Render cancelled/failed for page ${pageNum}`);
                 }
+                if (typeof onComplete === 'function') onComplete();
             });
         }).catch(() => {
             this.state.renderingPages.delete(pageNum);
+            if (typeof onComplete === 'function') onComplete();
         });
+    },
+
+    // Sequential background preloader to keep 5 pages preloaded ahead
+    preloadBuffer: function (currentNum) {
+        if (!this.state.pdfDoc) return;
+        const targetPage = currentNum || this.state.currentPage;
+
+        // Build priority queue: next 5 pages ahead, then 1-2 pages behind
+        const targetQueue = [];
+        for (let i = 1; i <= 5; i++) {
+            const pAhead = targetPage + i;
+            if (pAhead <= this.state.totalPages) targetQueue.push(pAhead);
+        }
+        for (let i = 1; i <= 2; i++) {
+            const pBehind = targetPage - i;
+            if (pBehind >= 1) targetQueue.push(pBehind);
+        }
+
+        // Find the first unrendered and non-rendering page in the buffer queue
+        const nextToRender = targetQueue.find(p => !this.state.renderedPages.has(p) && !this.state.renderingPages.has(p));
+        if (nextToRender) {
+            setTimeout(() => {
+                if (!this.state.pdfDoc) return;
+                if (!this.state.renderedPages.has(nextToRender) && !this.state.renderingPages.has(nextToRender)) {
+                    this.renderPageCard(nextToRender, () => {
+                        // Once rendered, chain to preload the next page in buffer
+                        this.preloadBuffer(this.state.currentPage);
+                    });
+                }
+            }, 60);
+        }
     },
 
     // Unload Canvas from Card (Preserves placeholder dimensions and scroll stability)
@@ -613,7 +657,7 @@ const PdfViewerEngine = {
         this.state.renderedPages.delete(pageNum);
     },
 
-    // Evict Distant Pages to keep RAM bounded on 200-page files
+    // Evict Distant Pages to keep RAM bounded on 200-page files while preserving 5-page buffer
     evictDistantPages: function () {
         const pages = Array.from(this.state.renderedPages);
         pages.sort((a, b) => {
@@ -622,7 +666,8 @@ const PdfViewerEngine = {
 
         while (pages.length > 0 && this.state.renderedPages.size > this.state.maxActiveCanvases) {
             const furthest = pages.shift();
-            if (Math.abs(furthest - this.state.currentPage) > 3) {
+            // Never evict any page within 6 pages of the current page
+            if (Math.abs(furthest - this.state.currentPage) > 6) {
                 this.unloadPageCard(furthest);
             } else {
                 break;
@@ -658,6 +703,8 @@ const PdfViewerEngine = {
         if (closestPage !== this.state.currentPage && closestPage >= 1 && closestPage <= this.state.totalPages) {
             this.state.currentPage = closestPage;
             this.updateDockState();
+            // Replenish 5-page lookahead buffer as user scrolls
+            this.preloadBuffer(closestPage);
         }
     },
 
@@ -685,6 +732,7 @@ const PdfViewerEngine = {
 
         this.state.currentPage = pageNum;
         this.updateDockState();
+        this.preloadBuffer(pageNum);
 
         this.state.isProgrammaticScroll = true;
         card.scrollIntoView({ behavior: behavior, block: 'start' });
