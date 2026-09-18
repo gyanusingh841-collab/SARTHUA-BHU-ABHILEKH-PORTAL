@@ -62,7 +62,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
     <!-- Minified Core Portal Stylesheet -->
-    <link rel="stylesheet" href="style.min.css?v=5.8">
+    <link rel="stylesheet" href="style.min.css?v=5.9">
 
     <!-- Non-Blocking Google Web Fonts -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -104,19 +104,19 @@
                     </a>
 
                     <!-- Revenue Glossary Modal Trigger -->
-                    <button class="nav-btn nav-btn--outline" onclick="openGlossaryModal()" title="भू-राजस्व शब्दावली">
+                    <button class="nav-btn nav-btn--outline" onclick="openGlossaryModal()" title="भू-राजस्व शब्दावली" aria-label="भू-राजस्व शब्दावली खोलें">
                         <i class="fas fa-info-circle"></i> <span>राजस्व शब्दावली</span>
                     </button>
 
                     <!-- Accessibility Font Zoom -->
-                    <div class="nav-font-ctrl" title="फॉन्ट आकार">
-                        <button class="font-btn" onclick="adjustFontSize(-1)">A-</button>
-                        <button class="font-btn active" id="fontResetBtn" onclick="adjustFontSize(0)">A</button>
-                        <button class="font-btn" onclick="adjustFontSize(1)">A+</button>
+                    <div class="nav-font-ctrl" title="फॉन्ट आकार" role="group" aria-label="फ़ॉन्ट आकार नियंत्रण">
+                        <button class="font-btn" onclick="adjustFontSize(-1)" aria-label="फ़ॉन्ट आकार छोटा करें (A-)">A-</button>
+                        <button class="font-btn active" id="fontResetBtn" onclick="adjustFontSize(0)" aria-label="सामान्य फ़ॉन्ट आकार (A)">A</button>
+                        <button class="font-btn" onclick="adjustFontSize(1)" aria-label="फ़ॉन्ट आकार बड़ा करें (A+)">A+</button>
                     </div>
 
                     <!-- Dark Mode Toggle -->
-                    <button class="nav-btn nav-btn--icon" id="themeToggleBtn" onclick="toggleTheme()" title="थीम बदलें">
+                    <button class="nav-btn nav-btn--icon" id="themeToggleBtn" onclick="toggleTheme()" title="थीम बदलें" aria-label="डार्क या लाइट थीम बदलें">
                         <i class="fas fa-moon" id="themeIcon"></i>
                     </button>
                 </div>
@@ -129,19 +129,20 @@
         <div class="container">
             <!-- Sleek Search Input Bar -->
             <div class="search-bar-unified">
-                <i class="fas fa-search search-input-icon"></i>
+                <i class="fas fa-search search-input-icon" aria-hidden="true"></i>
                 <input type="text" id="searchInput" 
                        placeholder="खाता संख्या (उदा. 50), खेसरा, या वॉल्यूम (VOL-01) खोजें..." 
                        class="search-input-field" 
+                       aria-label="खाता, खेसरा, या वॉल्यूम संख्या खोजें"
                        oninput="handleSearchInputChange(this)"
                        autocomplete="off">
-                <button id="clearSearchBtn" class="search-clear-btn" onclick="clearSearchInput()" title="साफ़ करें" style="display: none;">
+                <button id="clearSearchBtn" class="search-clear-btn" onclick="clearSearchInput()" title="साफ़ करें" aria-label="सर्च बॉक्स साफ़ करें" style="display: none;">
                     <i class="fas fa-times-circle"></i>
                 </button>
-                <button id="voiceSearchBtn" class="search-mic-btn" onclick="startVoiceSearch()" title="बोलकर खोजें (Voice Search)">
+                <button id="voiceSearchBtn" class="search-mic-btn" onclick="startVoiceSearch()" title="बोलकर खोजें (Voice Search)" aria-label="बोलकर खोजें (Voice Search)">
                     <i class="fas fa-microphone"></i>
                 </button>
-                <button onclick="searchRecords()" class="btn btn--search-primary">
+                <button onclick="searchRecords()" class="btn btn--search-primary" aria-label="अभिलेख खोजें">
                     <i class="fas fa-search"></i>
                     <span>खोजें</span>
                 </button>
@@ -720,24 +721,24 @@
                 
                 <div class="pdf-topbar-right">
                     <!-- Fit Mode Toggle (Fit Width vs Fit Page) -->
-                    <button id="pdfFitModeBtn" class="pdf-icon-btn" title="चौड़ाई अनुसार फिट करें / पूरा पेज (Fit Width/Page)">
+                    <button id="pdfFitModeBtn" class="pdf-icon-btn" title="चौड़ाई अनुसार फिट करें / पूरा पेज (Fit Width/Page)" aria-label="चौड़ाई अनुसार फिट करें या पूरा पेज देखें">
                         <i class="fas fa-arrows-alt-h"></i>
                         <span class="pdf-btn-label">चौड़ाई</span>
                     </button>
                     <!-- Rotate 90 deg -->
-                    <button id="pdfRotateBtn" class="pdf-icon-btn" title="90° घुमाएं (Rotate)">
+                    <button id="pdfRotateBtn" class="pdf-icon-btn" title="90° घुमाएं (Rotate)" aria-label="पेज 90 डिग्री घुमाएं">
                         <i class="fas fa-redo-alt"></i>
                     </button>
                     <!-- Print Page -->
-                    <button id="pdfPrintBtn" class="pdf-icon-btn" title="पेज प्रिंट करें (Print Page)">
+                    <button id="pdfPrintBtn" class="pdf-icon-btn" title="पेज प्रिंट करें (Print Page)" aria-label="दस्तावेज़ प्रिंट करें">
                         <i class="fas fa-print"></i>
                     </button>
                     <!-- Fullscreen -->
-                    <button id="pdfFullscreenBtn" class="pdf-icon-btn pdf-btn-desktop-only" title="फुलस्क्रीन (Fullscreen)">
+                    <button id="pdfFullscreenBtn" class="pdf-icon-btn pdf-btn-desktop-only" title="फुलस्क्रीन (Fullscreen)" aria-label="फुलस्क्रीन मोड चालू या बंद करें">
                         <i class="fas fa-expand"></i>
                     </button>
                     <!-- Close -->
-                    <button id="pdfCloseBtn" class="pdf-icon-btn pdf-btn--close" title="बंद करें (Esc)">
+                    <button id="pdfCloseBtn" class="pdf-icon-btn pdf-btn--close" title="बंद करें (Esc)" aria-label="PDF व्यूअर बंद करें">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -768,10 +769,10 @@
             </main>
 
             <!-- Floating Bottom Pill Dock -->
-            <nav class="pdf-bottom-dock" id="pdfBottomDock" aria-label="PDF Navigation">
+            <nav class="pdf-bottom-dock" id="pdfBottomDock" aria-label="PDF नेविगेशन बार">
                 <div class="pdf-dock-capsule">
                     <!-- Prev Page -->
-                    <button id="pdfPrevBtn" class="pdf-dock-btn" title="पिछला पेज (Left Arrow)">
+                    <button id="pdfPrevBtn" class="pdf-dock-btn" title="पिछला पेज (Left Arrow)" aria-label="पिछला पेज देखें">
                         <i class="fas fa-chevron-left"></i>
                     </button>
 
@@ -783,24 +784,24 @@
                     </div>
 
                     <!-- Next Page -->
-                    <button id="pdfNextBtn" class="pdf-dock-btn" title="अगला पेज (Right Arrow)">
+                    <button id="pdfNextBtn" class="pdf-dock-btn" title="अगला पेज (Right Arrow)" aria-label="अगला पेज देखें">
                         <i class="fas fa-chevron-right"></i>
                     </button>
 
                     <span class="pdf-dock-divider"></span>
 
                     <!-- Zoom Out -->
-                    <button id="pdfZoomOutBtn" class="pdf-dock-btn" title="ज़ूम आउट (-)">
+                    <button id="pdfZoomOutBtn" class="pdf-dock-btn" title="ज़ूम आउट (-)" aria-label="दस्तावेज़ ज़ूम आउट करें">
                         <i class="fas fa-minus"></i>
                     </button>
 
                     <!-- Zoom % (Click to toggle/reset Fit Width) -->
-                    <button id="pdfZoomResetBtn" class="pdf-dock-zoom-btn" title="रीसेट ज़ूम">
+                    <button id="pdfZoomResetBtn" class="pdf-dock-zoom-btn" title="रीसेट ज़ूम" aria-label="ज़ूम रीसेट करें">
                         <span id="pdfZoomPercent">100%</span>
                     </button>
 
                     <!-- Zoom In -->
-                    <button id="pdfZoomInBtn" class="pdf-dock-btn" title="ज़ूम इन (+)">
+                    <button id="pdfZoomInBtn" class="pdf-dock-btn" title="ज़ूम इन (+)" aria-label="दस्तावेज़ ज़ूम इन करें">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
@@ -870,7 +871,7 @@
                         <p class="modal-subtitle">मौजा: सरथुआ (थाना 218) | त्वरित WhatsApp सेवा</p>
                     </div>
                 </div>
-                <button class="modal-close-btn" onclick="closeRequestModal()" title="बंद करें">&times;</button>
+                <button class="modal-close-btn" onclick="closeRequestModal()" title="बंद करें" aria-label="बंद करें">&times;</button>
             </div>
             <form id="requestForm" onsubmit="handleRequestSubmit(event)" class="interactive-modal-body">
                 <div class="form-group">
@@ -927,7 +928,7 @@
                         <p class="modal-subtitle">बिहार भूमि अभिलेख में प्रयुक्त महत्वपूर्ण शब्दों का सरल अर्थ</p>
                     </div>
                 </div>
-                <button class="modal-close-btn" onclick="closeGlossaryModal()" title="बंद करें">&times;</button>
+                <button class="modal-close-btn" onclick="closeGlossaryModal()" title="बंद करें" aria-label="शब्दावली बंद करें">&times;</button>
             </div>
             <div class="interactive-modal-body glossary-body">
                 <div class="glossary-grid">
@@ -972,10 +973,10 @@
     </div>
 
     <!-- MVC Architecture Modules (Model, View, PDF Streaming Engine, Controller) -->
-    <script src="js/model.js?v=5.8" defer></script>
-    <script src="js/view.js?v=5.8" defer></script>
-    <script src="js/pdf-viewer.js?v=5.8" defer></script>
-    <script src="js/controller.js?v=5.8" defer></script>
+    <script src="js/model.js?v=5.9" defer></script>
+    <script src="js/view.js?v=5.9" defer></script>
+    <script src="js/pdf-viewer.js?v=5.9" defer></script>
+    <script src="js/controller.js?v=5.9" defer></script>
     <!-- Cloudflare Turnstile Smart Challenge API (deferred so it never blocks mobile page load) -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </body>
