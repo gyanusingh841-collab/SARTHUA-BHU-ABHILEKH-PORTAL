@@ -1581,25 +1581,60 @@ body {
 
 .btn-status-pill,
 .btn--disabled {
-  background: #f8fafc;
-  color: #94a3b8;
-  border: 1px dashed #cbd5e1;
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
   padding: 6px 12px;
   border-radius: 7px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: not-allowed;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   white-space: nowrap;
 }
 
+.btn-status-pill span,
+.btn--disabled span {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.btn-status-pill i,
+.btn--disabled i {
+  color: #475569;
+  font-size: 12px;
+}
+
+.btn-status-pill--unavailable {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-status-pill--unavailable span {
+  color: #1e293b;
+  font-weight: 600;
+}
+
 [data-theme="dark"] .btn-status-pill,
-[data-theme="dark"] .btn--disabled {
-  background: rgba(255, 255, 255, 0.04);
+[data-theme="dark"] .btn--disabled,
+[data-theme="dark"] .btn-status-pill--unavailable {
+  background: rgba(255, 255, 255, 0.08);
   border-color: #334155;
-  color: #64748b;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .btn-status-pill span,
+[data-theme="dark"] .btn--disabled span,
+[data-theme="dark"] .btn-status-pill--unavailable span {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .btn-status-pill i,
+[data-theme="dark"] .btn--disabled i {
+  color: #cbd5e1;
 }
 
 /* Empty State in Table */
