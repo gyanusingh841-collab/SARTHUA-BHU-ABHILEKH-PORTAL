@@ -296,8 +296,12 @@ const AppController = {
         AppView.showAlert('अनुरोध WhatsApp पर प्रेषित किया जा रहा है।', 'success');
     },
 
-    // Directly open PDF View Action
+    // PDF View Action with Cloudflare Turnstile Challenge Protection
     viewPDF: function (url, filename, size) {
+        if (!TurnstileSecurity.isVerified()) {
+            TurnstileSecurity.requestVerification(url, filename, size);
+            return;
+        }
         PdfViewerEngine.open(url, filename, size);
     }
 };
@@ -310,6 +314,12 @@ const TurnstileSecurity = {
     siteKey: '0x4AAAAAAE1YZgLnOa6zSIiq',
     widgetId: null,
     pendingAction: null,
+
+    getActiveSiteKey: function () {
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        // Cloudflare official test sitekey (always passes) for localhost
+        return isLocal ? '1x00000000000000000000AA' : this.siteKey;
+    },
 
     isVerified: function () {
         return sessionStorage.getItem('cf_turnstile_verified') === 'true';
@@ -360,7 +370,7 @@ const TurnstileSecurity = {
 
         try {
             this.widgetId = turnstile.render(container, {
-                sitekey: this.siteKey,
+                sitekey: this.getActiveSiteKey(),
                 theme: 'dark',
                 callback: (token) => {
                     if (token && typeof token === 'string' && token.length > 5) {
