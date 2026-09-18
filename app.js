@@ -384,11 +384,9 @@ function openPdfModal(pdfUrl, filename, fileSizeBytes) {
         url: pdfUrl,
         disableRange: false,
         disableStream: true,
-        disableAutoFetch: true
+        disableAutoFetch: true,
+        rangeChunkSize: 131072 // 128 KB chunks on demand
     };
-    if (fileSizeBytes && fileSizeBytes > 0) {
-        docParams.length = fileSizeBytes;
-    }
 
     pdfjsLib.getDocument(docParams).promise.then(pdf => {
         pdfState.pdfDoc = pdf;
