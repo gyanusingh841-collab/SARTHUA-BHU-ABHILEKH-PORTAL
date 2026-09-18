@@ -333,17 +333,16 @@ const PdfViewerEngine = {
             pageInput.max = 1;
         }
 
-        // Byte-Range streaming parameters (Strict On-Demand HTTP 206 Chunks)
-        // Do NOT set docParams.length manually with estimated MB size:
-        // an inexact length triggers 416 Range Not Satisfiable, causing PDF.js to download the entire file!
-        // PDF.js automatically gets the exact total size from Content-Range on the first 206 chunk.
+        // Byte-Range streaming parameters
         const docParams = {
             url: pdfUrl,
             disableRange: false,
             disableStream: true,
-            disableAutoFetch: true,
-            rangeChunkSize: 131072 // 128 KB chunks on demand
+            disableAutoFetch: true
         };
+        if (fileSizeBytes && fileSizeBytes > 0) {
+            docParams.length = fileSizeBytes;
+        }
 
         pdfjsLib.getDocument(docParams).promise.then(async (pdf) => {
             this.state.pdfDoc = pdf;
@@ -489,10 +488,10 @@ const PdfViewerEngine = {
         const viewport = document.getElementById('pdfViewport');
         if (!viewport) return;
 
-        // RootMargin: preload only the adjacent upcoming page (~250px) as the user scrolls
+        // RootMargin: preload pages 800px ahead in both scroll directions
         const observerOptions = {
             root: viewport,
-            rootMargin: '250px 0px 250px 0px',
+            rootMargin: '800px 0px 800px 0px',
             threshold: 0.01
         };
 
