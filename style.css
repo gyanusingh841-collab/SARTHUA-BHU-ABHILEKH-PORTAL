@@ -2262,7 +2262,6 @@ body {
   -webkit-overflow-scrolling: touch;
   touch-action: pan-x pan-y pinch-zoom;
   outline: none;
-  scroll-behavior: smooth;
 }
 
 /* Custom Scrollbar for PDF Viewport */
@@ -2292,7 +2291,6 @@ body {
   align-items: center;
   gap: 24px;
   padding-bottom: 40px;
-  transition: transform 0.15s ease-out;
 }
 
 /* Individual Page Card / Container */
@@ -2311,8 +2309,9 @@ body {
   -ms-user-select: none;
   -webkit-touch-callout: none;
   overflow: hidden;
-  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  transition: box-shadow 0.2s ease;
   flex-shrink: 0;
+  contain: layout paint;
 }
 
 .pdf-page-card:hover {
@@ -2384,6 +2383,10 @@ body {
   -ms-user-select: none;
   -webkit-touch-callout: none;
   pointer-events: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: width, height;
+  image-rendering: auto;
 }
 
 /* Loading Overlay */

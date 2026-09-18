@@ -33,6 +33,8 @@ const PdfViewerEngine = {
         observer: null,
         scrollRafId: null,
         isProgrammaticScroll: false,
+        isZooming: false,
+        zoomDebounceTimer: null,
         lastScrollY: 0,
         uiHideTimer: null,
         isUiHidden: false,
@@ -727,6 +729,8 @@ const PdfViewerEngine = {
                 if (isNaN(pageNum)) return;
 
                 if (entry.isIntersecting) {
+                    // Ignore transient IntersectionObserver callbacks during active zoom debounce
+                    if (this.state.isZooming) return;
                     // Page is in or near viewport -> Render page canvas
                     this.renderPageCard(pageNum);
                 } else {
@@ -744,7 +748,7 @@ const PdfViewerEngine = {
         cards.forEach(card => this.state.observer.observe(card));
     },
 
-    // Render a Single Page inside its Card Container
+    // Render a Single Page inside its Card Container (Zero-Flicker Double-Buffered)
     renderPageCard: function (pageNum, onComplete) {
         if (!this.state.pdfDoc) return;
         if (this.state.renderedPages.has(pageNum)) {
@@ -760,7 +764,7 @@ const PdfViewerEngine = {
 
         this.state.pdfDoc.getPage(pageNum).then(page => {
             const viewport = page.getViewport({ scale: this.state.zoomScale, rotation: this.state.rotation });
-            const outputScale = Math.min(2.0, window.devicePixelRatio || 1); // Cap at 2 for performance
+            const outputScale = Math.min(2.0, window.devicePixelRatio || 1); // Cap at 2 for mobile GPU performance
 
             // Ensure card matches exact rendered dimensions
             const styledW = Math.floor(viewport.width);
@@ -769,24 +773,23 @@ const PdfViewerEngine = {
             card.style.height = `${styledH}px`;
             card.style.minHeight = `${styledH}px`;
 
-            // Reuse or create canvas element
-            let canvas = card.querySelector('canvas.pdf-page-canvas');
-            if (!canvas) {
-                canvas = document.createElement('canvas');
-                canvas.className = 'pdf-page-canvas';
-                card.appendChild(canvas);
+            // Prepare fresh offscreen canvas for rendering so existing canvas remains visible without blanking
+            const newCanvas = document.createElement('canvas');
+            newCanvas.className = 'pdf-page-canvas';
+            newCanvas.width = Math.floor(viewport.width * outputScale);
+            newCanvas.height = Math.floor(viewport.height * outputScale);
+            newCanvas.style.width = `${styledW}px`;
+            newCanvas.style.height = `${styledH}px`;
 
-                // Anti-save / Anti-drag on canvas
-                canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-                canvas.addEventListener('dragstart', (e) => e.preventDefault());
-            }
+            // Anti-save / Anti-drag protection
+            newCanvas.addEventListener('contextmenu', (e) => e.preventDefault());
+            newCanvas.addEventListener('dragstart', (e) => e.preventDefault());
 
-            canvas.width = Math.floor(viewport.width * outputScale);
-            canvas.height = Math.floor(viewport.height * outputScale);
-            canvas.style.width = `${styledW}px`;
-            canvas.style.height = `${styledH}px`;
+            const ctx = newCanvas.getContext('2d');
+            // Fill opaque white background so canvas never shows transparent/grey flash
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
 
-            const ctx = canvas.getContext('2d');
             const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
 
             const renderTask = page.render({
@@ -798,11 +801,22 @@ const PdfViewerEngine = {
             this.state.renderTasks[pageNum] = renderTask;
 
             renderTask.promise.then(() => {
+                // If this render task was cancelled or superseded by a newer zoom, discard it
+                if (this.state.renderTasks[pageNum] !== renderTask) return;
+
                 delete this.state.renderTasks[pageNum];
                 this.state.renderingPages.delete(pageNum);
                 this.state.renderedPages.add(pageNum);
 
-                // Hide skeleton
+                // Atomic Canvas Swap: replace existing canvas or append new (0ms gap, ZERO flicker!)
+                const existingCanvas = card.querySelector('canvas.pdf-page-canvas');
+                if (existingCanvas) {
+                    existingCanvas.replaceWith(newCanvas);
+                } else {
+                    card.appendChild(newCanvas);
+                }
+
+                // Hide skeleton placeholder
                 const skeleton = document.getElementById(`pdf-skeleton-${pageNum}`);
                 if (skeleton) skeleton.classList.add('hidden');
 
@@ -813,7 +827,9 @@ const PdfViewerEngine = {
 
                 if (typeof onComplete === 'function') onComplete();
             }).catch((err) => {
-                delete this.state.renderTasks[pageNum];
+                if (this.state.renderTasks[pageNum] === renderTask) {
+                    delete this.state.renderTasks[pageNum];
+                }
                 this.state.renderingPages.delete(pageNum);
                 if (err?.name !== 'RenderingCancelledException') {
                     console.warn(`Render cancelled/failed for page ${pageNum}`);
@@ -899,6 +915,7 @@ const PdfViewerEngine = {
     handleViewportScroll: function () {
         const viewport = document.getElementById('pdfViewport');
         if (!viewport || !this.state.totalPages) return;
+        if (this.state.isProgrammaticScroll) return;
 
         const viewportRect = viewport.getBoundingClientRect();
         const viewportMidY = viewportRect.top + viewportRect.height * 0.35;
@@ -990,7 +1007,7 @@ const PdfViewerEngine = {
         this.applyZoomToAllCards();
     },
 
-    // Apply New Scale to All Cards and Re-Render
+    // Apply New Scale to All Cards and Re-Render (Zero-Flicker Double Buffering)
     applyZoomToAllCards: function () {
         const zoomText = document.getElementById('pdfZoomPercent');
         if (zoomText) {
@@ -1004,7 +1021,19 @@ const PdfViewerEngine = {
         const cardWidth = Math.floor(naturalW * this.state.zoomScale);
         const cardHeight = Math.floor(naturalH * this.state.zoomScale);
 
-        // Cancel running render tasks
+        // 1. Calculate relative reading center inside current card before resizing
+        const viewport = document.getElementById('pdfViewport');
+        const activeCard = document.getElementById(`pdf-page-${this.state.currentPage}`);
+        let relCenterY = 0.5;
+        let relCenterX = 0.5;
+        if (viewport && activeCard && activeCard.offsetHeight > 0 && activeCard.offsetWidth > 0) {
+            const viewportCenterY = viewport.scrollTop + viewport.clientHeight / 2;
+            const viewportCenterX = viewport.scrollLeft + viewport.clientWidth / 2;
+            relCenterY = (viewportCenterY - activeCard.offsetTop) / activeCard.offsetHeight;
+            relCenterX = (viewportCenterX - activeCard.offsetLeft) / activeCard.offsetWidth;
+        }
+
+        // 2. Cancel pending PDF.js render tasks
         if (this.state.renderTasks) {
             Object.keys(this.state.renderTasks).forEach(p => {
                 try { this.state.renderTasks[p]?.cancel(); } catch (_) { }
@@ -1014,7 +1043,7 @@ const PdfViewerEngine = {
         this.state.renderingPages.clear();
         this.state.renderedPages.clear();
 
-        // Update dimensions of all cards
+        // 3. Resize all cards AND existing canvases instantly via GPU CSS without removing them (Zero-Flicker)
         const cards = document.querySelectorAll('.pdf-page-card');
         cards.forEach(card => {
             card.style.width = `${cardWidth}px`;
@@ -1022,24 +1051,46 @@ const PdfViewerEngine = {
             card.style.minHeight = `${cardHeight}px`;
 
             const canvas = card.querySelector('canvas.pdf-page-canvas');
-            if (canvas) canvas.remove();
-
-            const skeleton = card.querySelector('.pdf-page-skeleton');
-            if (skeleton) skeleton.classList.remove('hidden');
+            if (canvas) {
+                // Instantly scale existing canvas via CSS - NO white screen, NO skeleton flash!
+                canvas.style.width = `${cardWidth}px`;
+                canvas.style.height = `${cardHeight}px`;
+            }
         });
 
-        // Re-align to current reading page smoothly
-        this.scrollToPage(this.state.currentPage, 'auto');
+        // 4. Seamlessly restore reading center position (Zero Scroll Jump)
+        if (viewport && activeCard) {
+            this.state.isProgrammaticScroll = true;
+            viewport.scrollTop = (activeCard.offsetTop + relCenterY * cardHeight) - (viewport.clientHeight / 2);
+            viewport.scrollLeft = (activeCard.offsetLeft + relCenterX * cardWidth) - (viewport.clientWidth / 2);
+            requestAnimationFrame(() => {
+                this.state.isProgrammaticScroll = false;
+            });
+        }
 
-        // Trigger observer to re-render pages now in view
-        setTimeout(() => {
-            this.setupObserver();
-        }, 50);
+        // 5. Debounce sharp re-rendering of visible cards so rapid zoom clicks don't thrash PDF.js
+        if (this.state.zoomDebounceTimer) clearTimeout(this.state.zoomDebounceTimer);
+        this.state.isZooming = true;
+        this.state.zoomDebounceTimer = setTimeout(() => {
+            this.state.isZooming = false;
+            // Re-render current page and nearby buffer at crystal-clear resolution
+            this.renderPageCard(this.state.currentPage, () => {
+                this.preloadBuffer(this.state.currentPage);
+            });
+        }, 120);
     },
 
     // Rotate 90 Degrees Clockwise
     rotate: function () {
         this.state.rotation = (this.state.rotation + 90) % 360;
+        // On rotation, canvas aspect ratio flips so clear cards
+        const cards = document.querySelectorAll('.pdf-page-card');
+        cards.forEach(card => {
+            const canvas = card.querySelector('canvas.pdf-page-canvas');
+            if (canvas) canvas.remove();
+            const skeleton = card.querySelector('.pdf-page-skeleton');
+            if (skeleton) skeleton.classList.remove('hidden');
+        });
         this.applyZoomToAllCards();
     },
 
