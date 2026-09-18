@@ -25,6 +25,7 @@ const PdfViewerEngine = {
         isLandscape: false,
         renderedPages: new Set(),
         renderingPages: new Set(),
+        renderTasks: {},
         maxActiveCanvases: 18, // Optimal RAM limit while holding 5-page lookahead buffer
         bufferAheadCount: 5,   // Always keep 5 pages ahead preloaded in buffer
         pdfUrl: '',
@@ -336,6 +337,18 @@ const PdfViewerEngine = {
                 AppView.showAlert('यह दस्तावेज़ उपलब्ध नहीं है।', 'error');
             } else {
                 alert('यह दस्तावेज़ उपलब्ध नहीं है।');
+            }
+            return;
+        }
+
+        console.log('[PdfViewerEngine] open() called:', { pdfUrl, filename, fileSizeBytes });
+
+        if (typeof pdfjsLib === 'undefined') {
+            console.error('[PdfViewerEngine] pdfjsLib is undefined! PDF.js failed to load.');
+            if (typeof AppView !== 'undefined' && AppView.showAlert) {
+                AppView.showAlert('PDF.js लाइब्रेरी लोड नहीं हो सकी। कृपया पेज रीफ़्रेश करें।', 'error');
+            } else {
+                alert('PDF.js लाइब्रेरी लोड नहीं हो सकी। कृपया पेज रीफ़्रेश करें।');
             }
             return;
         }
@@ -844,9 +857,11 @@ const PdfViewerEngine = {
         const cardHeight = Math.floor(naturalH * this.state.zoomScale);
 
         // Cancel running render tasks
-        Object.keys(this.state.renderTasks).forEach(p => {
-            try { this.state.renderTasks[p]?.cancel(); } catch (_) { }
-        });
+        if (this.state.renderTasks) {
+            Object.keys(this.state.renderTasks).forEach(p => {
+                try { this.state.renderTasks[p]?.cancel(); } catch (_) { }
+            });
+        }
         this.state.renderTasks = {};
         this.state.renderingPages.clear();
         this.state.renderedPages.clear();
@@ -987,9 +1002,11 @@ const PdfViewerEngine = {
             cancelAnimationFrame(this.state.scrollRafId);
             this.state.scrollRafId = null;
         }
-        Object.keys(this.state.renderTasks).forEach(p => {
-            try { this.state.renderTasks[p]?.cancel(); } catch (_) { }
-        });
+        if (this.state.renderTasks) {
+            Object.keys(this.state.renderTasks).forEach(p => {
+                try { this.state.renderTasks[p]?.cancel(); } catch (_) { }
+            });
+        }
         this.state.renderTasks = {};
         this.state.renderedPages.clear();
         this.state.renderingPages.clear();
