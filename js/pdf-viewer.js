@@ -33,6 +33,10 @@ const PdfViewerEngine = {
         observer: null,
         scrollRafId: null,
         isProgrammaticScroll: false,
+        lastScrollY: 0,
+        uiHideTimer: null,
+        isUiHidden: false,
+        floatingPillTimer: null,
         touch: {
             initialDist: 0,
             initialScale: 1.0,
@@ -181,12 +185,17 @@ const PdfViewerEngine = {
             });
         }
 
-        // Zoom Reset / Percent Click: Cycle between Fit-Width and 100%
+        // Zoom Reset / Percent Click: Cycle through comfortable zoom presets
         if (zoomResetBtn) {
             zoomResetBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (this.state.zoomMode === 'fit-width') {
-                    this.setZoom(1.0);
+                const currentPct = Math.round(this.state.zoomScale * 100);
+                if (currentPct < 120) {
+                    this.setZoom(1.35);
+                } else if (currentPct < 165) {
+                    this.setZoom(1.8);
+                } else if (currentPct < 220) {
+                    this.setZoom(2.5);
                 } else {
                     this.state.zoomMode = 'fit-width';
                     this.recalculateAndApplyZoom();
@@ -260,19 +269,155 @@ const PdfViewerEngine = {
             });
         }
 
-        // Viewport scroll listener for active page tracking
+        // Viewport scroll listener for active page tracking, auto-hide, & progress bar
         if (viewport) {
             viewport.addEventListener('scroll', () => {
                 if (this.state.isProgrammaticScroll) return;
+
+                const currentScrollY = viewport.scrollTop;
+                const scrollDelta = currentScrollY - this.state.lastScrollY;
+
+                // Downward scroll: Auto-hide floating dock and topbar
+                if (scrollDelta > 16 && currentScrollY > 70) {
+                    this.hideUI();
+                    this.flashFloatingPagePill();
+                }
+                // Upward scroll: Bring controls back smoothly
+                else if (scrollDelta < -16) {
+                    this.showUI();
+                }
+
+                this.state.lastScrollY = currentScrollY;
+
                 if (this.state.scrollRafId) cancelAnimationFrame(this.state.scrollRafId);
                 this.state.scrollRafId = requestAnimationFrame(() => {
                     this.handleViewportScroll();
+                    this.updateReadingProgress();
                 });
             }, { passive: true });
         }
 
+        // Setup Auto-Hide & Modern Controls
+        this.setupAutoHideAndProgress(viewport, modal);
+
         // Setup Touch Gestures (Pinch-to-zoom, Double-tap)
         this.setupTouchAndInteractions(viewport);
+    },
+
+    // Setup Smart Auto-Hide Controls & Quick Interaction Listeners
+    setupAutoHideAndProgress: function (viewport, modal) {
+        if (!viewport) return;
+
+        const bottomDock = document.getElementById('pdfBottomDock');
+        const scrollTopBtn = document.getElementById('pdfScrollTopBtn');
+
+        // Scroll to Top FAB Button
+        if (scrollTopBtn) {
+            scrollTopBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.scrollToPage(1);
+                this.showUI();
+            });
+        }
+
+        // Tap/click viewport to toggle UI (when not clicking card controls)
+        viewport.addEventListener('click', (e) => {
+            if (e.target.closest('button, input, select, a, .pdf-dock-capsule, .pdf-fab-scroll-top')) return;
+            if (this.state.isUiHidden) {
+                this.showUI();
+            } else {
+                this.hideUI();
+            }
+        });
+
+        // Hover / touch over dock pauses auto-hide timer
+        if (bottomDock) {
+            bottomDock.addEventListener('mouseenter', () => {
+                if (this.state.uiHideTimer) clearTimeout(this.state.uiHideTimer);
+            });
+            bottomDock.addEventListener('mouseleave', () => {
+                this.scheduleAutoHide(2500);
+            });
+            bottomDock.addEventListener('touchstart', () => {
+                if (this.state.uiHideTimer) clearTimeout(this.state.uiHideTimer);
+            }, { passive: true });
+        }
+
+        // Desktop mouse movement near top/bottom edges shows UI
+        if (modal) {
+            modal.addEventListener('mousemove', (e) => {
+                if (e.clientY < 55 || e.clientY > window.innerHeight - 75) {
+                    if (this.state.isUiHidden) this.showUI();
+                }
+            });
+        }
+    },
+
+    showUI: function () {
+        const container = document.querySelector('.pdf-modal-container');
+        if (container) container.classList.remove('pdf-ui-autohide');
+        this.state.isUiHidden = false;
+
+        const pill = document.getElementById('pdfFloatingPagePill');
+        if (pill) pill.classList.add('hidden');
+
+        this.scheduleAutoHide(4500);
+    },
+
+    hideUI: function () {
+        const container = document.querySelector('.pdf-modal-container');
+        if (!container || this.state.isUiHidden) return;
+
+        // Don't auto-hide if user is actively typing in page input
+        const pageInput = document.getElementById('pdfPageNumInput');
+        if (pageInput && document.activeElement === pageInput) return;
+
+        container.classList.add('pdf-ui-autohide');
+        this.state.isUiHidden = true;
+    },
+
+    scheduleAutoHide: function (delay = 4500) {
+        if (this.state.uiHideTimer) clearTimeout(this.state.uiHideTimer);
+        this.state.uiHideTimer = setTimeout(() => {
+            if (this.state.pdfDoc && !this.state.isUiHidden) {
+                this.hideUI();
+            }
+        }, delay);
+    },
+
+    flashFloatingPagePill: function () {
+        if (!this.state.isUiHidden) return;
+        const pill = document.getElementById('pdfFloatingPagePill');
+        const text = document.getElementById('pdfFloatingPageText');
+        if (!pill || !text) return;
+
+        text.textContent = `पेज ${this.state.currentPage} / ${this.state.totalPages}`;
+        pill.classList.remove('hidden');
+
+        if (this.state.floatingPillTimer) clearTimeout(this.state.floatingPillTimer);
+        this.state.floatingPillTimer = setTimeout(() => {
+            pill.classList.add('hidden');
+        }, 1800);
+    },
+
+    updateReadingProgress: function () {
+        const viewport = document.getElementById('pdfViewport');
+        const bar = document.getElementById('pdfProgressBar');
+        const fab = document.getElementById('pdfScrollTopBtn');
+        if (!viewport || !bar) return;
+
+        const maxScroll = viewport.scrollHeight - viewport.clientHeight;
+        const progress = maxScroll > 0 ? (viewport.scrollTop / maxScroll) * 100 : 0;
+        bar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+
+        if (fab) {
+            if (viewport.scrollTop > 600) {
+                fab.classList.remove('hidden');
+            } else {
+                fab.classList.add('hidden');
+            }
+        }
     },
 
     // Setup Touch & Interactive Viewport Handling
@@ -449,6 +594,9 @@ const PdfViewerEngine = {
             this.renderPageCard(1, () => {
                 this.preloadBuffer(1);
             });
+
+            this.showUI();
+            this.updateReadingProgress();
 
         }).catch((err) => {
             console.error('PDF load error:', err);
@@ -1010,6 +1158,28 @@ const PdfViewerEngine = {
         this.state.renderTasks = {};
         this.state.renderedPages.clear();
         this.state.renderingPages.clear();
+
+        if (this.state.uiHideTimer) {
+            clearTimeout(this.state.uiHideTimer);
+            this.state.uiHideTimer = null;
+        }
+        if (this.state.floatingPillTimer) {
+            clearTimeout(this.state.floatingPillTimer);
+            this.state.floatingPillTimer = null;
+        }
+        this.state.isUiHidden = false;
+
+        const containerModal = document.querySelector('.pdf-modal-container');
+        if (containerModal) containerModal.classList.remove('pdf-ui-autohide');
+
+        const bar = document.getElementById('pdfProgressBar');
+        if (bar) bar.style.width = '0%';
+
+        const fab = document.getElementById('pdfScrollTopBtn');
+        if (fab) fab.classList.add('hidden');
+
+        const pill = document.getElementById('pdfFloatingPagePill');
+        if (pill) pill.classList.add('hidden');
 
         const container = document.getElementById('pdfPagesContainer');
         if (container) container.innerHTML = '';

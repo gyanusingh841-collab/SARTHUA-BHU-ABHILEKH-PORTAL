@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>सरथुआ भू-अभिलेख पोर्टल | मौजा: सरथुआ, थाना: 218 (भोजपुर, बिहार)</title>
-    <link rel="stylesheet" href="style.css?v=5.2">
+    <link rel="stylesheet" href="style.css?v=5.6">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Cloudflare Turnstile Smart Challenge API -->
@@ -443,6 +443,9 @@
                 </div>
             </header>
 
+            <!-- Modern Thin Reading Progress Bar -->
+            <div class="pdf-reading-progress" id="pdfProgressBar" style="width: 0%;"></div>
+
             <!-- PDF Canvas Viewport -->
             <main class="pdf-viewport" id="pdfViewport" tabindex="0">
                 <div id="pdfLoadingIndicator" class="pdf-loading-overlay">
@@ -451,6 +454,16 @@
                 </div>
                 <div class="pdf-pages-container" id="pdfPagesContainer">
                     <!-- Dynamic continuous scroll page cards will be rendered here -->
+                </div>
+
+                <!-- Floating Scroll-To-Top FAB -->
+                <button id="pdfScrollTopBtn" class="pdf-fab-scroll-top hidden" title="ऊपर जाएं (Top)" aria-label="शीर्ष पर जाएं">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+
+                <!-- Floating Minimalist Page Badge during Auto-Hide -->
+                <div id="pdfFloatingPagePill" class="pdf-floating-page-pill hidden">
+                    <span id="pdfFloatingPageText">पेज 1 / ...</span>
                 </div>
             </main>
 
@@ -661,9 +674,9 @@
     <!-- PDF.js Library CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <!-- MVC Architecture Modules (Model, View, PDF Streaming Engine, Controller) -->
-    <script src="js/model.js?v=5.5"></script>
-    <script src="js/view.js?v=5.5"></script>
-    <script src="js/pdf-viewer.js?v=5.5"></script>
-    <script src="js/controller.js?v=5.5"></script>
+    <script src="js/model.js?v=5.6"></script>
+    <script src="js/view.js?v=5.6"></script>
+    <script src="js/pdf-viewer.js?v=5.6"></script>
+    <script src="js/controller.js?v=5.6"></script>
 </body>
 </html>
