@@ -42,6 +42,42 @@ const PdfViewerEngine = {
         }
     },
 
+    // Exact byte sizes for zero-head, zero-416 Cloudflare byte-range streaming
+    exactFileSizes: {
+        "Sarthua_Vol_01_1970.pdf": 2142456,
+        "Sarthua_Vol_02_1970.pdf": 80187190,
+        "Sarthua_Vol_04_1970.pdf": 55772939,
+        "Sarthua_Vol_05_1970.pdf": 48353437,
+        "Sarthua_Vol_06_1970.pdf": 40967162,
+        "Sarthua_Vol_07_1970.pdf": 64510811,
+        "Sarthua_Vol_08_1970.pdf": 1001503,
+        "Sarthua_Vol_09_1970.pdf": 64703896,
+        "Sarthua_Vol_10_1970.pdf": 45800453,
+        "Sarthua_Vol_11_1970.pdf": 58086541,
+        "Sarthua_Vol_11A_1970.pdf": 39566785,
+        "Sarthua_Vol_12_1970.pdf": 47479605,
+        "Sarthua_Vol_13_1970.pdf": 49792694,
+        "Sarthua_Vol_14_1970.pdf": 27383637,
+        "Sarthua_Vol_15_1970.pdf": 54683735,
+        "Sarthua_Vol_16_1970.pdf": 52692837,
+        "Sarthua_Vol_17_1970.pdf": 54421271,
+        "Sarthua_Vol_18_1970.pdf": 50662823,
+        "Sarthua_Vol_19_1970.pdf": 27911323,
+        "Sarthua_Vol_20_1970.pdf": 20408480,
+        "Sarthua_Vol_21_1970.pdf": 7944408,
+        "Sarthua_Rev_01_1970.pdf": 46061704,
+        "Sarthua_Rev_02_1970.pdf": 2855840,
+        "Sarthua_Rev_03_1970.pdf": 30568610,
+        "Sarthua_Rev_04_1970.pdf": 24570452,
+        "Sarthua_Rev_05_1970.pdf": 35272704,
+        "Sarthua_Rev_06_1970.pdf": 44960308,
+        "Sarthua_Rev_07_1970.pdf": 56195847,
+        "Sarthua_Rev_08_1970.pdf": 225419333,
+        "Sarthua_Rev_09_1970.pdf": 219616525,
+        "Sarthua_cs_01_1911.pdf": 143322712,
+        "Sarthua_cs_02_1911.pdf": 147535938
+    },
+
     // Initialize Viewer DOM Listeners
     init: function () {
         const prevBtn = document.getElementById('pdfPrevBtn');
@@ -333,16 +369,30 @@ const PdfViewerEngine = {
             pageInput.max = 1;
         }
 
+        // Resolve stream URL and handle Localhost / Cloudflare Hotlink Protection
+        let streamUrl = pdfUrl;
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+        if (isLocalhost && pdfUrl.startsWith('https://docs.gyanu.online/')) {
+            if (window.location.port === '8089') {
+                streamUrl = `/pdf-proxy?url=${encodeURIComponent(pdfUrl)}`;
+            } else {
+                // If accessed via Live Server (e.g. port 5500) or file://, proxy via active dev_server on port 8089
+                streamUrl = `http://localhost:8089/pdf-proxy?url=${encodeURIComponent(pdfUrl)}`;
+            }
+        }
+
+        // Determine exact file size to prevent both Cloudflare 403 HEAD block and 416 Out of Range error
+        const exactSize = this.exactFileSizes[filename] || (fileSizeBytes > 100000 ? fileSizeBytes : 0);
+
         // Byte-Range streaming parameters
-        // Setting docParams.length prevents PDF.js from sending HEAD requests (which Cloudflare blocks with 403 Forbidden)
         const docParams = {
-            url: pdfUrl,
+            url: streamUrl,
             disableRange: false,
             disableStream: true,
             disableAutoFetch: true
         };
-        if (fileSizeBytes && fileSizeBytes > 0) {
-            docParams.length = fileSizeBytes;
+        if (exactSize > 0) {
+            docParams.length = exactSize;
         }
 
         pdfjsLib.getDocument(docParams).promise.then(async (pdf) => {
@@ -390,9 +440,18 @@ const PdfViewerEngine = {
         }).catch((err) => {
             console.error('PDF load error:', err);
             if (loadingOverlay) loadingOverlay.classList.add('hidden');
-            const errorMsg = (window.location.protocol === 'file:')
-                ? 'Local File (file://) पर S3 PDF CORS ब्लॉक होता है। Live Server या Web Hosting से खोलें।'
-                : 'PDF लोड करने में समस्या आई।';
+            let errorMsg = 'PDF लोड करने में समस्या आई।';
+            if (window.location.protocol === 'file:') {
+                errorMsg = 'Local File (file://) पर CORS ब्लॉक होता है। "python dev_server.py" चलाएं और http://localhost:8089 से खोलें।';
+            } else if (err && (err.name === 'MissingPDFException' || String(err).includes('403') || err.status === 403)) {
+                if (isLocalhost) {
+                    errorMsg = 'Cloudflare Security 403: Localhost पर देखने हेतु "python dev_server.py" (पोर्ट 8089) चालू रखें, या gyanu.online डोमेन से खोलें।';
+                } else {
+                    errorMsg = 'Cloudflare Security 403: यह फ़ाइल केवल gyanu.online डोमेन से अधिकृत है।';
+                }
+            } else if (err && (String(err).includes('416') || err.status === 416)) {
+                errorMsg = 'Range 416 Error: फ़ाइल का साइज़ अमान्य था। पुनः प्रयास करें।';
+            }
 
             if (typeof AppView !== 'undefined' && AppView.showAlert) {
                 AppView.showAlert(errorMsg, 'error');
