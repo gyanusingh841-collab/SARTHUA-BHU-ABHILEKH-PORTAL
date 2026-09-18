@@ -352,8 +352,23 @@ const TurnstileSecurity = {
         const container = document.getElementById('cfTurnstileWidget');
         if (!container) return;
 
-        // Wait if Turnstile library is not yet loaded
+        // Wait if Turnstile library is not yet loaded (load on-demand)
         if (typeof turnstile === 'undefined') {
+            if (!this._scriptLoading) {
+                this._scriptLoading = true;
+                const script = document.createElement('script');
+                script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+                script.async = true;
+                script.defer = true;
+                script.onload = () => {
+                    this._scriptLoading = false;
+                    this.renderWidget();
+                };
+                script.onerror = () => {
+                    this._scriptLoading = false;
+                };
+                document.head.appendChild(script);
+            }
             const statusEl = document.getElementById('cfTurnstileStatus');
             if (statusEl) statusEl.innerHTML = '<i class="fas fa-spinner fa-spin text-cyan"></i> Cloudflare Edge Security लोड हो रहा है...';
             setTimeout(() => this.renderWidget(), 300);
