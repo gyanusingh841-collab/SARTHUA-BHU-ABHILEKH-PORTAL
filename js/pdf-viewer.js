@@ -1283,19 +1283,3 @@ const PdfViewerEngine = {
 };
 
 window.PdfViewerEngine = PdfViewerEngine;
-
-// Preload PDF.js during idle time after 3.5s so opening PDF is instant without blocking initial page load
-if (typeof window !== 'undefined') {
-    const scheduleIdlePreload = () => {
-        if ('requestIdleCallback' in window) {
-            requestIdleCallback(() => PdfViewerEngine.loadPdfJsLib(), { timeout: 4500 });
-        } else {
-            setTimeout(() => PdfViewerEngine.loadPdfJsLib(), 3500);
-        }
-    };
-    if (document.readyState === 'complete') {
-        scheduleIdlePreload();
-    } else {
-        window.addEventListener('load', scheduleIdlePreload, { once: true });
-    }
-}

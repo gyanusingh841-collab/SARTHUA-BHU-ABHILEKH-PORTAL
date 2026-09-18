@@ -3611,4 +3611,88 @@ html[data-font-size="lg"] {
 }
 
 
-
+
+
+
+/* ==========================================================================
+   OPTIMIZED FONTAWESOME SUBSET (font-display: swap, 0% Unused CSS)
+   ========================================================================== */
+@font-face{font-family:'Font Awesome 6 Brands';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2') format('woff2');}
+@font-face{font-family:'Font Awesome 6 Free';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.woff2') format('woff2');}
+@font-face{font-family:'Font Awesome 6 Free';font-style:normal;font-weight:900;font-display:swap;src:url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2');}
+.fa,.fas,.fa-solid,.far,.fa-regular,.fab,.fa-brands{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;display:inline-block;font-style:normal;font-variant:normal;line-height:1;text-rendering:auto}
+.fa,.fas,.fa-solid{font-family:'Font Awesome 6 Free';font-weight:900}
+.far,.fa-regular{font-family:'Font Awesome 6 Free';font-weight:400}
+.fab,.fa-brands{font-family:'Font Awesome 6 Brands';font-weight:400}
+.fa-spin{animation:fa-spin 2s infinite linear}@keyframes fa-spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.fa-arrow-up-long:before,.fa-long-arrow-up:before{content:"\f176"}
+.fa-arrows-alt-h:before,.fa-left-right:before{content:"\f337"}
+.fa-balance-scale-right:before,.fa-scale-unbalanced-flip:before{content:"\f516"}
+.fa-bolt-lightning:before{content:"\e0b7"}
+.fa-bookmark:before{content:"\f02e"}
+.fa-book-open-reader:before,.fa-book-reader:before{content:"\f5da"}
+.fa-book-open-reader:before,.fa-book-reader:before{content:"\f5da"}
+.fa-calendar-alt:before,.fa-calendar-days:before{content:"\f073"}
+.fa-calendar-check:before{content:"\f274"}
+.fa-check-circle:before,.fa-circle-check:before{content:"\f058"}
+.fa-chevron-left:before{content:"\f053"}
+.fa-chevron-right:before{content:"\f054"}
+.fa-clock-four:before,.fa-clock:before{content:"\f017"}
+.fa-cogs:before,.fa-gears:before{content:"\f085"}
+.fa-comment-dots:before,.fa-commenting:before{content:"\f4ad"}
+.fa-compass:before{content:"\f14e"}
+.fa-compress-alt:before,.fa-down-left-and-up-right-to-center:before{content:"\f422"}
+.fa-copy:before{content:"\f0c5"}
+.fa-edit:before,.fa-pen-to-square:before{content:"\f044"}
+.fa-circle-exclamation:before,.fa-exclamation-circle:before{content:"\f06a"}
+.fa-exclamation-triangle:before,.fa-triangle-exclamation:before,.fa-warning:before{content:"\f071"}
+.fa-expand-arrows-alt:before,.fa-maximize:before{content:"\f31e"}
+.fa-expand-arrows-alt:before,.fa-maximize:before{content:"\f31e"}
+.fa-external-link-alt:before,.fa-up-right-from-square:before{content:"\f35d"}
+.fa-eye-slash:before{content:"\f070"}
+.fa-file-alt:before,.fa-file-lines:before,.fa-file-text:before{content:"\f15c"}
+.fa-file-contract:before{content:"\f56c"}
+.fa-file-invoice-dollar:before{content:"\f571"}
+.fa-file-alt:before,.fa-file-lines:before,.fa-file-text:before{content:"\f15c"}
+.fa-file-pdf:before{content:"\f1c1"}
+.fa-file-signature:before{content:"\f573"}
+.fa-fingerprint:before{content:"\f577"}
+.fa-folder-plus:before{content:"\f65e"}
+.fa-folder-open:before{content:"\f07c"}
+.fa-hand-holding-heart:before{content:"\f4be"}
+.fa-hands-helping:before,.fa-handshake-angle:before{content:"\f4c4"}
+.fa-clock-rotate-left:before,.fa-history:before{content:"\f1da"}
+.fa-circle-info:before,.fa-info-circle:before{content:"\f05a"}
+.fa-landmark-flag:before{content:"\e51c"}
+.fa-layer-group:before{content:"\f5fd"}
+.fa-list-1-2:before,.fa-list-numeric:before,.fa-list-ol:before{content:"\f0cb"}
+.fa-lock:before{content:"\f023"}
+.fa-map-location:before,.fa-map-marked:before{content:"\f59f"}
+.fa-map-location-dot:before,.fa-map-marked-alt:before{content:"\f5a0"}
+.fa-microphone-alt-slash:before,.fa-microphone-lines-slash:before{content:"\f539"}
+.fa-circle-minus:before,.fa-minus-circle:before{content:"\f056"}
+.fa-money-bill-wave:before{content:"\f53a"}
+.fa-moon:before{content:"\f186"}
+.fa-pen-fancy:before{content:"\f5ac"}
+.fa-phone-alt:before,.fa-phone-flip:before{content:"\f879"}
+.fa-plus-square:before,.fa-square-plus:before{content:"\f0fe"}
+.fa-print:before{content:"\f02f"}
+.fa-receipt:before{content:"\f543"}
+.fa-arrow-right-rotate:before,.fa-arrow-rotate-forward:before,.fa-arrow-rotate-right:before,.fa-redo:before{content:"\f01e"}
+.fa-redo-alt:before,.fa-rotate-forward:before,.fa-rotate-right:before{content:"\f2f9"}
+.fa-ruler-combined:before{content:"\f546"}
+.fa-magnifying-glass-location:before,.fa-search-location:before{content:"\f689"}
+.fa-shield-alt:before,.fa-shield-halved:before{content:"\f3ed"}
+.fa-shield-virus:before{content:"\e06c"}
+.fa-spinner:before{content:"\f110"}
+.fa-sun-plant-wilt:before{content:"\e57a"}
+.fa-rotate:before,.fa-sync-alt:before{content:"\f2f1"}
+.fa-tags:before{content:"\f02c"}
+.fa-table-cells-large:before,.fa-th-large:before{content:"\f009"}
+.fa-close:before,.fa-multiply:before,.fa-remove:before,.fa-times:before,.fa-xmark:before{content:"\f00d"}
+.fa-circle-xmark:before,.fa-times-circle:before,.fa-xmark-circle:before{content:"\f057"}
+.fa-screwdriver-wrench:before,.fa-tools:before{content:"\f7d9"}
+.fa-user-times:before,.fa-user-xmark:before{content:"\f235"}
+.fa-user-shield:before{content:"\f505"}
+.fa-weight-hanging:before{content:"\f5cd"}
+.fa-whatsapp:before{content:"\f232"}
