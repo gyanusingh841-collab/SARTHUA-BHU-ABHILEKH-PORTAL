@@ -559,7 +559,7 @@ const PdfViewerEngine = {
         // Resolve stream URL and handle Localhost / Cloudflare Hotlink Protection
         let streamUrl = pdfUrl;
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
-        if (isLocalhost && pdfUrl.startsWith('https://docs.sarthua.online/')) {
+        if (isLocalhost && pdfUrl.startsWith('https://docs.sarthua.in/')) {
             if (window.location.port === '8089') {
                 streamUrl = `/pdf-proxy?url=${encodeURIComponent(pdfUrl)}`;
             } else {
