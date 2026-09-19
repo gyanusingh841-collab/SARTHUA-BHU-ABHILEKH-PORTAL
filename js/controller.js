@@ -19,10 +19,19 @@ const AppController = {
         AppView.applyTheme(AppModel.state.theme || 'light');
         AppView.applyFontSize(AppModel.state.fontSizeOffset || 'md');
 
-        // 4. Render Initial Tables with All Records
-        AppView.renderJamabandiTable(AppModel.data.jamabandi, '');
-        AppView.renderRevisionalTable(AppModel.data.revisional, '');
-        AppView.renderCadastralTable(AppModel.data.cadastral, '');
+        // 4. Render Initial Tables only if not already pre-rendered
+        const jamabandiTbody = document.getElementById('jamabandi-tbody');
+        if (!jamabandiTbody || jamabandiTbody.children.length === 0) {
+            AppView.renderJamabandiTable(AppModel.data.jamabandi, '');
+        }
+        const revisionalTbody = document.getElementById('revisional-tbody');
+        if (!revisionalTbody || revisionalTbody.children.length === 0) {
+            AppView.renderRevisionalTable(AppModel.data.revisional, '');
+        }
+        const cadastralTbody = document.getElementById('cadastral-tbody');
+        if (!cadastralTbody || cadastralTbody.children.length === 0) {
+            AppView.renderCadastralTable(AppModel.data.cadastral, '');
+        }
 
         // 5. Setup Event Listeners
         this.setupEventListeners();
