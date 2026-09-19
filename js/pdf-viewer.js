@@ -635,9 +635,9 @@ const PdfViewerEngine = {
                 errorMsg = 'Local File (file://) पर CORS ब्लॉक होता है। "python dev_server.py" चलाएं और http://localhost:8089 से खोलें।';
             } else if (err && (err.name === 'MissingPDFException' || String(err).includes('403') || err.status === 403)) {
                 if (isLocalhost) {
-                    errorMsg = 'Cloudflare Security 403: Localhost पर देखने हेतु "python dev_server.py" (पोर्ट 8089) चालू रखें, या gyanu.online डोमेन से खोलें।';
+                    errorMsg = 'Cloudflare Security 403: Localhost पर देखने हेतु "python dev_server.py" (पोर्ट 8089) चालू रखें, या sarthua.in डोमेन से खोलें।';
                 } else {
-                    errorMsg = 'Cloudflare Security 403: यह फ़ाइल केवल gyanu.online डोमेन से अधिकृत है।';
+                    errorMsg = 'Cloudflare Security 403: यह फ़ाइल केवल अधिकृत डोमेन (sarthua.in) से स्वीकृत है।';
                 }
             } else if (err && (String(err).includes('416') || err.status === 416)) {
                 errorMsg = 'Range 416 Error: फ़ाइल का साइज़ अमान्य था। पुनः प्रयास करें।';
