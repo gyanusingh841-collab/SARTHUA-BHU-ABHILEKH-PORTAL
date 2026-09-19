@@ -1,6 +1,6 @@
 """
 Sarthua Bhu-Abhilekh Portal - Local Development Server with Streaming PDF Proxy
-Bypasses Cloudflare Hotlink Protection for local testing by attaching 'Referer: https://gyanu.online/'
+Bypasses Cloudflare Hotlink Protection for local testing by attaching 'Referer: https://sarthua.in/'
 """
 import http.server
 import socketserver
@@ -24,7 +24,7 @@ class ProxyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 # Forward Range header if present
                 req = urllib.request.Request(target_url)
                 req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
-                req.add_header('Referer', 'https://gyanu.online/')
+                req.add_header('Referer', 'https://sarthua.in/')
 
                 range_header = self.headers.get('Range')
                 if range_header:

@@ -556,19 +556,10 @@ const PdfViewerEngine = {
             pageInput.max = 1;
         }
 
-        // Resolve stream URL and handle Localhost / Cloudflare Hotlink Protection
-        let streamUrl = pdfUrl;
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
-        if (isLocalhost && pdfUrl.startsWith('https://docs.sarthua.in/')) {
-            if (window.location.port === '8089') {
-                streamUrl = `/pdf-proxy?url=${encodeURIComponent(pdfUrl)}`;
-            } else {
-                // If accessed via Live Server (e.g. port 5500) or file://, proxy via active dev_server on port 8089
-                streamUrl = `http://localhost:8089/pdf-proxy?url=${encodeURIComponent(pdfUrl)}`;
-            }
-        }
+        // Stream PDF directly from Cloudflare R2 / Custom Domain
+        const streamUrl = pdfUrl;
 
-        // Determine exact file size to prevent both Cloudflare 403 HEAD block and 416 Out of Range error
+        // Determine exact file size to optimize byte-range requests
         const exactSize = this.exactFileSizes[filename] || (fileSizeBytes > 100000 ? fileSizeBytes : 0);
 
         // Byte-Range streaming parameters
@@ -604,19 +595,19 @@ const PdfViewerEngine = {
                 badge.textContent = this.state.isLandscape ? 'रजिस्टर (Landscape)' : 'पोर्ट्रेट';
             }
 
-            // Calculate initial zoom scale
             this.calculateScale();
 
             // Build all page placeholders for 1..totalPages
             this.buildPageCards();
 
-            // Initialize IntersectionObserver for progressive on-demand page loading
+            // Attach IntersectionObserver for lazy on-demand rendering
             this.setupObserver();
 
+            // Hide loading overlay
             if (loadingOverlay) loadingOverlay.classList.add('hidden');
-
-            // Scroll viewport to top and start 5-page lookahead buffer
             if (viewport) viewport.scrollTop = 0;
+
+            // Sync dock controls state
             this.updateDockState();
 
             // Immediately render Page 1 and preload next 5 pages in buffer
@@ -632,13 +623,9 @@ const PdfViewerEngine = {
             if (loadingOverlay) loadingOverlay.classList.add('hidden');
             let errorMsg = 'PDF लोड करने में समस्या आई।';
             if (window.location.protocol === 'file:') {
-                errorMsg = 'Local File (file://) पर CORS ब्लॉक होता है। "python dev_server.py" चलाएं और http://localhost:8089 से खोलें।';
+                errorMsg = 'Local File (file://) पर ब्राउज़र सुरक्षा (CORS) लागू होती है। कृपया लाइव वेब सर्वर या sarthua.in से खोलें।';
             } else if (err && (err.name === 'MissingPDFException' || String(err).includes('403') || err.status === 403)) {
-                if (isLocalhost) {
-                    errorMsg = 'Cloudflare Security 403: Localhost पर देखने हेतु "python dev_server.py" (पोर्ट 8089) चालू रखें, या sarthua.in डोमेन से खोलें।';
-                } else {
-                    errorMsg = 'Cloudflare Security 403: यह फ़ाइल केवल अधिकृत डोमेन (sarthua.in) से स्वीकृत है।';
-                }
+                errorMsg = 'दस्तावेज़ लोड करने की अनुमति नहीं मिली (403)। कृपया sarthua.in से पुनः प्रयास करें।';
             } else if (err && (String(err).includes('416') || err.status === 416)) {
                 errorMsg = 'Range 416 Error: फ़ाइल का साइज़ अमान्य था। पुनः प्रयास करें।';
             }
