@@ -5,6 +5,8 @@ User-agent: *
 Allow: /
 Allow: /favicon.ico
 Allow: /favicon.svg
+Allow: /og-image.png
+Allow: /manifest.json
 Allow: /style.css
 Allow: /js/
 
