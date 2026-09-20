@@ -257,6 +257,18 @@ const AppView = {
                 }
             });
         }
+
+        // Initialize / Invalidate Leaflet Map when switching to Bhu-Naksha Tab
+        if (tabName === 'bhunaksha') {
+            setTimeout(() => {
+                if (window.SarthuaMapViewer) {
+                    SarthuaMapViewer.init();
+                    if (SarthuaMapViewer.map) {
+                        SarthuaMapViewer.map.invalidateSize();
+                    }
+                }
+            }, 80);
+        }
     },
 
     // Accessibility Text Resizing (A- / A / A+)
