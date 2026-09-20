@@ -1,10 +1,130 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Main Portal Homepage -->
   <url>
     <loc>https://sarthua.in/</loc>
-    <lastmod>2026-09-19</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
+
+    <!-- 1970 Revisional Survey (RS) 8K Map Sheets -->
+    <image:image>
+      <image:loc>https://docs.sarthua.in/maps/Sarthua_Sheet_1_HD_WhiteBG.png</image:loc>
+      <image:title>सरथुआ रिविजनल सर्वे 1970 - चादर 01 (8K अल्ट्रा HD नक्शा)</image:title>
+      <image:caption>मौजा: सरथुआ, थाना: 218, अंचल: उदवंतनगर, भोजपुर (बिहार) - चादर 01 नक्शा</image:caption>
+      <image:geo_location>सरथुआ, भोजपुर, बिहार, भारत</image:geo_location>
+    </image:image>
+    <image:image>
+      <image:loc>https://docs.sarthua.in/maps/Sarthua_Sheet_2_HD_WhiteBG.png</image:loc>
+      <image:title>सरथुआ रिविजनल सर्वे 1970 - चादर 02 (8K अल्ट्रा HD नक्शा)</image:title>
+      <image:caption>मौजा: सरथुआ, थाना: 218 - चादर 02 नक्शा</image:caption>
+      <image:geo_location>सरथुआ, भोजपुर, बिहार, भारत</image:geo_location>
+    </image:image>
+    <image:image>
+      <image:loc>https://docs.sarthua.in/maps/Sarthua_Sheet_3_HD_WhiteBG.png</image:loc>
+      <image:title>सरथुआ रिविजनल सर्वे 1970 - चादर 03 (8K अल्ट्रा HD नक्शा)</image:title>
+      <image:caption>मौजा: सरथुआ, थाना: 218 - चादर 03 नक्शा</image:caption>
+      <image:geo_location>सरथुआ, भोजपुर, बिहार, भारत</image:geo_location>
+    </image:image>
+    <image:image>
+      <image:loc>https://docs.sarthua.in/maps/Sarthua_Sheet_4_HD_WhiteBG.png</image:loc>
+      <image:title>सरथुआ रिविजनल सर्वे 1970 - चादर 04 (8K अल्ट्रा HD नक्शा)</image:title>
+      <image:caption>मौजा: सरथुआ, थाना: 218 - चादर 04 नक्शा</image:caption>
+      <image:geo_location>सरथुआ, भोजपुर, बिहार, भारत</image:geo_location>
+    </image:image>
+    <image:image>
+      <image:loc>https://docs.sarthua.in/maps/Sarthua_Sheet_5_HD_WhiteBG.png</image:loc>
+      <image:title>सरथुआ रिविजनल सर्वे 1970 - चादर 05 (8K अल्ट्रा HD नक्शा)</image:title>
+      <image:caption>मौजा: सरथुआ, थाना: 218 - चादर 05 नक्शा</image:caption>
+      <image:geo_location>सरथुआ, भोजपुर, बिहार, भारत</image:geo_location>
+    </image:image>
+    <image:image>
+      <image:loc>https://docs.sarthua.in/maps/Sarthua_Sheet_6_HD_WhiteBG.png</image:loc>
+      <image:title>सरथुआ रिविजनल सर्वे 1970 - चादर 06 (8K अल्ट्रा HD नक्शा)</image:title>
+      <image:caption>मौजा: सरथुआ, थाना: 218 - चादर 06 नक्शा</image:caption>
+      <image:geo_location>सरथुआ, भोजपुर, बिहार, भारत</image:geo_location>
+    </image:image>
+
+    <!-- 1911 Cadastral Survey (CS) 8K Map Sheets -->
+    <image:image>
+      <image:loc>https://docs.sarthua.in/maps/Sarthua_CS_Sheet_00_HD_WhiteBG.png</image:loc>
+      <image:title>सरथुआ कैडस्ट्रल सर्वे 1911 - सम्पूर्ण मौजा मास्टर नक्शा (8K HD)</image:title>
+      <image:caption>मौजा सरथुआ (थाना 218) का ऐतिहासिक 1911 सम्पूर्ण मौजा कैडस्ट्रल नक्शा</image:caption>
+      <image:geo_location>सरथुआ, भोजपुर, बिहार, भारत</image:geo_location>
+    </image:image>
+    <image:image>
+      <image:loc>https://docs.sarthua.in/maps/Sarthua_CS_Sheet_1_HD_WhiteBG.png</image:loc>
+      <image:title>सरथुआ कैडस्ट्रल सर्वे 1911 - चादर 01</image:title>
+      <image:caption>मौजा सरथुआ 1911 कैडस्ट्रल सर्वे चादर 01</image:caption>
+      <image:geo_location>सरथुआ, भोजपुर, बिहार, भारत</image:geo_location>
+    </image:image>
+    <image:image>
+      <image:loc>https://docs.sarthua.in/maps/Sarthua_CS_Sheet_2_HD_WhiteBG.png</image:loc>
+      <image:title>सरथुआ कैडस्ट्रल सर्वे 1911 - चादर 02</image:title>
+      <image:caption>मौजा सरथुआ 1911 कैडस्ट्रल सर्वे चादर 02</image:caption>
+      <image:geo_location>सरथुआ, भोजपुर, बिहार, भारत</image:geo_location>
+    </image:image>
+    <image:image>
+      <image:loc>https://docs.sarthua.in/maps/Sarthua_CS_Sheet_3_HD_WhiteBG.png</image:loc>
+      <image:title>सरथुआ कैडस्ट्रल सर्वे 1911 - चादर 03</image:title>
+      <image:caption>मौजा सरथुआ 1911 कैडस्ट्रल सर्वे चादर 03</image:caption>
+      <image:geo_location>सरथुआ, भोजपुर, बिहार, भारत</image:geo_location>
+    </image:image>
+    <image:image>
+      <image:loc>https://docs.sarthua.in/maps/Sarthua_CS_Sheet_4_HD_WhiteBG.png</image:loc>
+      <image:title>सरथुआ कैडस्ट्रल सर्वे 1911 - चादर 04</image:title>
+      <image:caption>मौजा सरथुआ 1911 कैडस्ट्रल सर्वे चादर 04</image:caption>
+      <image:geo_location>सरथुआ, भोजपुर, बिहार, भारत</image:geo_location>
+    </image:image>
+    <image:image>
+      <image:loc>https://docs.sarthua.in/maps/Sarthua_CS_Sheet_5_HD_WhiteBG.png</image:loc>
+      <image:title>सरथुआ कैडस्ट्रल सर्वे 1911 - चादर 05</image:title>
+      <image:caption>मौजा सरथुआ 1911 कैडस्ट्रल सर्वे चादर 05</image:caption>
+      <image:geo_location>सरथुआ, भोजपुर, बिहार, भारत</image:geo_location>
+    </image:image>
   </url>
+
+  <!-- Section: Digital 8K Bhu-Naksha (GIS Multi-Survey Viewer) -->
+  <url>
+    <loc>https://sarthua.in/#map</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+  </url>
+
+  <!-- Section: Jamabandi Panji (Register II) -->
+  <url>
+    <loc>https://sarthua.in/#jamabandi</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+
+  <!-- Section: 1970 Revisional Survey Khatiyan -->
+  <url>
+    <loc>https://sarthua.in/#revisional</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+
+  <!-- Section: 1911 Cadastral Survey Khatiyan -->
+  <url>
+    <loc>https://sarthua.in/#cadastral</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <!-- Section: Citizen Land Services -->
+  <url>
+    <loc>https://sarthua.in/#services</loc>
+    <lastmod>2026-09-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
 </urlset>

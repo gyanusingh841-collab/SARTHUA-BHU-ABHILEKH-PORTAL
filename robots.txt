@@ -1,17 +1,32 @@
 # Robots.txt for Sarthua Bhu-Abhilekh Portal
 # Official URL: https://sarthua.in/
 
+User-agent: Googlebot
+Allow: /
+Allow: /maps/
+Allow: /js/
+Allow: /style.css
+Allow: /style.min.css
+Allow: /sarthua_plots_db.json
+Allow: /website_data.json
+Allow: /og-image.png
+
+User-agent: Googlebot-Image
+Allow: /maps/
+Allow: /og-image.png
+Allow: /apple-touch-icon.png
+Allow: /favicon.svg
+
 User-agent: *
 Allow: /
+Allow: /maps/
 Allow: /favicon.ico
 Allow: /favicon.svg
 Allow: /og-image.png
 Allow: /manifest.json
 Allow: /style.css
+Allow: /style.min.css
 Allow: /js/
 
-# Crawl-delay
-Crawl-delay: 1
-
-# Sitemaps
+# Official Sitemap Index
 Sitemap: https://sarthua.in/sitemap.xml

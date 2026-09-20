@@ -35,25 +35,137 @@
     <meta name="twitter:description" content="1911 कैडस्ट्रल खतियान, 1970 रिविजनल सर्वे और जमाबंदी पंजी ऑनलाइन देखें।">
     <meta name="twitter:image" content="https://sarthua.in/og-image.png">
 
-    <!-- Structured Data (Schema.org JSON-LD for Google Rich Search) -->
+    <!-- Geographic & Regional SEO Tags for Google Local Search -->
+    <meta name="geo.region" content="IN-BR">
+    <meta name="geo.placename" content="Sarthua, Bhojpur, Bihar, India">
+    <meta name="geo.position" content="25.5034;84.5937">
+    <meta name="ICBM" content="25.5034, 84.5937">
+
+    <!-- Comprehensive Structured Data (Schema.org JSON-LD Graph for Google Rich Snippets & FAQs) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "GovernmentService",
-      "name": "सरथुआ भू-अभिलेख पोर्टल",
-      "alternateName": "Sarthua Land Records Portal",
-      "url": "https://sarthua.in/",
-      "description": "मौजा सरथुआ, थाना संख्या 218, अंचल उदवंतनगर (भोजपुर, बिहार) के ऐतिहासिक कैडस्ट्रल खतियान (1911), रिविजनल सर्वे (1970), जमाबंदी पंजी और डिजिटल भू-नक्शा (GIS Cadastral Map) का सार्वजनिक डिजिटल संग्रह।",
-      "serviceType": "Public Land Records Archive",
-      "provider": {
-        "@type": "AdministrativeArea",
-        "name": "सरथुआ, उदवंतनगर, भोजपुर (बिहार)"
-      },
-      "areaServed": {
-        "@type": "AdministrativeArea",
-        "name": "सरथुआ (Sarthua), थाना 218, उदवंतनगर, भोजपुर, बिहार"
-      },
-      "inLanguage": ["hi", "en"]
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://sarthua.in/#website",
+          "url": "https://sarthua.in/",
+          "name": "सरथुआ भू-अभिलेख पोर्टल",
+          "alternateName": "Sarthua Bhu-Abhilekh Portal",
+          "description": "मौजा सरथुआ (थाना 218, भोजपुर, बिहार) के खतियान, जमाबंदी पंजी और डिजिटल 8K भू-नक्शा का आधिकारिक सार्वजनिक पोर्टल।",
+          "inLanguage": "hi",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://sarthua.in/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "GovernmentService",
+          "@id": "https://sarthua.in/#service",
+          "name": "सरथुआ डिजिटल भू-अभिलेख सेवा",
+          "alternateName": "Sarthua Digital Land Records Service",
+          "url": "https://sarthua.in/",
+          "serviceType": "Public Land Records Archive & GIS Cadastral Maps",
+          "provider": {
+            "@type": "AdministrativeArea",
+            "name": "सरथुआ, अंचल: उदवंतनगर, जिला: भोजपुर (बिहार)",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Sarthua",
+              "addressRegion": "Bihar",
+              "postalCode": "802210",
+              "addressCountry": "IN"
+            }
+          },
+          "areaServed": {
+            "@type": "AdministrativeArea",
+            "name": "सरथुआ (थाना संख्या 218)"
+          }
+        },
+        {
+          "@type": "Dataset",
+          "@id": "https://sarthua.in/#dataset",
+          "name": "सरथुआ मौजा भू-राजस्व एवं खतियान डेटाबेस (थाना 218)",
+          "description": "मौजा सरथुआ के 4,200+ प्लॉट्स, 22 वॉल्यूम जमाबंदी पंजी, 9 वॉल्यूम रिविजनल सर्वे (1970) एवं 2 वॉल्यूम कैडस्ट्रल सर्वे (1911) का डिजिटल रिकॉर्ड।",
+          "url": "https://sarthua.in/",
+          "license": "https://creativecommons.org/licenses/publicdomain/",
+          "temporalCoverage": "1911/2026",
+          "spatialCoverage": {
+            "@type": "Place",
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 25.5034,
+              "longitude": 84.5937
+            }
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://sarthua.in/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "सरथुआ का थाना नंबर और अंचल कौन सा है?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "मौजा सरथुआ का थाना नंबर 218, अंचल उदवंतनगर और जिला भोजपुर (आरा), बिहार है।"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "सरथुआ की जमाबंदी पंजी (Register II) ऑनलाइन कैसे देखें?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "सरथुआ भू-अभिलेख पोर्टल (sarthua.in) के 'जमाबंदी पंजी' टैब में जाकर आप वॉल्यूम 01 से 21 तक के सभी मूल राजस्व पन्नों को उच्च गुणवत्ता में ऑनलाइन पढ़ सकते हैं।"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "सरथुआ का 1911 कैडस्ट्रल और 1970 रिविजनल खतियान कहाँ उपलब्ध है?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "इस पोर्टल पर 1911 कैडस्ट्रल सर्वे के 2 वॉल्यूम (830 पेज) और 1970 रिविजनल सर्वे के सभी 9 वॉल्यूम सीधे उपलब्ध हैं, जिन्हें बिना किसी शुल्क के देखा जा सकता है।"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "सरथुआ का डिजिटल 8K भू-नक्शा कैसे देखें?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "पोर्टल के 'डिजिटल नक्शा' सेक्शन में 1970 रिविजनल सर्वे (चादर 1 से 6) एवं 1911 कैडस्ट्रल सर्वे (चादर 00 से 5) का 8K अल्ट्रा HD नक्शा उपलब्ध है, जिसमें ज़ूम करके सीधे प्लॉट नंबर और चौहद्दी देखी जा सकती है।"
+              }
+            }
+          ]
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "https://sarthua.in/#breadcrumb",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "बिहार भू-अभिलेख",
+              "item": "https://sarthua.in/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "भोजपुर (उदवंतनगर)",
+              "item": "https://sarthua.in/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "मौजा सरथुआ (थाना 218)",
+              "item": "https://sarthua.in/"
+            }
+          ]
+        }
+      ]
     }
     </script>
 
