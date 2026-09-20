@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="theme-color" content="#0b1e36">
+    <script>(function(){try{var t=localStorage.getItem('sarthua_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+
+    <title>डिजिटल भू-नक्शा (Bhu-Naksha GIS Map) | सरथुआ भू-अभिलेख पोर्टल</title>
+    <meta name="description" content="सरथुआ मौजा (थाना 218) का 8K अल्ट्रा HD डिजिटल भू-नक्शा - 1970 रिविजनल सर्वे व 1911 कैडस्ट्रल सर्वे के सभी चादर, प्लॉट/खेसरा नंबर सहित, मुफ्त ऑनलाइन।">
+    <meta name="author" content="सरथुआ ग्राम पंचायत एवं डिजिटल भू-अभिलेख संग्रह">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="https://sarthua.in/bhu-naksha.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sarthua.in/bhu-naksha.html">
+    <meta property="og:title" content="डिजिटल भू-नक्शा (Bhu-Naksha GIS Map) | सरथुआ भू-अभिलेख पोर्टल">
+    <meta property="og:description" content="सरथुआ भू-नक्शा (GIS Cadastral Map) - 8K अल्ट्रा HD, RS 1970 व CS 1911, खेसरा सर्च के साथ।">
+    <meta property="og:image" content="https://sarthua.in/og-image.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="hi_IN">
+    <meta property="og:site_name" content="सरथुआ भू-अभिलेख पोर्टल">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="डिजिटल भू-नक्शा (Bhu-Naksha GIS Map) | सरथुआ भू-अभिलेख पोर्टल">
+    <meta name="twitter:description" content="सरथुआ भू-नक्शा (GIS Cadastral Map) - 8K अल्ट्रा HD, RS 1970 व CS 1911, खेसरा सर्च के साथ।">
+    <meta name="twitter:image" content="https://sarthua.in/og-image.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "होम", "item": "https://sarthua.in/"},
+        {"@type": "ListItem", "position": 2, "name": "भू-नक्शा", "item": "https://sarthua.in/bhu-naksha.html"}
+      ]
+    }
+    </script>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="alternate icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://docs.sarthua.in" crossorigin>
+
+    <link rel="stylesheet" href="style.min.css?v=8.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+</head>
+<body>
+    <div class="gov-tricolor-ribbon"></div>
+
+    <header class="portal-navbar">
+        <div class="container">
+            <div class="navbar-inner">
+                <div class="navbar-brand">
+                    <a href="index.html" class="brand-crest" style="text-decoration:none;" aria-label="होम पेज पर जाएं">
+                        <i class="fas fa-landmark"></i>
+                    </a>
+                    <div class="brand-info">
+                        <p class="brand-title" data-en="Sarthua Bhu-Abhilekh Portal">सरथुआ भू-अभिलेख पोर्टल</p>
+                        <div class="brand-meta">
+                            <span data-en="Mauja: Sarthua">मौजा: सरथुआ</span> <span class="meta-sep">•</span>
+                            <span data-en="Thana No: 218">थाना नं: 218</span> <span class="meta-sep">•</span>
+                            <span data-en="Udwantnagar (Bhojpur)">उदवंतनगर (भोजपुर)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navbar-actions">
+                    <a href="https://docs.sarthua.in/support/Support_EBook_Kaithi.pdf"
+                       target="_blank" rel="noopener" class="nav-btn nav-btn--accent" title="कैथी से देवनागरी रूपांतरण गाइड">
+                        <i class="fas fa-book-open"></i> <span data-en="Kaithi Guide">कैथी गाइड</span>
+                    </a>
+
+                    <a href="glossary.html" class="nav-btn nav-btn--outline" title="भू-राजस्व शब्दावली">
+                        <i class="fas fa-info-circle"></i> <span data-en="Glossary">राजस्व शब्दावली</span>
+                    </a>
+
+                    <button class="nav-btn nav-btn--outline lang-toggle-btn" id="langToggleBtn" onclick="toggleLanguage()" title="Hindi / English" aria-label="भाषा बदलें / Switch language">EN</button>
+
+                    <div class="nav-font-ctrl" title="फॉन्ट आकार" role="group" aria-label="फ़ॉन्ट आकार नियंत्रण">
+                        <button class="font-btn" onclick="adjustFontSize(-1)" aria-label="फ़ॉन्ट आकार छोटा करें (A-)">A-</button>
+                        <button class="font-btn active" id="fontResetBtn" onclick="adjustFontSize(0)" aria-label="सामान्य फ़ॉन्ट आकार (A)">A</button>
+                        <button class="font-btn" onclick="adjustFontSize(1)" aria-label="फ़ॉन्ट आकार बड़ा करें (A+)">A+</button>
+                    </div>
+
+                    <button class="nav-btn nav-btn--icon" id="themeToggleBtn" onclick="toggleTheme()" title="थीम बदलें" aria-label="डार्क या लाइट थीम बदलें">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="page-nav-wrap">
+        <div class="container">
+            <div class="page-nav">
+                <a href="index.html" class="page-nav-link"><i class="fas fa-home"></i> <span data-en="Home">होम</span></a>
+                <a href="jamabandi.html" class="page-nav-link"><i class="fas fa-book"></i> <span data-en="Jamabandi Panji">जमाबंदी पंजी</span></a>
+                <a href="revisional-survey.html" class="page-nav-link"><i class="fas fa-history"></i> <span data-en="Revisional Survey">Revisional Survey</span></a>
+                <a href="cadastral-survey.html" class="page-nav-link"><i class="fas fa-map"></i> <span data-en="Cadastral Survey">Cadastral Survey</span></a>
+                <a href="bhu-naksha.html" class="page-nav-link active"><i class="fas fa-map-marked-alt"></i> <span data-en="Bhu-Naksha">भू-नक्शा</span></a>
+                <a href="services.html" class="page-nav-link"><i class="fas fa-hand-holding-heart"></i> <span data-en="E-Services">ई-सेवाएं</span></a>
+                <a href="glossary.html" class="page-nav-link"><i class="fas fa-book-reader"></i> <span data-en="Glossary">शब्दावली</span></a>
+            </div>
+        </div>
+    </nav>
+    <div class="breadcrumb-trail">
+        <a href="index.html" data-en="Home">होम</a> / <span data-en="Bhu-Naksha">भू-नक्शा</span>
+    </div>
+    <main class="main-content">
+        <div class="container">
+        <div class="page-banner">
+            <div class="modern-section-header">
+                <div class="msh-left">
+                    <div class="msh-icon" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); color: #2563eb; border-color: #bfdbfe;"><i class="fas fa-map-marked-alt"></i></div>
+                    <div class="msh-info">
+                        <h1 data-en="Digital Bhu-Naksha (GIS Cadastral Map)">डिजिटल भू-नक्शा (GIS Cadastral Map)</h1>
+                        <span class="msh-period" data-en="Ultra HD 8K map • Mauja: Sarthua, Thana No: 218">अल्ट्रा HD 8K नक्शा • मौजा: सरथुआ, थाना संख्या: 218</span>
+                    </div>
+                </div>
+                <div class="msh-badges">
+                    <span class="msh-pill" id="mapActiveSheetBadge"><i class="fas fa-layer-group"></i> <span data-en="Sheet No:">चादर संख्या:</span> <strong>01</strong></span>
+                    <span class="msh-pill msh-pill--status"><i class="fas fa-check-circle"></i> <span data-en="8K Ultra HD (6 sheets total)">8K अल्ट्रा HD (कुल 6 चादर)</span></span>
+                </div>
+            </div>
+        </div>
+                <div class="sarthua-map-card" id="sarthuaMapCard">
+                    <!-- Map Toolbar -->
+                    <div class="map-toolbar">
+                        <div class="map-toolbar-left">
+                            <div class="map-search-wrap">
+                                <i class="fas fa-search"></i>
+                                <input type="number" id="mapKhasraSearchInput" placeholder="खेसरा / प्लॉट नं. खोजें (उदा. 64)..." onkeydown="if(event.key==='Enter') SarthuaMapViewer.searchPlot()">
+                                <button class="btn btn--sm btn--primary" onclick="SarthuaMapViewer.searchPlot()" title="प्लॉट खोजें">
+                                    <span>खोजें</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="map-toolbar-center">
+                            <!-- Survey Switcher: 1970 RS vs 1911 CS -->
+                            <div class="map-survey-switcher" role="group" aria-label="सर्वेक्षण चयनकर्ता">
+                                <button class="map-survey-btn active" data-survey="RS" onclick="SarthuaMapViewer.switchSurvey('RS')" title="1970 रिविजनल सर्वे">
+                                    <i class="fas fa-layer-group"></i> <span>1970 RS</span>
+                                </button>
+                                <button class="map-survey-btn" data-survey="CS" onclick="SarthuaMapViewer.switchSurvey('CS')" title="1911 कैडस्ट्रल सर्वे">
+                                    <i class="fas fa-history"></i> <span>1911 CS</span>
+                                </button>
+                            </div>
+
+                            <!-- Dynamic Sheet Switcher -->
+                            <div class="map-sheet-switcher" id="mapSheetSwitcherWrap" role="group" aria-label="चादर चयनकर्ता">
+                                <span class="sheet-switcher-label"><i class="fas fa-map"></i> चादर:</span>
+                                <button class="map-sheet-btn active" data-sheet="1" onclick="SarthuaMapViewer.switchSheet(1)" title="चादर संख्या 01">01</button>
+                                <button class="map-sheet-btn" data-sheet="2" onclick="SarthuaMapViewer.switchSheet(2)" title="चादर संख्या 02">02</button>
+                                <button class="map-sheet-btn" data-sheet="3" onclick="SarthuaMapViewer.switchSheet(3)" title="चादर संख्या 03">03</button>
+                                <button class="map-sheet-btn" data-sheet="4" onclick="SarthuaMapViewer.switchSheet(4)" title="चादर संख्या 04">04</button>
+                                <button class="map-sheet-btn" data-sheet="5" onclick="SarthuaMapViewer.switchSheet(5)" title="चादर संख्या 05">05</button>
+                                <button class="map-sheet-btn" data-sheet="6" onclick="SarthuaMapViewer.switchSheet(6)" title="चादर संख्या 06">06</button>
+                            </div>
+                        </div>
+
+                        <div class="map-toolbar-right">
+                            <div class="map-actions-group">
+                                <button class="map-action-btn" onclick="SarthuaMapViewer.zoomIn()" title="ज़ूम इन (+)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button class="map-action-btn" onclick="SarthuaMapViewer.zoomOut()" title="ज़ूम आउट (-)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button class="map-action-btn" onclick="SarthuaMapViewer.resetView()" title="नक्शा रीसेट करें (H)">
+                                    <i class="fas fa-expand-arrows-alt"></i> <span>रीसेट</span>
+                                </button>
+                                <button class="map-action-btn" onclick="SarthuaMapViewer.toggleFullscreen()" title="फुल स्क्रीन (F)">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Map Canvas Container -->
+                    <div id="sarthuaMapContainer" class="sarthua-map-canvas" role="application" aria-label="मौजा सरथुआ का इंटरैक्टिव भू-नक्शा (GIS कैडस्ट्रल मानचित्र)"></div>
+
+                    <!-- Footer Hint Strip -->
+                    <div class="map-footer-hint">
+                        <div class="mfh-item">
+                            <i class="fas fa-info-circle"></i>
+                            <span>माउस व्हील / डबल क्लिक या टच पिंच से ज़ूम करें</span>
+                        </div>
+                        <div class="mfh-item">
+                            <i class="fas fa-mouse-pointer"></i>
+                            <span>प्लॉट पर क्लिक कर विवरण देखें</span>
+                        </div>
+                        <div class="mfh-item" id="mapCoordsDisplay">
+                            <i class="fas fa-crosshairs"></i> X: — | Y: —
+                        </div>
+                        <div class="mfh-item">
+                            <span>पैमाना: <strong>16" = 1 मील</strong></span>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </main>
+    <footer class="portal-footer">
+        <div class="container">
+            <div class="footer-disclaimer-strip">
+                <i class="fas fa-balance-scale disclaimer-strip-icon"></i>
+                <div class="disclaimer-strip-text" data-en="Legal Notice &amp; Disclaimer: This portal is for digital preservation, public awareness and historical study of Sarthua village. For a legally certified copy, please obtain it through due process from the Anchal Office (Udwantnagar, Bhojpur).">
+                    <strong>विधिक सूचना एवं अस्वीकरण:</strong> यह पोर्टल सरथुआ ग्राम के डिजिटल संरक्षण, जन-जागरूकता एवं ऐतिहासिक अध्ययन हेतु है। विधिक प्रमाणित प्रतिलिपि (Certified Copy) हेतु कृपया अंचल कार्यालय (उदवंतनगर, भोजपुर) से विधिवत नकल प्राप्त करें।
+                </div>
+            </div>
+
+            <div class="footer-bottom-bar">
+                <div class="footer-admin-info">
+                    <span class="admin-badge"><i class="fas fa-user-shield"></i> <span data-en="Administrator">व्यवस्थापक</span></span>
+                    <span class="admin-owner">This Website Owned By <strong>Gyanu Kumar</strong></span>
+                    <a href="https://wa.me/919006035986" target="_blank" class="footer-wa-pill" title="WhatsApp पर संदेश भेजें">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>+91 9006035986</span>
+                    </a>
+                </div>
+
+                <div class="footer-copyright">
+                    <p>&copy; 2025 <span data-en="Sarthua Bhu-Abhilekh Portal">सरथुआ भू-अभिलेख पोर्टल</span> • <span data-en="Mauja: Sarthua, Thana: 218">मौजा: सरथुआ, थाना: 218</span></p>
+                    <span class="footer-sub" data-en="Udwantnagar, Bhojpur (Bihar)">उदवंतनगर, भोजपुर (बिहार)</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="loadingModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="loading-spinner"></div>
+            <p><i class="fas fa-file-pdf"></i> PDF लोड हो रहा है...</p>
+        </div>
+    </div>
+    <script src="js/site.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
+    <script src="js/map.bundle.js?v=8.0" defer></script>
+</body>
+</html>

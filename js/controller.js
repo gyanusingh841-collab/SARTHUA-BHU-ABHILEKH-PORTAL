@@ -37,11 +37,7 @@ const AppController = {
         this.setupEventListeners();
         this.setupKeyboardShortcuts();
 
-        // 6. Deep-link: open the tab named in the URL hash (e.g. sarthua.in/#jamabandi)
-        this.routeFromHash();
-        window.addEventListener('hashchange', () => this.routeFromHash());
-
-        // 7. Run a search if the URL carries one (?q=...), used by the sitelinks searchbox
+        // 6. Run a search if the URL carries one (?q=...), used by the sitelinks searchbox
         const q = new URLSearchParams(window.location.search).get('q');
         if (q) {
             const searchInput = document.getElementById('searchInput');
@@ -50,17 +46,6 @@ const AppController = {
                 this.handleSearchInputChange(searchInput);
             }
             this.performSearch(q);
-        }
-    },
-
-    // Map a URL hash to a valid tab id and activate it
-    routeFromHash: function () {
-        const validTabs = ['jamabandi', 'revisional', 'cadastral', 'services', 'bhunaksha'];
-        const aliases = { map: 'bhunaksha' };
-        let tabName = (window.location.hash || '').replace('#', '').trim();
-        tabName = aliases[tabName] || tabName;
-        if (validTabs.includes(tabName)) {
-            this.switchTab(tabName, null);
         }
     },
 
@@ -144,17 +129,6 @@ const AppController = {
                 }
             }
         });
-    },
-
-    // Tab Navigation
-    switchTab: function (tabName, evt) {
-        AppModel.state.currentTab = tabName;
-        AppView.updateTabUI(tabName, evt);
-        try {
-            if (window.location.hash !== '#' + tabName) {
-                history.replaceState(null, '', '#' + tabName);
-            }
-        } catch (e) { }
     },
 
     // Search Execution
@@ -344,7 +318,6 @@ const AppController = {
 
 // Global Exposes for HTML inline onclick and form handlers
 window.AppController = AppController;
-window.showTab = function (tabName, evt) { AppController.switchTab(tabName, evt); };
 window.searchRecords = function () {
     const q = document.getElementById('searchInput')?.value || '';
     AppController.performSearch(q);
@@ -355,10 +328,6 @@ window.applyQuickSearch = function (term) { AppController.applyQuickSearch(term)
 window.startVoiceSearch = function () { AppController.startVoiceSearch(); };
 window.openRequestModal = function (service) { AppView.openRequestModal(service); };
 window.closeRequestModal = function () { AppView.closeRequestModal(); };
-window.openGlossaryModal = function () { AppView.openGlossaryModal(); };
-window.closeGlossaryModal = function () { AppView.closeGlossaryModal(); };
-window.adjustFontSize = function (delta) { AppController.handleFontSize(delta); };
-window.toggleTheme = function () { AppController.handleThemeToggle(); };
 window.handleRequestSubmit = function (e) { AppController.handleRequestSubmit(e); };
 window.viewPDF = function (url, filename, size) { AppController.viewPDF(url, filename, size); };
 window.closePdfModal = function () { PdfViewerEngine.close(); };
