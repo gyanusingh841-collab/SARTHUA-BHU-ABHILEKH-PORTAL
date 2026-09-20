@@ -48,7 +48,7 @@
             "@type": "SearchAction",
             "target": {
               "@type": "EntryPoint",
-              "urlTemplate": "https://sarthua.in/jamabandi.html?q={search_term_string}"
+              "urlTemplate": "https://sarthua.in/jamabandi?q={search_term_string}"
             },
             "query-input": "required name=search_term_string"
           }
@@ -110,11 +110,11 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
     <script>
     (function () {
-        var hashMap = { jamabandi: 'jamabandi.html', revisional: 'revisional-survey.html', cadastral: 'cadastral-survey.html', bhunaksha: 'bhu-naksha.html', map: 'bhu-naksha.html', services: 'services.html' };
+        var hashMap = { jamabandi: 'jamabandi', revisional: 'revisional-survey', cadastral: 'cadastral-survey', bhunaksha: 'bhu-naksha', map: 'bhu-naksha', services: 'services' };
         var hash = (window.location.hash || '').replace('#', '').trim();
         if (hashMap[hash]) { window.location.replace(hashMap[hash]); return; }
         var q = new URLSearchParams(window.location.search).get('q');
-        if (q) { window.location.replace('jamabandi.html?q=' + encodeURIComponent(q)); }
+        if (q) { window.location.replace('jamabandi?q=' + encodeURIComponent(q)); }
     })();
     </script>
 </head>
@@ -125,7 +125,7 @@
         <div class="container">
             <div class="navbar-inner">
                 <div class="navbar-brand">
-                    <a href="index.html" class="brand-crest" style="text-decoration:none;" aria-label="होम पेज पर जाएं">
+                    <a href="/" class="brand-crest" style="text-decoration:none;" aria-label="होम पेज पर जाएं">
                         <i class="fas fa-landmark"></i>
                     </a>
                     <div class="brand-info">
@@ -144,7 +144,7 @@
                         <i class="fas fa-book-open"></i> <span data-en="Kaithi Guide">कैथी गाइड</span>
                     </a>
 
-                    <a href="glossary.html" class="nav-btn nav-btn--outline" title="भू-राजस्व शब्दावली">
+                    <a href="glossary" class="nav-btn nav-btn--outline" title="भू-राजस्व शब्दावली">
                         <i class="fas fa-info-circle"></i> <span data-en="Glossary">राजस्व शब्दावली</span>
                     </a>
 
@@ -167,13 +167,13 @@
     <nav class="page-nav-wrap">
         <div class="container">
             <div class="page-nav">
-                <a href="index.html" class="page-nav-link active"><i class="fas fa-home"></i> <span data-en="Home">होम</span></a>
-                <a href="jamabandi.html" class="page-nav-link"><i class="fas fa-book"></i> <span data-en="Jamabandi Panji">जमाबंदी पंजी</span></a>
-                <a href="revisional-survey.html" class="page-nav-link"><i class="fas fa-history"></i> <span data-en="Revisional Survey">Revisional Survey</span></a>
-                <a href="cadastral-survey.html" class="page-nav-link"><i class="fas fa-map"></i> <span data-en="Cadastral Survey">Cadastral Survey</span></a>
-                <a href="bhu-naksha.html" class="page-nav-link"><i class="fas fa-map-marked-alt"></i> <span data-en="Bhu-Naksha">भू-नक्शा</span></a>
-                <a href="services.html" class="page-nav-link"><i class="fas fa-hand-holding-heart"></i> <span data-en="E-Services">ई-सेवाएं</span></a>
-                <a href="glossary.html" class="page-nav-link"><i class="fas fa-book-reader"></i> <span data-en="Glossary">शब्दावली</span></a>
+                <a href="/" class="page-nav-link active"><i class="fas fa-home"></i> <span data-en="Home">होम</span></a>
+                <a href="jamabandi" class="page-nav-link"><i class="fas fa-book"></i> <span data-en="Jamabandi Panji">जमाबंदी पंजी</span></a>
+                <a href="revisional-survey" class="page-nav-link"><i class="fas fa-history"></i> <span data-en="Revisional Survey">Revisional Survey</span></a>
+                <a href="cadastral-survey" class="page-nav-link"><i class="fas fa-map"></i> <span data-en="Cadastral Survey">Cadastral Survey</span></a>
+                <a href="bhu-naksha" class="page-nav-link"><i class="fas fa-map-marked-alt"></i> <span data-en="Bhu-Naksha">भू-नक्शा</span></a>
+                <a href="services" class="page-nav-link"><i class="fas fa-hand-holding-heart"></i> <span data-en="E-Services">ई-सेवाएं</span></a>
+                <a href="glossary" class="page-nav-link"><i class="fas fa-book-reader"></i> <span data-en="Glossary">शब्दावली</span></a>
             </div>
         </div>
     </nav>
@@ -194,15 +194,15 @@
                                class="search-input-field"
                                aria-label="खाता, खेसरा, या वॉल्यूम संख्या खोजें"
                                autocomplete="off">
-                        <button onclick="window.location.href='jamabandi.html?q='+encodeURIComponent(document.getElementById('searchInput').value)" class="btn btn--search-primary" aria-label="अभिलेख खोजें">
+                        <button onclick="window.location.href='jamabandi?q='+encodeURIComponent(document.getElementById('searchInput').value)" class="btn btn--search-primary" aria-label="अभिलेख खोजें">
                             <i class="fas fa-search"></i>
                             <span data-en="Search">खोजें</span>
                         </button>
                     </div>
                 </div>
                 <div class="hero-cta-row" style="margin-top: 20px;">
-                    <a href="jamabandi.html" class="btn btn--gold"><i class="fas fa-book"></i> <span data-en="View Jamabandi Panji">जमाबंदी पंजी देखें</span></a>
-                    <a href="bhu-naksha.html" class="btn btn--ghost-light"><i class="fas fa-map-marked-alt"></i> <span data-en="View Bhu-Naksha">भू-नक्शा देखें</span></a>
+                    <a href="jamabandi" class="btn btn--gold"><i class="fas fa-book"></i> <span data-en="View Jamabandi Panji">जमाबंदी पंजी देखें</span></a>
+                    <a href="bhu-naksha" class="btn btn--ghost-light"><i class="fas fa-map-marked-alt"></i> <span data-en="View Bhu-Naksha">भू-नक्शा देखें</span></a>
                 </div>
             </div>
         </div>
@@ -218,37 +218,37 @@
     <main class="main-content">
         <div class="container">
             <div class="nav-card-grid">
-                <a href="jamabandi.html" class="nav-card">
+                <a href="jamabandi" class="nav-card">
                     <div class="nav-card-icon"><i class="fas fa-book"></i></div>
                     <h3 data-en="Jamabandi Panji">जमाबंदी पंजी</h3>
                     <p data-en="Register II — all 22 volumes from 1970 to present, in high-quality PDF.">रजिस्टर 2 — 1970 से अब तक के सभी 22 वॉल्यूम, हाई क्वालिटी PDF में।</p>
                     <span class="nav-card-arrow" data-en="View Records &rarr;">अभिलेख देखें &rarr;</span>
                 </a>
-                <a href="revisional-survey.html" class="nav-card">
+                <a href="revisional-survey" class="nav-card">
                     <div class="nav-card-icon"><i class="fas fa-history"></i></div>
                     <h3 data-en="Revisional Survey (1970)">Revisional Survey (1970)</h3>
                     <p data-en="All 9 books of the revised post-independence survey.">स्वतंत्रता पश्चात के संशोधित सर्वेक्षण की सभी 9 पुस्तकें।</p>
                     <span class="nav-card-arrow" data-en="View Records &rarr;">अभिलेख देखें &rarr;</span>
                 </a>
-                <a href="cadastral-survey.html" class="nav-card">
+                <a href="cadastral-survey" class="nav-card">
                     <div class="nav-card-icon"><i class="fas fa-map"></i></div>
                     <h3 data-en="Cadastral Survey (1911)">Cadastral Survey (1911)</h3>
                     <p data-en="The original British-era historic khatiyan, 2 books.">ब्रिटिश कालीन ऐतिहासिक मूल खतियान, 2 पुस्तकें।</p>
                     <span class="nav-card-arrow" data-en="View Records &rarr;">अभिलेख देखें &rarr;</span>
                 </a>
-                <a href="bhu-naksha.html" class="nav-card">
+                <a href="bhu-naksha" class="nav-card">
                     <div class="nav-card-icon"><i class="fas fa-map-marked-alt"></i></div>
                     <h3 data-en="Digital Bhu-Naksha">डिजिटल भू-नक्शा</h3>
                     <p data-en="8K ultra-HD GIS map with plot/khesra search.">8K अल्ट्रा HD GIS नक्शा, प्लॉट/खेसरा सर्च सहित।</p>
                     <span class="nav-card-arrow" data-en="Open Map &rarr;">नक्शा खोलें &rarr;</span>
                 </a>
-                <a href="services.html" class="nav-card">
+                <a href="services" class="nav-card">
                     <div class="nav-card-icon"><i class="fas fa-hand-holding-heart"></i></div>
                     <h3 data-en="E-Services &amp; Support">ई-सेवाएं व सहायता</h3>
                     <p data-en="WhatsApp document requests and official Bihar government portal links.">WhatsApp दस्तावेज़ अनुरोध व बिहार सरकार पोर्टल लिंक।</p>
                     <span class="nav-card-arrow" data-en="Get Help &rarr;">सहायता पाएं &rarr;</span>
                 </a>
-                <a href="glossary.html" class="nav-card">
+                <a href="glossary" class="nav-card">
                     <div class="nav-card-icon"><i class="fas fa-book-reader"></i></div>
                     <h3 data-en="Revenue Glossary">राजस्व शब्दावली</h3>
                     <p data-en="Simple meanings of Khatiyan, Khesra, Jamabandi and other terms.">खतियान, खेसरा, जमाबंदी जैसे शब्दों का सरल अर्थ।</p>

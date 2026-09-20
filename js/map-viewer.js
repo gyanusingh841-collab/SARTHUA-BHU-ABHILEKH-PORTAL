@@ -441,7 +441,7 @@ const SarthuaMapViewer = {
                         <div class="mpp-row"><span>चादर संख्या:</span> <strong>${this.currentSheet === 0 ? 'सम्पूर्ण मौजा' : '0' + this.currentSheet}</strong></div>
                     </div>
                     <div class="mpp-actions">
-                        <a href="jamabandi.html?q=${encodeURIComponent(matchedPlot.plot_no)}" class="btn btn--sm btn--primary">
+                        <a href="jamabandi?q=${encodeURIComponent(matchedPlot.plot_no)}" class="btn btn--sm btn--primary">
                             <i class="fas fa-book"></i> खतियान में देखें
                         </a>
                         <a href="${lpmUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--sm btn--secondary" title="सरकारी LPM नक्शा रिपोर्ट PDF">
@@ -464,10 +464,10 @@ const SarthuaMapViewer = {
                         <div class="mpp-row"><span>अंचल / थाना:</span> <strong>उदवंतनगर (218)</strong></div>
                     </div>
                     <div class="mpp-actions">
-                        <a href="revisional-survey.html" class="btn btn--sm btn--primary">
+                        <a href="revisional-survey" class="btn btn--sm btn--primary">
                             <i class="fas fa-history"></i> 1970 खतियान
                         </a>
-                        <a href="cadastral-survey.html" class="btn btn--sm btn--secondary">
+                        <a href="cadastral-survey" class="btn btn--sm btn--secondary">
                             <i class="fas fa-book-open"></i> 1911 खतियान
                         </a>
                     </div>
@@ -533,7 +533,7 @@ const SarthuaMapViewer = {
                     <div class="mpp-row"><span>चादर संख्या:</span> <strong>${this.currentSheet === 0 ? 'सम्पूर्ण मौजा' : '0' + this.currentSheet}</strong></div>
                 </div>
                 <div class="mpp-actions">
-                    <a href="jamabandi.html?q=${encodeURIComponent(query)}" class="btn btn--sm btn--primary">
+                    <a href="jamabandi?q=${encodeURIComponent(query)}" class="btn btn--sm btn--primary">
                         <i class="fas fa-history"></i> खतियान में देखें
                     </a>
                     <a href="${lpmLink}" target="_blank" rel="noopener noreferrer" class="btn btn--sm btn--secondary" title="सरकारी LPM नक्शा रिपोर्ट PDF">

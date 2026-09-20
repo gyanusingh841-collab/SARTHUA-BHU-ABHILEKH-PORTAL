@@ -1,0 +1,8 @@
+# Cloudflare Pages 301 Permanent Redirects for Clean URLs
+/index.html              /                       301
+/jamabandi.html          /jamabandi              301
+/revisional-survey.html  /revisional-survey      301
+/cadastral-survey.html   /cadastral-survey       301
+/bhu-naksha.html         /bhu-naksha             301
+/services.html           /services               301
+/glossary.html           /glossary               301
