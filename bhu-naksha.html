@@ -141,7 +141,7 @@
                         <div class="map-toolbar-left">
                             <div class="map-search-wrap">
                                 <i class="fas fa-search"></i>
-                                <input type="number" id="mapKhasraSearchInput" placeholder="खेसरा / प्लॉट नं. खोजें (उदा. 64)..." onkeydown="if(event.key==='Enter') SarthuaMapViewer.searchPlot()">
+                                <input type="text" inputmode="numeric" id="mapKhasraSearchInput" placeholder="खेसरा / प्लॉट नं. खोजें (उदा. 64)..." onkeydown="if(event.key==='Enter') SarthuaMapViewer.searchPlot()">
                                 <button class="btn btn--sm btn--primary" onclick="SarthuaMapViewer.searchPlot()" title="प्लॉट खोजें">
                                     <span>खोजें</span>
                                 </button>
@@ -247,6 +247,23 @@
     </div>
     <script src="js/site.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
-    <script src="js/map.bundle.js?v=8.0" defer></script>
+    <script src="js/map.bundle.js?v=8.1" defer></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var params = new URLSearchParams(window.location.search);
+        var q = params.get('q');
+        if (q) {
+            var checkInit = setInterval(function () {
+                if (window.SarthuaMapViewer && window.SarthuaMapViewer.isInitialized) {
+                    clearInterval(checkInit);
+                    var input = document.getElementById('mapKhasraSearchInput');
+                    if (input) input.value = q;
+                    window.SarthuaMapViewer.searchPlot(q);
+                }
+            }, 100);
+            setTimeout(function () { clearInterval(checkInit); }, 8000);
+        }
+    });
+    </script>
 </body>
 </html>

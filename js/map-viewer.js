@@ -251,7 +251,8 @@ const SarthuaMapViewer = {
         if (!container || this.isInitialized) return;
 
         if (typeof L === 'undefined') {
-            console.warn('Leaflet library loading...');
+            console.warn('[BhuNaksha] Leaflet library loading, retrying in 50ms...');
+            setTimeout(() => this.init(), 50);
             return;
         }
 
@@ -278,6 +279,9 @@ const SarthuaMapViewer = {
         // Add 8K Ultra-HD Authentic Survey Map Layer
         this.imageOverlay = L.imageOverlay(sheet.white, this.imageBounds).addTo(this.map);
         this.map.fitBounds(this.imageBounds);
+        setTimeout(() => {
+            if (this.map) this.map.invalidateSize();
+        }, 150);
 
         // Render dynamic sheet switcher buttons
         this.renderSheetSwitcher();
@@ -437,9 +441,9 @@ const SarthuaMapViewer = {
                         <div class="mpp-row"><span>चादर संख्या:</span> <strong>${this.currentSheet === 0 ? 'सम्पूर्ण मौजा' : '0' + this.currentSheet}</strong></div>
                     </div>
                     <div class="mpp-actions">
-                        <button onclick="AppController.performSearch('${matchedPlot.plot_no}'); showTab('${this.currentSurvey === 'CS' ? 'cadastral' : 'revisional'}');" class="btn btn--sm btn--primary">
+                        <a href="jamabandi.html?q=${encodeURIComponent(matchedPlot.plot_no)}" class="btn btn--sm btn--primary">
                             <i class="fas fa-book"></i> खतियान में देखें
-                        </button>
+                        </a>
                         <a href="${lpmUrl}" target="_blank" rel="noopener noreferrer" class="btn btn--sm btn--secondary" title="सरकारी LPM नक्शा रिपोर्ट PDF">
                             <i class="fas fa-file-pdf"></i> LPM रिपोर्ट
                         </a>
@@ -460,12 +464,12 @@ const SarthuaMapViewer = {
                         <div class="mpp-row"><span>अंचल / थाना:</span> <strong>उदवंतनगर (218)</strong></div>
                     </div>
                     <div class="mpp-actions">
-                        <button onclick="showTab('revisional');" class="btn btn--sm btn--primary">
+                        <a href="revisional-survey.html" class="btn btn--sm btn--primary">
                             <i class="fas fa-history"></i> 1970 खतियान
-                        </button>
-                        <button onclick="showTab('cadastral');" class="btn btn--sm btn--secondary">
+                        </a>
+                        <a href="cadastral-survey.html" class="btn btn--sm btn--secondary">
                             <i class="fas fa-book-open"></i> 1911 खतियान
-                        </button>
+                        </a>
                     </div>
                 </div>
             `;
@@ -483,7 +487,11 @@ const SarthuaMapViewer = {
     searchPlot: function (khasraNo) {
         const query = (khasraNo || document.getElementById('mapKhasraSearchInput')?.value || '').trim();
         if (!query) {
-            if (window.AppView) AppView.showAlert('कृपया खेसरा संख्या दर्ज करें (उदा. 64)', 'info');
+            if (window.AppView) {
+                AppView.showAlert('कृपया खेसरा संख्या दर्ज करें (उदा. 64)', 'info');
+            } else {
+                alert('कृपया खेसरा संख्या दर्ज करें (उदा. 64)');
+            }
             return;
         }
 
@@ -525,9 +533,9 @@ const SarthuaMapViewer = {
                     <div class="mpp-row"><span>चादर संख्या:</span> <strong>${this.currentSheet === 0 ? 'सम्पूर्ण मौजा' : '0' + this.currentSheet}</strong></div>
                 </div>
                 <div class="mpp-actions">
-                    <button onclick="AppController.performSearch('${query}'); showTab('${this.currentSurvey === 'CS' ? 'cadastral' : 'revisional'}');" class="btn btn--sm btn--primary">
+                    <a href="jamabandi.html?q=${encodeURIComponent(query)}" class="btn btn--sm btn--primary">
                         <i class="fas fa-history"></i> खतियान में देखें
-                    </button>
+                    </a>
                     <a href="${lpmLink}" target="_blank" rel="noopener noreferrer" class="btn btn--sm btn--secondary" title="सरकारी LPM नक्शा रिपोर्ट PDF">
                         <i class="fas fa-file-pdf"></i> LPM रिपोर्ट
                     </a>
@@ -598,8 +606,9 @@ const SarthuaMapViewer = {
     // Keyboard Shortcuts
     setupKeyboardControls: function () {
         document.addEventListener('keydown', (e) => {
-            const mapTab = document.getElementById('bhunaksha');
-            if (!mapTab || !mapTab.classList.contains('active') || !this.map) return;
+            const container = document.getElementById('sarthuaMapContainer');
+            if (!container || !this.map) return;
+            if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
 
             if (e.key === '+' || e.key === '=') {
                 e.preventDefault();
@@ -622,3 +631,21 @@ const SarthuaMapViewer = {
 };
 
 window.SarthuaMapViewer = SarthuaMapViewer;
+
+// Auto-initialize when running on bhu-naksha.html
+(function bootSarthuaMap() {
+    function tryInit() {
+        const container = document.getElementById('sarthuaMapContainer');
+        if (!container) return;
+        if (typeof L !== 'undefined' && window.SarthuaMapViewer) {
+            window.SarthuaMapViewer.init();
+        } else {
+            setTimeout(tryInit, 50);
+        }
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', tryInit);
+    } else {
+        tryInit();
+    }
+})();
