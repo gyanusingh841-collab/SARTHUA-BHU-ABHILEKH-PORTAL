@@ -36,6 +36,32 @@ const AppController = {
         // 5. Setup Event Listeners
         this.setupEventListeners();
         this.setupKeyboardShortcuts();
+
+        // 6. Deep-link: open the tab named in the URL hash (e.g. sarthua.in/#jamabandi)
+        this.routeFromHash();
+        window.addEventListener('hashchange', () => this.routeFromHash());
+
+        // 7. Run a search if the URL carries one (?q=...), used by the sitelinks searchbox
+        const q = new URLSearchParams(window.location.search).get('q');
+        if (q) {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = q;
+                this.handleSearchInputChange(searchInput);
+            }
+            this.performSearch(q);
+        }
+    },
+
+    // Map a URL hash to a valid tab id and activate it
+    routeFromHash: function () {
+        const validTabs = ['jamabandi', 'revisional', 'cadastral', 'services', 'bhunaksha'];
+        const aliases = { map: 'bhunaksha' };
+        let tabName = (window.location.hash || '').replace('#', '').trim();
+        tabName = aliases[tabName] || tabName;
+        if (validTabs.includes(tabName)) {
+            this.switchTab(tabName, null);
+        }
     },
 
     // Setup DOM Listeners
@@ -124,6 +150,11 @@ const AppController = {
     switchTab: function (tabName, evt) {
         AppModel.state.currentTab = tabName;
         AppView.updateTabUI(tabName, evt);
+        try {
+            if (window.location.hash !== '#' + tabName) {
+                history.replaceState(null, '', '#' + tabName);
+            }
+        } catch (e) { }
     },
 
     // Search Execution
