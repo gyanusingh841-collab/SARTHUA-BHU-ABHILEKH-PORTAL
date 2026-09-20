@@ -14336,5 +14336,85 @@
       ],
       "lpm_url": "https://bhunaksha.bihar.gov.in/plotReportPDF.jsp?state=10&giscode=RS29010402902180701&plotno=674&sameowner=false&derivedLayers=-1&selectedLayers=-1&scale=0"
     }
+  },
+  "sheets": {
+    "1": {
+      "name": "चादर 01",
+      "gis_code": "RS29010402902180701",
+      "image": "https://sarthua-bhuabhilekh.s3.ap-south-1.amazonaws.com/maps/Sarthua_Sheet_1_HD_WhiteBG.png",
+      "imgWidth": 7265,
+      "imgHeight": 8000,
+      "bounds": {
+        "minX": 263375.602,
+        "minY": 2820048.664,
+        "maxX": 264945.802,
+        "maxY": 2821777.71
+      }
+    },
+    "2": {
+      "name": "चादर 02",
+      "gis_code": "RS29010402902180702",
+      "image": "https://sarthua-bhuabhilekh.s3.ap-south-1.amazonaws.com/maps/Sarthua_Sheet_2_HD_WhiteBG.png",
+      "imgWidth": 4819,
+      "imgHeight": 8000,
+      "bounds": {
+        "minX": 264063.704,
+        "minY": 2818638.237,
+        "maxX": 264939.069,
+        "maxY": 2820091.325
+      }
+    },
+    "3": {
+      "name": "चादर 03",
+      "gis_code": "RS29010402902180703",
+      "image": "https://sarthua-bhuabhilekh.s3.ap-south-1.amazonaws.com/maps/Sarthua_Sheet_3_HD_WhiteBG.png",
+      "imgWidth": 7690,
+      "imgHeight": 8000,
+      "bounds": {
+        "minX": 264850.142,
+        "minY": 2818164.791,
+        "maxX": 266737.105,
+        "maxY": 2820127.927
+      }
+    },
+    "4": {
+      "name": "चादर 04",
+      "gis_code": "RS29010402902180704",
+      "image": "https://sarthua-bhuabhilekh.s3.ap-south-1.amazonaws.com/maps/Sarthua_Sheet_4_HD_WhiteBG.png",
+      "imgWidth": 8000,
+      "imgHeight": 6501,
+      "bounds": {
+        "minX": 264836.941,
+        "minY": 2820031.306,
+        "maxX": 266737.824,
+        "maxY": 2821575.966
+      }
+    },
+    "5": {
+      "name": "चादर 05",
+      "gis_code": "RS29010402902180705",
+      "image": "https://sarthua-bhuabhilekh.s3.ap-south-1.amazonaws.com/maps/Sarthua_Sheet_5_HD_WhiteBG.png",
+      "imgWidth": 3441,
+      "imgHeight": 8000,
+      "bounds": {
+        "minX": 266658.792,
+        "minY": 2818671.265,
+        "maxX": 267422.11,
+        "maxY": 2820445.667
+      }
+    },
+    "6": {
+      "name": "चादर 06",
+      "gis_code": "RS29010402902180706",
+      "image": "https://sarthua-bhuabhilekh.s3.ap-south-1.amazonaws.com/maps/Sarthua_Sheet_6_HD_WhiteBG.png",
+      "imgWidth": 8000,
+      "imgHeight": 6468,
+      "bounds": {
+        "minX": 265624.633,
+        "minY": 2819662.519,
+        "maxX": 266174.588,
+        "maxY": 2820107.181
+      }
+    }
   }
 }
