@@ -14341,7 +14341,7 @@
     "1": {
       "name": "चादर 01",
       "gis_code": "RS29010402902180701",
-      "image": "https://sarthua-bhuabhilekh.s3.ap-south-1.amazonaws.com/maps/Sarthua_Sheet_1_HD_WhiteBG.png",
+      "image": "https://docs.sarthua.in/maps/Sarthua_Sheet_1_HD_WhiteBG.png",
       "imgWidth": 7265,
       "imgHeight": 8000,
       "bounds": {
@@ -14354,7 +14354,7 @@
     "2": {
       "name": "चादर 02",
       "gis_code": "RS29010402902180702",
-      "image": "https://sarthua-bhuabhilekh.s3.ap-south-1.amazonaws.com/maps/Sarthua_Sheet_2_HD_WhiteBG.png",
+      "image": "https://docs.sarthua.in/maps/Sarthua_Sheet_2_HD_WhiteBG.png",
       "imgWidth": 4819,
       "imgHeight": 8000,
       "bounds": {
@@ -14367,7 +14367,7 @@
     "3": {
       "name": "चादर 03",
       "gis_code": "RS29010402902180703",
-      "image": "https://sarthua-bhuabhilekh.s3.ap-south-1.amazonaws.com/maps/Sarthua_Sheet_3_HD_WhiteBG.png",
+      "image": "https://docs.sarthua.in/maps/Sarthua_Sheet_3_HD_WhiteBG.png",
       "imgWidth": 7690,
       "imgHeight": 8000,
       "bounds": {
@@ -14380,7 +14380,7 @@
     "4": {
       "name": "चादर 04",
       "gis_code": "RS29010402902180704",
-      "image": "https://sarthua-bhuabhilekh.s3.ap-south-1.amazonaws.com/maps/Sarthua_Sheet_4_HD_WhiteBG.png",
+      "image": "https://docs.sarthua.in/maps/Sarthua_Sheet_4_HD_WhiteBG.png",
       "imgWidth": 8000,
       "imgHeight": 6501,
       "bounds": {
@@ -14393,7 +14393,7 @@
     "5": {
       "name": "चादर 05",
       "gis_code": "RS29010402902180705",
-      "image": "https://sarthua-bhuabhilekh.s3.ap-south-1.amazonaws.com/maps/Sarthua_Sheet_5_HD_WhiteBG.png",
+      "image": "https://docs.sarthua.in/maps/Sarthua_Sheet_5_HD_WhiteBG.png",
       "imgWidth": 3441,
       "imgHeight": 8000,
       "bounds": {
@@ -14406,7 +14406,7 @@
     "6": {
       "name": "चादर 06",
       "gis_code": "RS29010402902180706",
-      "image": "https://sarthua-bhuabhilekh.s3.ap-south-1.amazonaws.com/maps/Sarthua_Sheet_6_HD_WhiteBG.png",
+      "image": "https://docs.sarthua.in/maps/Sarthua_Sheet_6_HD_WhiteBG.png",
       "imgWidth": 8000,
       "imgHeight": 6468,
       "bounds": {
