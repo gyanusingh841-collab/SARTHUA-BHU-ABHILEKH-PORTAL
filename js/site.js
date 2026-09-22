@@ -1,6 +1,6 @@
 /**
  * Sarthua Bhu-Abhilekh Portal - Shared Site Chrome (loaded on every page)
- * Theme toggle, font-size toggle, and Hindi/English language toggle.
+ * Theme (follows the OS until the user picks one) and Hindi/English toggle.
  * Kept independent of the record/PDF/map bundles so the home, glossary and
  * services pages don't have to load the heavier data bundles just to toggle
  * the navbar controls.
@@ -10,6 +10,22 @@
     'use strict';
 
     // ---- Theme (light/dark) ----
+    // No saved choice -> follow the system setting (and keep following it live).
+    // Clicking the toggle saves an explicit choice, which then always wins.
+    var systemDark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+    function savedTheme() {
+        try {
+            var t = localStorage.getItem('sarthua_theme');
+            if (t === 'light' || t === 'dark') return t;
+        } catch (e) { }
+        return null;
+    }
+
+    function resolvedTheme() {
+        return savedTheme() || (systemDark && systemDark.matches ? 'dark' : 'light');
+    }
+
     function applyTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
         var icon = document.getElementById('themeIcon');
@@ -29,28 +45,6 @@
         var next = current === 'dark' ? 'light' : 'dark';
         applyTheme(next);
         try { localStorage.setItem('sarthua_theme', next); } catch (e) { }
-    };
-
-    // ---- Font size (A- / A / A+) ----
-    function applyFontSize(size) {
-        if (size === 'sm' || size === 'lg') {
-            document.documentElement.setAttribute('data-font-size', size);
-        } else {
-            document.documentElement.removeAttribute('data-font-size');
-        }
-        var btns = document.querySelectorAll('.nav-font-ctrl .font-btn');
-        btns.forEach(function (b) { b.classList.remove('active'); });
-        if (size === 'sm' && btns[0]) btns[0].classList.add('active');
-        else if (size === 'md' && btns[1]) btns[1].classList.add('active');
-        else if (size === 'lg' && btns[2]) btns[2].classList.add('active');
-    }
-
-    window.adjustFontSize = function (delta) {
-        var size = 'md';
-        if (delta === -1) size = 'sm';
-        else if (delta === 1) size = 'lg';
-        applyFontSize(size);
-        try { localStorage.setItem('sarthua_font_size', size); } catch (e) { }
     };
 
     // ---- Hindi / English toggle ----
@@ -84,15 +78,21 @@
 
     // ---- Boot ----
     document.addEventListener('DOMContentLoaded', function () {
-        var savedTheme = 'light', savedFont = 'md', savedLang = 'hi';
+        var savedLang = 'hi';
         try {
-            savedTheme = localStorage.getItem('sarthua_theme') || 'light';
-            savedFont = localStorage.getItem('sarthua_font_size') || 'md';
             savedLang = localStorage.getItem('sarthua_lang') || 'hi';
+            localStorage.removeItem('sarthua_font_size'); // retired A-/A/A+ control
         } catch (e) { }
-        applyTheme(savedTheme);
-        applyFontSize(savedFont);
+        applyTheme(resolvedTheme());
         if (savedLang === 'en') applyLanguage('en');
+
+        if (systemDark) {
+            var onSystemChange = function () {
+                if (!savedTheme()) applyTheme(resolvedTheme());
+            };
+            if (systemDark.addEventListener) systemDark.addEventListener('change', onSystemChange);
+            else if (systemDark.addListener) systemDark.addListener(onSystemChange);
+        }
 
         var yearEl = document.getElementById('copyrightYear');
         if (yearEl) yearEl.textContent = new Date().getFullYear();

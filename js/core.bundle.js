@@ -81,8 +81,7 @@ const AppModel = {
     state: {
         currentTab: 'jamabandi',
         searchQuery: '',
-        theme: 'light',
-        fontSizeOffset: 'md'
+        theme: 'light'
     },
     searchResults: {
         jamabandi: [],
@@ -94,9 +93,8 @@ const AppModel = {
     init: function () {
         try {
             const savedTheme = localStorage.getItem('sarthua_theme');
-            if (savedTheme) this.state.theme = savedTheme;
-            const savedSize = localStorage.getItem('sarthua_font_size');
-            if (savedSize) this.state.fontSizeOffset = savedSize;
+            if (savedTheme === 'light' || savedTheme === 'dark') this.state.theme = savedTheme;
+            else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) this.state.theme = 'dark';
         } catch (e) { }
         return this.state;
     },
@@ -512,23 +510,6 @@ const AppView = {
                 }
             }, 80);
         }
-    },
-
-    // Accessibility Text Resizing (A- / A / A+)
-    applyFontSize: function (size) {
-        if (size === 'sm') {
-            document.documentElement.setAttribute('data-font-size', 'sm');
-        } else if (size === 'lg') {
-            document.documentElement.setAttribute('data-font-size', 'lg');
-        } else {
-            document.documentElement.removeAttribute('data-font-size');
-        }
-
-        const fontBtns = document.querySelectorAll('.nav-font-ctrl .font-btn');
-        fontBtns.forEach(btn => btn.classList.remove('active'));
-        if (size === 'sm' && fontBtns[0]) fontBtns[0].classList.add('active');
-        else if (size === 'md' && fontBtns[1]) fontBtns[1].classList.add('active');
-        else if (size === 'lg' && fontBtns[2]) fontBtns[2].classList.add('active');
     },
 
     // Theme (Dark / Light)
@@ -1916,7 +1897,6 @@ const AppController = {
 
         // 3. Apply Theme & Accessibility preferences immediately
         AppView.applyTheme(AppModel.state.theme || 'light');
-        AppView.applyFontSize(AppModel.state.fontSizeOffset || 'md');
 
         // 4. Render Initial Tables only if not already pre-rendered
         const jamabandiTbody = document.getElementById('jamabandi-tbody');
@@ -2155,19 +2135,6 @@ const AppController = {
             console.error('Speech recognition start failed:', err);
             if (micBtn) micBtn.classList.remove('listening');
         }
-    },
-
-    // Font Resize Handler
-    handleFontSize: function (delta) {
-        let newSize = 'md';
-        if (delta === -1) newSize = 'sm';
-        else if (delta === 1) newSize = 'lg';
-
-        AppModel.state.fontSizeOffset = newSize;
-        AppView.applyFontSize(newSize);
-        try {
-            localStorage.setItem('sarthua_font_size', newSize);
-        } catch (e) { }
     },
 
     // Theme Toggle Handler
