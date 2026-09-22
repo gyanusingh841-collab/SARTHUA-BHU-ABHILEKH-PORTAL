@@ -93,5 +93,8 @@
         applyTheme(savedTheme);
         applyFontSize(savedFont);
         if (savedLang === 'en') applyLanguage('en');
+
+        var yearEl = document.getElementById('copyrightYear');
+        if (yearEl) yearEl.textContent = new Date().getFullYear();
     });
 })();
