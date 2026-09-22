@@ -51,9 +51,10 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://docs.sarthua.in" crossorigin>
 
-    <link rel="stylesheet" href="style.min.css?v=10.1">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.min.css?v=10.3">
+    <link rel="preload" href="/fonts/fa-solid.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"></noscript>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
 <body>
@@ -135,6 +136,7 @@
                 </div>
             </div>
         </div>
+        <p class="page-intro" data-en="Maps of Mauja Sarthua from the 1970 Revisional Survey (6 sheets) and the 1911 Cadastral Survey in 8K HD. Enter a khesra/plot number in the search to zoom straight to that plot, or click any plot on the map to see its details.">मौजा सरथुआ के 1970 रिविजनल सर्वे (6 चादर) और 1911 कैडस्ट्रल सर्वे के नक्शे 8K HD में। सर्च में खेसरा/प्लॉट नंबर डालें — नक्शा सीधे उस प्लॉट पर पहुँच जाएगा, या नक्शे पर किसी भी प्लॉट पर क्लिक करके उसकी जानकारी देखें।</p>
                 <div class="sarthua-map-card" id="sarthuaMapCard">
                     <!-- Map Toolbar -->
                     <div class="map-toolbar">

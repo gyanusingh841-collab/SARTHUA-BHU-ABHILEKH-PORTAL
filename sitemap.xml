@@ -6,7 +6,7 @@
   <!-- Home -->
   <url>
     <loc>https://sarthua.in/</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -14,7 +14,7 @@
   <!-- Jamabandi Panji (Register II) -->
   <url>
     <loc>https://sarthua.in/jamabandi</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
@@ -22,7 +22,7 @@
   <!-- 1970 Revisional Survey Khatiyan -->
   <url>
     <loc>https://sarthua.in/revisional-survey</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
@@ -30,7 +30,7 @@
   <!-- 1911 Cadastral Survey Khatiyan -->
   <url>
     <loc>https://sarthua.in/cadastral-survey</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
@@ -38,7 +38,7 @@
   <!-- Digital 8K Bhu-Naksha (GIS Multi-Survey Viewer) -->
   <url>
     <loc>https://sarthua.in/bhu-naksha</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.90</priority>
 
@@ -122,7 +122,7 @@
   <!-- Citizen Land Services -->
   <url>
     <loc>https://sarthua.in/services</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
   </url>
@@ -130,7 +130,7 @@
   <!-- Revenue Glossary & FAQ -->
   <url>
     <loc>https://sarthua.in/glossary</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
