@@ -106,7 +106,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://docs.sarthua.in" crossorigin>
 
-    <link rel="stylesheet" href="style.min.css?v=8.6">
+    <link rel="stylesheet" href="style.min.css?v=8.8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
     <script>
@@ -292,42 +292,106 @@
                     </div>
 
                     <div class="voc-grid">
-                        <div class="voc-item">
-                            <div class="voc-item-label"><i class="fas fa-map-pin" aria-hidden="true"></i> <span data-en="Thana No.">थाना संख्या</span></div>
-                            <div class="voc-item-val">218</div>
+                        <!-- Item 1: Thana -->
+                        <div class="voc-item voc-item--thana">
+                            <div class="voc-item-icon"><i class="fas fa-map-pin" aria-hidden="true"></i></div>
+                            <div class="voc-item-content">
+                                <div class="voc-item-label" data-en="Thana No.">थाना संख्या</div>
+                                <div class="voc-item-val">218</div>
+                                <div class="voc-item-meta" data-en="Official Mauja Code">राजस्व मौजा कोड</div>
+                            </div>
                         </div>
-                        <div class="voc-item voc-item--interactive" onclick="copyVocText('802210 / 802206', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();copyVocText('802210 / 802206', this);}" tabindex="0" role="button" aria-label="पिन कोड कॉपी करें: 802210 / 802206" title="क्लिक करके पिन कोड कॉपी करें">
-                            <div class="voc-item-label"><i class="fas fa-mail-bulk" aria-hidden="true"></i> <span data-en="PIN Code">पिन कोड</span> <span class="voc-copy-btn"><i class="fas fa-copy" aria-hidden="true"></i></span></div>
-                            <div class="voc-item-val">802210 / 802206</div>
+
+                        <!-- Item 2: Block / Anchal -->
+                        <div class="voc-item voc-item--anchal">
+                            <div class="voc-item-icon"><i class="fas fa-building-columns" aria-hidden="true"></i></div>
+                            <div class="voc-item-content">
+                                <div class="voc-item-label" data-en="Block / Anchal">प्रखंड / अंचल</div>
+                                <div class="voc-item-val">उदवंतनगर</div>
+                                <div class="voc-item-meta" data-en="Udwantnagar Block">Udwantnagar</div>
+                            </div>
                         </div>
-                        <div class="voc-item">
-                            <div class="voc-item-label"><i class="fas fa-building-columns" aria-hidden="true"></i> <span data-en="Block / Anchal">प्रखंड / अंचल</span></div>
-                            <div class="voc-item-val">उदवंतनगर (Udwantnagar)</div>
+
+                        <!-- Item 3: Sub-division & District -->
+                        <div class="voc-item voc-item--district">
+                            <div class="voc-item-icon"><i class="fas fa-landmark-dome" aria-hidden="true"></i></div>
+                            <div class="voc-item-content">
+                                <div class="voc-item-label" data-en="Sub-division / District">अनुमंडल / जिला</div>
+                                <div class="voc-item-val">आरा सदर, भोजपुर</div>
+                                <div class="voc-item-meta" data-en="Bhojpur (Bihar)">बिहार • 802206</div>
+                            </div>
                         </div>
-                        <div class="voc-item">
-                            <div class="voc-item-label"><i class="fas fa-landmark-dome" aria-hidden="true"></i> <span data-en="Sub-division">अनुमंडल</span></div>
-                            <div class="voc-item-val">आरा सदर (Ara Sadar)</div>
+
+                        <!-- Item 4: PIN Code (Interactive) -->
+                        <div class="voc-item voc-item--interactive voc-item--pin" onclick="copyVocText('802210 / 802206', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();copyVocText('802210 / 802206', this);}" tabindex="0" role="button" aria-label="पिन कोड कॉपी करें: 802210 / 802206" title="क्लिक करके पिन कोड कॉपी करें">
+                            <div class="voc-item-icon"><i class="fas fa-mail-bulk" aria-hidden="true"></i></div>
+                            <div class="voc-item-content">
+                                <div class="voc-item-label-wrap">
+                                    <span class="voc-item-label" data-en="PIN Code">पिन कोड</span>
+                                    <span class="voc-copy-btn" title="कॉपी करें"><i class="fas fa-copy" aria-hidden="true"></i></span>
+                                </div>
+                                <div class="voc-item-val">802210 / 802206</div>
+                                <div class="voc-item-meta" data-en="Click to Copy PIN">क्लिक करके कॉपी करें</div>
+                            </div>
                         </div>
-                        <div class="voc-item voc-item--interactive" onclick="copyVocText('25.5034, 84.5937', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();copyVocText('25.5034, 84.5937', this);}" tabindex="0" role="button" aria-label="भू-निर्देशांक कॉपी करें: 25.5034, 84.5937" title="क्लिक करके भू-निर्देशांक कॉपी करें">
-                            <div class="voc-item-label"><i class="fas fa-compass" aria-hidden="true"></i> <span data-en="Coordinates">भू-निर्देशांक (GIS)</span> <span class="voc-copy-btn"><i class="fas fa-copy" aria-hidden="true"></i></span></div>
-                            <div class="voc-item-val">25.5034° N, 84.5937° E</div>
+
+                        <!-- Item 5: Coordinates GIS (Interactive) -->
+                        <div class="voc-item voc-item--interactive voc-item--geo" onclick="copyVocText('25.5034, 84.5937', this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();copyVocText('25.5034, 84.5937', this);}" tabindex="0" role="button" aria-label="भू-निर्देशांक कॉपी करें: 25.5034, 84.5937" title="क्लिक करके भू-निर्देशांक कॉपी करें">
+                            <div class="voc-item-icon"><i class="fas fa-compass" aria-hidden="true"></i></div>
+                            <div class="voc-item-content">
+                                <div class="voc-item-label-wrap">
+                                    <span class="voc-item-label" data-en="Coordinates (GIS)">भू-निर्देशांक (GIS)</span>
+                                    <span class="voc-copy-btn" title="कॉपी करें"><i class="fas fa-copy" aria-hidden="true"></i></span>
+                                </div>
+                                <div class="voc-item-val">25.5034° N, 84.5937° E</div>
+                                <div class="voc-item-meta" data-en="Village Centroid">मौजा केंद्रीय निर्देशांक</div>
+                            </div>
                         </div>
-                        <div class="voc-item">
-                            <div class="voc-item-label"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i> <span data-en="Archive Span">अभिलेख कालखंड</span></div>
-                            <div class="voc-item-val">1911 – 2026 (115 वर्ष)</div>
+
+                        <!-- Item 6: Archive Span -->
+                        <div class="voc-item voc-item--archive">
+                            <div class="voc-item-icon"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i></div>
+                            <div class="voc-item-content">
+                                <div class="voc-item-label" data-en="Archive Span">अभिलेख कालखंड</div>
+                                <div class="voc-item-val">1911 – 2026</div>
+                                <div class="voc-item-meta" data-en="115 Years of Records">115 वर्ष डिजिटल अभिलेख</div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="voc-details-row">
                         <div class="voc-col">
-                            <h3><i class="fas fa-route text-primary" aria-hidden="true"></i> <span data-en="Connectivity &amp; Location">स्थिति एवं आवागमन</span></h3>
-                            <p data-en="Sarthua village is situated in Bhojpur district, approximately 12-14 km from district headquarters Ara. Well-connected via the Ara-Sasaram highway route with robust rural transport connectivity.">
+                            <div class="voc-col-header">
+                                <div class="voc-col-icon voc-col-icon--route"><i class="fas fa-route" aria-hidden="true"></i></div>
+                                <div>
+                                    <h3 data-en="Connectivity &amp; Location">स्थिति एवं आवागमन</h3>
+                                    <p class="voc-col-sub" data-en="Regional transport &amp; transit links">जिला मुख्यालय आरा एवं राष्ट्रीय मार्ग से जुड़ाव</p>
+                                </div>
+                            </div>
+                            <div class="voc-chip-list">
+                                <div class="voc-chip"><i class="fas fa-map-pin text-primary" aria-hidden="true"></i> <span>दूरी: <strong>आरा से 12-14 किमी</strong></span></div>
+                                <div class="voc-chip"><i class="fas fa-road text-primary" aria-hidden="true"></i> <span>मार्ग: <strong>आरा-सासाराम हाईवे</strong></span></div>
+                                <div class="voc-chip"><i class="fas fa-train text-primary" aria-hidden="true"></i> <span>रेलवे: <strong>उदवंतनगर स्टेशन</strong></span></div>
+                            </div>
+                            <p class="voc-col-text" data-en="Sarthua village is situated in Bhojpur district, approximately 12-14 km from district headquarters Ara. Well-connected via the Ara-Sasaram highway route with robust rural transport connectivity.">
                                 सरथुआ गाँव भोजपुर जिले में जिला मुख्यालय आरा से लगभग 12-14 किमी की दूरी पर स्थित है। यह क्षेत्र आरा-सासाराम सड़क मार्ग एवं नजदीकी उदवंतनगर रेलवे स्टेशन से भलीभांति जुड़ा हुआ है।
                             </p>
                         </div>
+
                         <div class="voc-col">
-                            <h3><i class="fas fa-monument text-warning" aria-hidden="true"></i> <span data-en="Historical Survey Legacy">ऐतिहासिक सर्वेक्षण विरासत</span></h3>
-                            <p data-en="Home to 4,200+ surveyed plots across 6 sheets of the 1970 Revisional Survey and 5 sheets of the 1911 British Cadastral Survey. 100% digital preservation for transparent citizen access.">
+                            <div class="voc-col-header">
+                                <div class="voc-col-icon voc-col-icon--survey"><i class="fas fa-monument" aria-hidden="true"></i></div>
+                                <div>
+                                    <h3 data-en="Historical Survey Legacy">ऐतिहासिक सर्वेक्षण विरासत</h3>
+                                    <p class="voc-col-sub" data-en="115-Year Digital Cadastral Preservation">115 वर्ष पुराना मूल सर्वेक्षण व खतियान</p>
+                                </div>
+                            </div>
+                            <div class="voc-chip-list">
+                                <div class="voc-chip"><i class="fas fa-scroll text-warning" aria-hidden="true"></i> <span>कैडस्ट्रल (1911): <strong>5 सम्पूर्ण चादर</strong></span></div>
+                                <div class="voc-chip"><i class="fas fa-book text-warning" aria-hidden="true"></i> <span>रिविजनल (1970): <strong>6 चादर • 9 पुस्तकें</strong></span></div>
+                                <div class="voc-chip"><i class="fas fa-map text-warning" aria-hidden="true"></i> <span>प्लॉट्स: <strong>4,200+ मैप्ड खेसरा</strong></span></div>
+                            </div>
+                            <p class="voc-col-text" data-en="Home to 4,200+ surveyed plots across 6 sheets of the 1970 Revisional Survey and 5 sheets of the 1911 British Cadastral Survey. 100% digital preservation for transparent citizen access.">
                                 सरथुआ मौजा में 1970 रिविजनल सर्वे के 6 चादर व 1911 ब्रिटिश कैडस्ट्रल सर्वे के सम्पूर्ण मौजा चादर सहित 4,200 से अधिक पंजीकृत प्लॉट हैं, जिन्हें जन-पारदर्शिता हेतु सुरक्षित किया गया है।
                             </p>
                         </div>
