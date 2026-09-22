@@ -4263,7 +4263,7 @@ html[data-font-size="lg"] {
 .hero-inner {
   position: relative;
   z-index: 1;
-  max-width: 820px;
+  max-width: 860px;
 }
 .hero-ribbon {
   display: inline-flex;
@@ -4327,13 +4327,25 @@ html[data-font-size="lg"] {
   color: #e2e8f0;
   line-height: 1.7;
   margin: 0 0 24px 0;
-  max-width: 660px;
+  max-width: 720px;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+.hero-search-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin-top: 0;
+}
+.hero-search-wrap .search-bar-unified {
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
 }
 .hero-cta-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  align-items: center;
+  gap: 14px;
   margin-top: 22px;
 }
 .btn--gold {
@@ -4381,14 +4393,6 @@ html[data-font-size="lg"] {
 }
 .btn--ghost-light:active {
   transform: scale(0.98);
-}
-
-/* Home search bar sitting on the hero */
-.hero-search-wrap {
-  position: relative;
-  z-index: 1;
-  max-width: 820px;
-  margin-top: 26px;
 }
 
 /* Stat cards */
@@ -4554,63 +4558,6 @@ html[data-font-size="lg"] {
   align-items: center;
   gap: 5px;
   transition: transform 0.25s ease, color 0.25s ease;
-}
-
-/* Search Quick-Pills */
-.search-pills-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 14px;
-  flex-wrap: wrap;
-}
-.search-pills-label {
-  font-size: 12.5px;
-  color: #cbd5e1;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.search-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 13px;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.1);
-  color: #f1f5f9;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-.search-pill:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-}
-.search-pill--khesra:hover {
-  background: linear-gradient(135deg, #059669, #10b981);
-  border-color: #34d399;
-  color: #ffffff;
-}
-.search-pill--khata:hover {
-  background: linear-gradient(135deg, #d97706, #f59e0b);
-  border-color: #fde047;
-  color: #1e1006;
-}
-.search-pill--vol:hover {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  border-color: #a78bfa;
-  color: #ffffff;
-}
-.search-pill--map:hover {
-  background: linear-gradient(135deg, #0284c7, #38bdf8);
-  border-color: #7dd3fc;
-  color: #ffffff;
 }
 
 /* Village Overview Section */
@@ -5168,28 +5115,10 @@ html[data-font-size="lg"] {
     font-size: 13px !important;
     padding: 8px 6px !important;
   }
-  .btn--search-primary {
-    padding: 8px 14px !important;
-    font-size: 13px !important;
-    border-radius: 9px !important;
-  }
-  .search-pills-wrap {
-    margin-top: 10px !important;
-    gap: 6px !important;
-  }
-  .search-pills-label {
-    font-size: 11px !important;
-    width: 100% !important;
-    margin-bottom: 2px !important;
-  }
-  .search-pill {
-    padding: 4px 10px !important;
-    font-size: 11px !important;
-  }
   .hero-cta-row {
     flex-direction: column !important;
     gap: 8px !important;
-    margin-top: 16px !important;
+    margin-top: 14px !important;
   }
   .hero-cta-row .btn {
     width: 100% !important;
@@ -5279,4 +5208,22 @@ html[data-font-size="lg"] {
 /* ==========================================================================
    OPTIMIZED FONTAWESOME SUBSET (font-display: swap, 0% Unused CSS)
    ========================================================================== */
-@font-face{font-family:'Font Awesome 6 Brands';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2') format('woff2');}@font-face{font-family:'Font Awesome 6 Free';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.woff2') format('woff2');}@font-face{font-family:'Font Awesome 6 Free';font-style:normal;font-weight:900;font-display:swap;src:url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2');}.fa,.fas,.fa-solid,.far,.fa-regular,.fab,.fa-brands{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;display:inline-block;width:1.25em;text-align:center;font-style:normal;font-variant:normal;line-height:1;text-rendering:auto}.brand-crest i,.msh-icon i{width:auto}.fa,.fas,.fa-solid{font-family:'Font Awesome 6 Free';font-weight:900}.far,.fa-regular{font-family:'Font Awesome 6 Free';font-weight:400}.fab,.fa-brands{font-family:'Font Awesome 6 Brands';font-weight:400}.fa-spin{animation:fa-spin 2s infinite linear}@keyframes fa-spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.fa-arrow-up:before{content:"\f062"}.fa-arrows-alt-h:before{content:"\f337"}.fa-balance-scale:before{content:"\f24e"}.fa-balance-scale-right:before{content:"\f516"}.fa-ban:before{content:"\f05e"}.fa-bolt:before{content:"\f0e7"}.fa-bolt-lightning:before{content:"\e0b7"}.fa-book:before{content:"\f02d"}.fa-book-open:before{content:"\f518"}.fa-book-open-reader:before{content:"\f5da"}.fa-book-reader:before{content:"\f5da"}.fa-bookmark:before{content:"\f02e"}.fa-calendar-alt:before{content:"\f073"}.fa-calendar-check:before{content:"\f274"}.fa-calendar-days:before{content:"\f073"}.fa-check-circle:before{content:"\f058"}.fa-chevron-down:before{content:"\f078"}.fa-chevron-left:before{content:"\f053"}.fa-chevron-right:before{content:"\f054"}.fa-circle-check:before{content:"\f058"}.fa-circle-exclamation:before{content:"\f06a"}.fa-circle-info:before{content:"\f05a"}.fa-circle-minus:before{content:"\f056"}.fa-circle-xmark:before{content:"\f057"}.fa-clock:before{content:"\f017"}.fa-clock-rotate-left:before{content:"\f1da"}.fa-close:before{content:"\f00d"}.fa-cogs:before{content:"\f085"}.fa-comment-dots:before{content:"\f4ad"}.fa-compass:before{content:"\f14e"}.fa-compress:before{content:"\f066"}.fa-compress-alt:before{content:"\f422"}.fa-copy:before{content:"\f0c5"}.fa-edit:before{content:"\f044"}.fa-exclamation-circle:before{content:"\f06a"}.fa-exclamation-triangle:before{content:"\f071"}.fa-expand:before{content:"\f065"}.fa-expand-arrows-alt:before{content:"\f31e"}.fa-external-link-alt:before{content:"\f35d"}.fa-eye:before{content:"\f06e"}.fa-eye-slash:before{content:"\f070"}.fa-file-alt:before{content:"\f15c"}.fa-file-contract:before{content:"\f56c"}.fa-file-invoice:before{content:"\f570"}.fa-file-invoice-dollar:before{content:"\f571"}.fa-file-lines:before{content:"\f15c"}.fa-file-pdf:before{content:"\f1c1"}.fa-file-signature:before{content:"\f573"}.fa-file-text:before{content:"\f15c"}.fa-fingerprint:before{content:"\f577"}.fa-folder:before{content:"\f07b"}.fa-folder-open:before{content:"\f07c"}.fa-folder-plus:before{content:"\f65e"}.fa-gears:before{content:"\f085"}.fa-hand-holding-heart:before{content:"\f4be"}.fa-hands-helping:before{content:"\f4c4"}.fa-handshake-angle:before{content:"\f4c4"}.fa-history:before{content:"\f1da"}.fa-info-circle:before{content:"\f05a"}.fa-landmark:before{content:"\f66f"}.fa-landmark-flag:before{content:"\e51c"}.fa-layer-group:before{content:"\f5fd"}.fa-left-right:before{content:"\f337"}.fa-list-1-2:before{content:"\f0cb"}.fa-list-numeric:before{content:"\f0cb"}.fa-list-ol:before{content:"\f0cb"}.fa-lock:before{content:"\f023"}.fa-magnifying-glass:before{content:"\f002"}.fa-magnifying-glass-location:before{content:"\f689"}.fa-map:before{content:"\f279"}.fa-map-location:before{content:"\f59f"}.fa-map-location-dot:before{content:"\f5a0"}.fa-map-marked:before{content:"\f59f"}.fa-map-marked-alt:before{content:"\f5a0"}.fa-maximize:before{content:"\f31e"}.fa-microphone:before{content:"\f130"}.fa-microphone-alt-slash:before{content:"\f539"}.fa-microphone-lines:before{content:"\f3c9"}.fa-microphone-slash:before{content:"\f131"}.fa-minus:before{content:"\f068"}.fa-minus-circle:before{content:"\f056"}.fa-money-bill-wave:before{content:"\f53a"}.fa-moon:before{content:"\f186"}.fa-multiply:before{content:"\f00d"}.fa-pen-fancy:before{content:"\f5ac"}.fa-pen-to-square:before{content:"\f044"}.fa-phone-alt:before{content:"\f879"}.fa-phone-flip:before{content:"\f879"}.fa-plus:before{content:"\f067"}.fa-plus-square:before{content:"\f0fe"}.fa-print:before{content:"\f02f"}.fa-receipt:before{content:"\f543"}.fa-redo:before{content:"\f01e"}.fa-redo-alt:before{content:"\f2f9"}.fa-remove:before{content:"\f00d"}.fa-rotate:before{content:"\f2f1"}.fa-rotate-forward:before{content:"\f2f9"}.fa-rotate-right:before{content:"\f2f9"}.fa-ruler-combined:before{content:"\f546"}.fa-screwdriver-wrench:before{content:"\f7d9"}.fa-search:before{content:"\f002"}.fa-search-location:before{content:"\f689"}.fa-shield-alt:before{content:"\f3ed"}.fa-shield-halved:before{content:"\f3ed"}.fa-shield-virus:before{content:"\e06c"}.fa-spinner:before{content:"\f110"}.fa-square-plus:before{content:"\f0fe"}.fa-sun:before{content:"\f185"}.fa-sun-plant-wilt:before{content:"\e57a"}.fa-sync-alt:before{content:"\f2f1"}.fa-table-cells-large:before{content:"\f009"}.fa-tag:before{content:"\f02b"}.fa-tags:before{content:"\f02c"}.fa-th-large:before{content:"\f009"}.fa-times:before{content:"\f00d"}.fa-times-circle:before{content:"\f057"}.fa-tools:before{content:"\f7d9"}.fa-triangle-exclamation:before{content:"\f071"}.fa-up-right-from-square:before{content:"\f35d"}.fa-user:before{content:"\f007"}.fa-user-shield:before{content:"\f505"}.fa-user-times:before{content:"\f235"}.fa-user-xmark:before{content:"\f235"}.fa-warning:before{content:"\f071"}.fa-weight-hanging:before{content:"\f5cd"}.fa-whatsapp:before{content:"\f232"}.fa-xmark:before{content:"\f00d"}.fa-xmark-circle:before{content:"\f057"}.fa-building-columns:before{content:"\e07d"}.fa-landmark-dome:before{content:"\f66f"}.fa-mail-bulk:before{content:"\f674"}.fa-map-pin:before{content:"\f276"}.fa-route:before{content:"\f4d7"}.fa-road:before{content:"\f018"}.fa-train:before{content:"\f238"}.fa-monument:before{content:"\f5a6"}.fa-scroll:before{content:"\f70e"}
+@font-face{font-family:'Font Awesome 6 Brands';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2') format('woff2');}@font-face{font-family:'Font Awesome 6 Free';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-regular-400.woff2') format('woff2');}@font-face{font-family:'Font Awesome 6 Free';font-style:normal;font-weight:900;font-display:swap;src:url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2');}.fa,.fas,.fa-solid,.far,.fa-regular,.fab,.fa-brands{-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;display:inline-block;width:1.25em;text-align:center;font-style:normal;font-variant:normal;line-height:1;text-rendering:auto}.brand-crest i,.msh-icon i{width:auto}.fa,.fas,.fa-solid{font-family:'Font Awesome 6 Free';font-weight:900}.far,.fa-regular{font-family:'Font Awesome 6 Free';font-weight:400}.fab,.fa-brands{font-family:'Font Awesome 6 Brands';font-weight:400}.fa-spin{animation:fa-spin 2s infinite linear}@keyframes fa-spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.fa-arrow-up:before{content:"\f062"}.fa-arrows-alt-h:before{content:"\f337"}.fa-balance-scale:before{content:"\f24e"}.fa-balance-scale-right:before{content:"\f516"}.fa-ban:before{content:"\f05e"}.fa-bolt:before{content:"\f0e7"}.fa-bolt-lightning:before{content:"\e0b7"}.fa-book:before{content:"\f02d"}.fa-book-open:before{content:"\f518"}.fa-book-open-reader:before{content:"\f5da"}.fa-book-reader:before{content:"\f5da"}.fa-bookmark:before{content:"\f02e"}.fa-calendar-alt:before{content:"\f073"}.fa-calendar-check:before{content:"\f274"}.fa-calendar-days:before{content:"\f073"}.fa-check-circle:before{content:"\f058"}.fa-chevron-down:before{content:"\f078"}.fa-chevron-left:before{content:"\f053"}.fa-chevron-right:before{content:"\f054"}.fa-circle-check:before{content:"\f058"}.fa-circle-exclamation:before{content:"\f06a"}.fa-circle-info:before{content:"\f05a"}.fa-circle-minus:before{content:"\f056"}.fa-circle-xmark:before{content:"\f057"}.fa-clock:before{content:"\f017"}.fa-clock-rotate-left:before{content:"\f1da"}.fa-close:before{content:"\f00d"}.fa-cogs:before{content:"\f085"}.fa-comment-dots:before{content:"\f4ad"}.fa-compass:before{content:"\f14e"}.fa-compress:before{content:"\f066"}.fa-compress-alt:before{content:"\f422"}.fa-copy:before{content:"\f0c5"}.fa-edit:before{content:"\f044"}.fa-exclamation-circle:before{content:"\f06a"}.fa-exclamation-triangle:before{content:"\f071"}.fa-expand:before{content:"\f065"}.fa-expand-arrows-alt:before{content:"\f31e"}.fa-external-link-alt:before{content:"\f35d"}.fa-eye:before{content:"\f06e"}.fa-eye-slash:before{content:"\f070"}.fa-file-alt:before{content:"\f15c"}.fa-file-contract:before{content:"\f56c"}.fa-file-invoice:before{content:"\f570"}.fa-file-invoice-dollar:before{content:"\f571"}.fa-file-lines:before{content:"\f15c"}.fa-file-pdf:before{content:"\f1c1"}.fa-file-signature:before{content:"\f573"}.fa-file-text:before{content:"\f15c"}.fa-fingerprint:before{content:"\f577"}.fa-folder:before{content:"\f07b"}.fa-folder-open:before{content:"\f07c"}.fa-folder-plus:before{content:"\f65e"}.fa-gears:before{content:"\f085"}.fa-hand-holding-heart:before{content:"\f4be"}.fa-hands-helping:before{content:"\f4c4"}.fa-handshake-angle:before{content:"\f4c4"}.fa-history:before{content:"\f1da"}.fa-info-circle:before{content:"\f05a"}.fa-landmark:before{content:"\f66f"}.fa-landmark-flag:before{content:"\e51c"}.fa-layer-group:before{content:"\f5fd"}.fa-left-right:before{content:"\f337"}.fa-list-1-2:before{content:"\f0cb"}.fa-list-numeric:before{content:"\f0cb"}.fa-list-ol:before{content:"\f0cb"}.fa-lock:before{content:"\f023"}.fa-magnifying-glass:before{content:"\f002"}.fa-magnifying-glass-location:before{content:"\f689"}.fa-map:before{content:"\f279"}.fa-map-location:before{content:"\f59f"}.fa-map-location-dot:before{content:"\f5a0"}.fa-map-marked:before{content:"\f59f"}.fa-map-marked-alt:before{content:"\f5a0"}.fa-maximize:before{content:"\f31e"}.fa-microphone:before{content:"\f130"}.fa-microphone-alt-slash:before{content:"\f539"}.fa-microphone-lines:before{content:"\f3c9"}.fa-microphone-slash:before{content:"\f131"}.fa-minus:before{content:"\f068"}.fa-minus-circle:before{content:"\f056"}.fa-money-bill-wave:before{content:"\f53a"}.fa-moon:before{content:"\f186"}.fa-multiply:before{content:"\f00d"}.fa-pen-fancy:before{content:"\f5ac"}.fa-pen-to-square:before{content:"\f044"}.fa-phone-alt:before{content:"\f879"}.fa-phone-flip:before{content:"\f879"}.fa-plus:before{content:"\f067"}.fa-plus-square:before{content:"\f0fe"}.fa-print:before{content:"\f02f"}.fa-receipt:before{content:"\f543"}.fa-redo:before{content:"\f01e"}.fa-redo-alt:before{content:"\f2f9"}.fa-remove:before{content:"\f00d"}.fa-rotate:before{content:"\f2f1"}.fa-rotate-forward:before{content:"\f2f9"}.fa-rotate-right:before{content:"\f2f9"}.fa-ruler-combined:before{content:"\f546"}.fa-screwdriver-wrench:before{content:"\f7d9"}.fa-search:before{content:"\f002"}.fa-search-location:before{content:"\f689"}.fa-shield-alt:before{content:"\f3ed"}.fa-shield-halved:before{content:"\f3ed"}.fa-shield-virus:before{content:"\e06c"}.fa-spinner:before{content:"\f110"}.fa-square-plus:before{content:"\f0fe"}.fa-sun:before{content:"\f185"}.fa-sun-plant-wilt:before{content:"\e57a"}.fa-sync-alt:before{content:"\f2f1"}.fa-table-cells-large:before{content:"\f009"}.fa-tag:before{content:"\f02b"}.fa-tags:before{content:"\f02c"}.fa-th-large:before{content:"\f009"}.fa-times:before{content:"\f00d"}.fa-times-circle:before{content:"\f057"}.fa-tools:before{content:"\f7d9"}.fa-triangle-exclamation:before{content:"\f071"}.fa-up-right-from-square:before{content:"\f35d"}.fa-user:before{content:"\f007"}.fa-user-shield:before{content:"\f505"}.fa-user-times:before{content:"\f235"}.fa-user-xmark:before{content:"\f235"}.fa-warning:before{content:"\f071"}.fa-weight-hanging:before{content:"\f5cd"}.fa-whatsapp:before{content:"\f232"}.fa-xmark:before{content:"\f00d"}.fa-xmark-circle:before{content:"\f057"}.fa-building-columns:before{content:"\e07d"}.fa-landmark-dome:before{content:"\f66f"}.fa-mail-bulk:before{content:"\f674"}.fa-map-pin:before{content:"\f276"}.fa-route:before{content:"\f4d7"}.fa-road:before{content:"\f018"}.fa-train:before{content:"\f238"}.fa-monument:before{content:"\f5a6"}.fa-scroll:before{content:"\f70e"}.fa-home:before{content:"\f015"}.fa-check:before{content:"\f00c"}
+
+/* Footer sitemap links (SEO internal linking) */
+.footer-nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-bottom: 18px;
+}
+.footer-nav-links a {
+  font-size: 12.5px;
+  color: #cbd5e1;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.footer-nav-links a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
