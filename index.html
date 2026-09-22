@@ -105,7 +105,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://docs.sarthua.in" crossorigin>
 
-    <link rel="stylesheet" href="style.min.css?v=8.2">
+    <link rel="stylesheet" href="style.min.css?v=8.5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
     <script>
@@ -182,7 +182,7 @@
             <div class="hero-inner">
                 <span class="hero-ribbon"></span>
                 <div class="hero-eyebrow" data-en="Official Government Portal"><i class="fas fa-shield-halved"></i> आधिकारिक सार्वजनिक पोर्टल</div>
-                <h1 class="hero-title" data-en="Sarthua Digital Land Records Portal"><span style="color: #fbbf24;">सरथुआ (Sarthua)</span> डिजिटल भू-अभिलेख पोर्टल</h1>
+                <h1 class="hero-title" data-en="Sarthua Digital Land Records Portal"><span class="hero-highlight">सरथुआ (Sarthua)</span> <span class="hero-title-rest">डिजिटल भू-अभिलेख पोर्टल</span></h1>
                 <p class="hero-subtitle" data-en="Mauja Sarthua (Thana 218, Udwantnagar, Bhojpur) — read Jamabandi Panji, 1970 Revisional Survey, 1911 Cadastral Khatiyan and the 8K digital land map online, free of charge.">
                     मौजा सरथुआ (थाना 218, उदवंतनगर, भोजपुर) — जमाबंदी पंजी, 1970 रिविजनल सर्वे, 1911 कैडस्ट्रल खतियान और 8K डिजिटल भू-नक्शा ऑनलाइन, बिल्कुल निःशुल्क पढ़ें।
                 </p>
@@ -201,14 +201,14 @@
                     </div>
                     <div class="search-pills-wrap">
                         <span class="search-pills-label" data-en="Quick Search:"><i class="fas fa-bolt text-warning"></i> त्वरित खोज:</span>
-                        <button type="button" class="search-pill" onclick="document.getElementById('searchInput').value='64'; window.location.href='bhu-naksha?q=64'"><i class="fas fa-map-pin"></i> खेसरा 64</button>
-                        <button type="button" class="search-pill" onclick="document.getElementById('searchInput').value='1'; window.location.href='jamabandi?q=1'"><i class="fas fa-book"></i> खाता 1</button>
-                        <button type="button" class="search-pill" onclick="document.getElementById('searchInput').value='VOL-01'; window.location.href='jamabandi?q=VOL-01'"><i class="fas fa-layer-group"></i> VOL-01</button>
-                        <button type="button" class="search-pill" onclick="window.location.href='bhu-naksha'"><i class="fas fa-map"></i> 8K भू-नक्शा</button>
+                        <button type="button" class="search-pill search-pill--khesra" onclick="document.getElementById('searchInput').value='64'; window.location.href='bhu-naksha?q=64'"><i class="fas fa-map-pin"></i> खेसरा 64</button>
+                        <button type="button" class="search-pill search-pill--khata" onclick="document.getElementById('searchInput').value='1'; window.location.href='jamabandi?q=1'"><i class="fas fa-book"></i> खाता 1</button>
+                        <button type="button" class="search-pill search-pill--vol" onclick="document.getElementById('searchInput').value='VOL-01'; window.location.href='jamabandi?q=VOL-01'"><i class="fas fa-layer-group"></i> VOL-01</button>
+                        <button type="button" class="search-pill search-pill--map" onclick="window.location.href='bhu-naksha'"><i class="fas fa-map"></i> 8K भू-नक्शा</button>
                     </div>
                 </div>
-                <div class="hero-cta-row" style="margin-top: 20px;">
-                    <a href="jamabandi" class="btn btn--gold"><i class="fas fa-book"></i> <span data-en="View Jamabandi Panji">जमाबंदी पंजी देखें</span></a>
+                <div class="hero-cta-row" style="margin-top: 22px;">
+                    <a href="jamabandi" class="btn btn--gold"><i class="fas fa-book-open"></i> <span data-en="View Jamabandi Panji">जमाबंदी पंजी देखें</span></a>
                     <a href="bhu-naksha" class="btn btn--ghost-light"><i class="fas fa-map-marked-alt"></i> <span data-en="View Bhu-Naksha">भू-नक्शा देखें</span></a>
                 </div>
             </div>
@@ -294,8 +294,8 @@
                             <div class="voc-item-label"><i class="fas fa-map-pin"></i> <span data-en="Thana No.">थाना संख्या</span></div>
                             <div class="voc-item-val">218</div>
                         </div>
-                        <div class="voc-item">
-                            <div class="voc-item-label"><i class="fas fa-mail-bulk"></i> <span data-en="PIN Code">पिन कोड</span></div>
+                        <div class="voc-item voc-item--interactive" onclick="copyVocText('802210 / 802206', this)" title="क्लिक करके पिन कोड कॉपी करें">
+                            <div class="voc-item-label"><i class="fas fa-mail-bulk"></i> <span data-en="PIN Code">पिन कोड</span> <span class="voc-copy-btn"><i class="fas fa-copy"></i></span></div>
                             <div class="voc-item-val">802210 / 802206</div>
                         </div>
                         <div class="voc-item">
@@ -306,8 +306,8 @@
                             <div class="voc-item-label"><i class="fas fa-landmark-dome"></i> <span data-en="Sub-division">अनुमंडल</span></div>
                             <div class="voc-item-val">आरा सदर (Ara Sadar)</div>
                         </div>
-                        <div class="voc-item">
-                            <div class="voc-item-label"><i class="fas fa-compass"></i> <span data-en="Coordinates">भू-निर्देशांक (GIS)</span></div>
+                        <div class="voc-item voc-item--interactive" onclick="copyVocText('25.5034, 84.5937', this)" title="क्लिक करके भू-निर्देशांक कॉपी करें">
+                            <div class="voc-item-label"><i class="fas fa-compass"></i> <span data-en="Coordinates">भू-निर्देशांक (GIS)</span> <span class="voc-copy-btn"><i class="fas fa-copy"></i></span></div>
                             <div class="voc-item-val">25.5034° N, 84.5937° E</div>
                         </div>
                         <div class="voc-item">
@@ -375,6 +375,20 @@
             <p><i class="fas fa-file-pdf"></i> PDF लोड हो रहा है...</p>
         </div>
     </div>
+    <script>
+    function copyVocText(text, el) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function() {
+                var btn = el.querySelector('.voc-copy-btn');
+                if (btn) {
+                    var prev = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check" style="color:#10b981;"></i>';
+                    setTimeout(function() { btn.innerHTML = prev; }, 1800);
+                }
+            });
+        }
+    }
+    </script>
     <script src="js/site.js" defer></script>
 </body>
 </html>
