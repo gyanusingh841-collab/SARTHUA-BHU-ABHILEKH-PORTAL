@@ -4529,22 +4529,12 @@ body {
   color: var(--color-text-secondary);
 }
 
-/* 3x2 Balanced Grid - Always clean, balanced symmetry */
+/* Single row of 3 key facts (Thana, PIN, archive span) at every width */
 .voc-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
   margin-bottom: 22px;
-}
-@media (max-width: 960px) {
-  .voc-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (max-width: 560px) {
-  .voc-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .voc-item {
@@ -5018,7 +5008,6 @@ body {
     font-size: 16px;
   }
   .voc-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
   .voc-item {
@@ -5034,6 +5023,9 @@ body {
   }
   .voc-item-val {
     font-size: 14px;
+  }
+  .voc-item-meta {
+    font-size: 11px;
   }
   .voc-about {
     font-size: 13.5px;
