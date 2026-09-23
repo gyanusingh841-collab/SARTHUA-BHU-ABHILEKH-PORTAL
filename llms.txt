@@ -1,0 +1,78 @@
+# सरथुआ भू-अभिलेख पोर्टल (Sarthua Bhu-Abhilekh Portal)
+
+> मौजा सरथुआ (थाना संख्या 218, अंचल उदवंतनगर, जिला भोजपुर, बिहार, PIN 802206) के भू-अभिलेखों का निःशुल्क डिजिटल संग्रह: जमाबंदी पंजी (Register II), 1970 रिविजनल सर्वे खतियान, 1911 कैडस्ट्रल सर्वे खतियान और 8K डिजिटल भू-नक्शा।
+> Free digital archive of land records for revenue village Sarthua (Thana No. 218, Udwantnagar Anchal, Bhojpur district, Bihar, India): Jamabandi Panji (Register II), 1970 Revisional Survey Khatiyan, 1911 Cadastral Survey Khatiyan and an 8K digital cadastral map (Bhu-Naksha).
+
+यह पोर्टल केवल मौजा सरथुआ (थाना 218) के अभिलेख रखता है। सभी PDF बिना लॉगिन के निःशुल्क देखे/डाउनलोड किए जा सकते हैं। ये प्रतियाँ जानकारी और अध्ययन के लिए हैं; विधिक प्रमाणित प्रतिलिपि (Certified Copy) केवल अंचल कार्यालय उदवंतनगर, भोजपुर से मिलती है।
+
+## अभिलेख पेज (Record pages)
+
+- [जमाबंदी पंजी / Jamabandi Panji](https://sarthua.in/jamabandi): रजिस्टर 2, 1970 से वर्तमान, 22 वॉल्यूम (VOL-03 उपलब्ध नहीं)
+- [रिविजनल सर्वे खतियान 1970 / Revisional Survey](https://sarthua.in/revisional-survey): 9 पुस्तकें, खाता संख्या रेंज सहित
+- [कैडस्ट्रल सर्वे खतियान 1911 / Cadastral Survey](https://sarthua.in/cadastral-survey): ब्रिटिश कालीन मूल खतियान, 2 पुस्तकें
+- [डिजिटल भू-नक्शा / Bhu-Naksha](https://sarthua.in/bhu-naksha): 1970 रिविजनल (6 चादर) और 1911 कैडस्ट्रल (5 चादर) के 8K नक्शे, प्लॉट/खेसरा खोज सहित
+- [राजस्व शब्दावली व FAQ / Glossary](https://sarthua.in/glossary): खतियान, खेसरा, जमाबंदी आदि शब्दों के अर्थ
+- [ई-सेवाएं / Services](https://sarthua.in/services): WhatsApp पर प्रति का अनुरोध और बिहार सरकार के आधिकारिक पोर्टल लिंक
+
+## खोज (Search deep link)
+
+हर अभिलेख पेज `?q=` स्वीकार करता है और खुलते ही खोज चला देता है:
+- खाता संख्या से 1970 खतियान: https://sarthua.in/revisional-survey?q=250 (खाता 250 वाली पुस्तकें)
+- खाता संख्या से 1911 खतियान: https://sarthua.in/cadastral-survey?q=120
+- वॉल्यूम से जमाबंदी: https://sarthua.in/jamabandi?q=VOL-05
+
+## 1970 रिविजनल सर्वे: कौन सा खाता किस पुस्तक में
+
+- BOOK-1: खाता 1–178 — https://docs.sarthua.in/revisional_survey/Sarthua_Rev_01_1970.pdf
+- BOOK-2: खाता 12–158 — https://docs.sarthua.in/revisional_survey/Sarthua_Rev_02_1970.pdf
+- BOOK-3: खाता 198–400 — https://docs.sarthua.in/revisional_survey/Sarthua_Rev_03_1970.pdf
+- BOOK-4: खाता 331–452 — https://docs.sarthua.in/revisional_survey/Sarthua_Rev_04_1970.pdf
+- BOOK-5: खाता 458–663 — https://docs.sarthua.in/revisional_survey/Sarthua_Rev_05_1970.pdf
+- BOOK-6: खाता 676–896 — https://docs.sarthua.in/revisional_survey/Sarthua_Rev_06_1970.pdf
+- BOOK-7: खाता 712–915 — https://docs.sarthua.in/revisional_survey/Sarthua_Rev_07_1970.pdf
+- BOOK-8: खाता 1–25, 651–915 — https://docs.sarthua.in/revisional_survey/Sarthua_Rev_08_1970.pdf
+- BOOK-9: खाता 280–617 — https://docs.sarthua.in/revisional_survey/Sarthua_Rev_09_1970.pdf
+
+एक खाता एक से अधिक पुस्तकों में हो सकता है (रेंज आपस में ओवरलैप करती हैं)।
+
+## 1911 कैडस्ट्रल सर्वे
+
+- BOOK-1: खाता 1–188 — https://docs.sarthua.in/cadastral_survey/Sarthua_cs_01_1911.pdf
+- BOOK-2: खाता रेंज दर्ज नहीं — https://docs.sarthua.in/cadastral_survey/Sarthua_cs_02_1911.pdf
+
+पुराने अभिलेख कैथी लिपि में हैं; पढ़ने के लिए [कैथी से देवनागरी गाइड](https://docs.sarthua.in/support/Support_EBook_Kaithi.pdf)।
+
+## जमाबंदी पंजी (Register II) वॉल्यूम
+
+- VOL-01: 8 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_01_1970.pdf
+- VOL-02: 256 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_02_1970.pdf
+- VOL-03: उपलब्ध नहीं
+- VOL-04: 193 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_04_1970.pdf
+- VOL-05: 167 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_05_1970.pdf
+- VOL-06: 151 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_06_1970.pdf
+- VOL-07: 211 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_07_1970.pdf
+- VOL-08: 4 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_08_1970.pdf
+- VOL-09: 223 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_09_1970.pdf
+- VOL-10: 148 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_10_1970.pdf
+- VOL-11: 194 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_11_1970.pdf
+- VOL-11 (A): 160 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_11A_1970.pdf
+- VOL-12: 170 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_12_1970.pdf
+- VOL-13: 178 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_13_1970.pdf
+- VOL-14: 94 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_14_1970.pdf
+- VOL-15: 200 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_15_1970.pdf
+- VOL-16: 179 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_16_1970.pdf
+- VOL-17: 178 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_17_1970.pdf
+- VOL-18: 169 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_18_1970.pdf
+- VOL-19: 102 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_19_1970.pdf
+- VOL-20: 74 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_20_1970.pdf
+- VOL-21: 28 पेज — https://docs.sarthua.in/jamabandi_panji/Sarthua_Vol_21_1970.pdf
+
+## मशीन-पठनीय डेटा (Machine-readable data)
+
+- [website_data.json](https://sarthua.in/website_data.json): सभी वॉल्यूम/पुस्तकों की सूची — पेज संख्या, खाता रेंज और PDF लिंक
+- [sarthua_plots_db.json](https://sarthua.in/sarthua_plots_db.json): 1970 रिविजनल नक्शे के प्लॉट (खेसरा) — चादर, निर्देशांक और बिहार भू-नक्शा (bhunaksha.bihar.gov.in) की आधिकारिक प्लॉट रिपोर्ट का लिंक; कुंजी = प्लॉट नंबर
+
+## संपर्क (Contact)
+
+- व्यवस्थापक: Gyanu Kumar — WhatsApp +91 9006035986 (सुबह 9 से शाम 6 बजे), सेवाएं निःशुल्क
+- आधिकारिक सरकारी स्रोत: अंचल कार्यालय उदवंतनगर, भोजपुर; biharbhumi.bihar.gov.in; bhunaksha.bihar.gov.in
