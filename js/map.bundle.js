@@ -23,7 +23,7 @@ const SarthuaMapViewer = {
     lastCoords: null,
     livePlotCache: {},
     isLiveApiActive: true,
-    apiBaseUrl: (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ? '' : 'https://api.sarthua.in',
+    apiBaseUrl: 'https://api.sarthua.in',
     plotsData: typeof sarthuaPlotsData !== 'undefined' ? sarthuaPlotsData : null,
     plotsDb: {},
     isDbLoaded: false,
@@ -339,8 +339,8 @@ const SarthuaMapViewer = {
         // --- OLD SCANNED IMAGE SYSTEM (TEMPORARILY COMMENTED OUT AS REQUESTED) ---
         // const mapSourceUrl = sheet.white;
         
-        // --- DIRECT BIHAR GOVERNMENT OFFICIAL MAP LAYER (INSTANT STATIC) ---
-        const mapSourceUrl = `maps/gov/${this.currentSurvey}_sheet_${this.currentSheet}.png`;
+        // --- DIRECT BIHAR GOVERNMENT OFFICIAL MAP LAYER VIA CLOUDFLARE ---
+        const mapSourceUrl = `${this.apiBaseUrl}/api/gov-map?survey=${this.currentSurvey}&sheet=${this.currentSheet}`;
         this.imageOverlay = L.imageOverlay(mapSourceUrl, this.imageBounds).addTo(this.map);
         this.map.fitBounds(this.imageBounds);
         setTimeout(() => {
@@ -479,8 +479,8 @@ const SarthuaMapViewer = {
             // --- OLD SCANNED IMAGE SYSTEM (TEMPORARILY COMMENTED OUT AS REQUESTED) ---
             // const newMapUrl = sheet.white;
 
-            // --- DIRECT BIHAR GOVERNMENT OFFICIAL MAP LAYER (INSTANT STATIC) ---
-            const newMapUrl = `maps/gov/${this.currentSurvey}_sheet_${sheetNum}.png`;
+            // --- DIRECT BIHAR GOVERNMENT OFFICIAL MAP LAYER VIA CLOUDFLARE ---
+            const newMapUrl = `${this.apiBaseUrl}/api/gov-map?survey=${this.currentSurvey}&sheet=${sheetNum}`;
             this.imageOverlay.setUrl(newMapUrl);
             this.map.setMaxBounds([[-500, -500], [h + 500, w + 500]]);
             this.map.fitBounds(this.imageBounds, { animate: true });
@@ -886,10 +886,9 @@ const SarthuaMapViewer = {
         const qMaxX = Math.round(maxX / quant) * quant;
         const qMaxY = Math.round(maxY / quant) * quant;
 
-        // Calculate optimal crisp tile dimension
-        const pixelRatio = window.devicePixelRatio || 1;
-        const w = Math.min(1600, Math.max(800, Math.round(size.x * Math.min(1.5, pixelRatio))));
-        const h = Math.min(1600, Math.max(800, Math.round(size.y * Math.min(1.5, pixelRatio))));
+        // Calculate optimal crisp tile dimension (capped at 1024x768 so NIC server renders in 1-2s without timing out)
+        const w = Math.min(1024, Math.max(640, Math.round(size.x)));
+        const h = Math.min(768, Math.max(480, Math.round(size.y)));
 
         const activeSurvey = this.currentSurvey;
         const activeSheet = this.currentSheet;
@@ -903,29 +902,42 @@ const SarthuaMapViewer = {
             this.currentWmsImg = null;
         }
 
-        const img = new Image();
-        this.currentWmsImg = img;
+        let retryCount = 0;
+        const loadTile = () => {
+            const img = new Image();
+            this.currentWmsImg = img;
 
-        img.onload = () => {
-            if (this.currentWmsImg !== img) return; // Stale response, ignore
-            this.currentWmsImg = null;
-            if (this.currentSurvey !== activeSurvey || this.currentSheet !== activeSheet) return;
-            if (this.map.getZoom() < -0.25) return;
-            if (!this.dynamicWmsLayer) {
-                this.dynamicWmsLayer = L.imageOverlay(wmsUrl, bounds, { opacity: 0.98, zIndex: 10 }).addTo(this.map);
-            } else {
-                this.dynamicWmsLayer.setBounds(bounds);
-                this.dynamicWmsLayer.setUrl(wmsUrl);
-            }
-        };
-
-        img.onerror = () => {
-            if (this.currentWmsImg === img) {
+            img.onload = () => {
+                if (this.currentWmsImg !== img) return; // Stale response, ignore
                 this.currentWmsImg = null;
-            }
+                if (this.currentSurvey !== activeSurvey || this.currentSheet !== activeSheet) return;
+                if (this.map.getZoom() < -0.25) return;
+                if (!this.dynamicWmsLayer) {
+                    this.dynamicWmsLayer = L.imageOverlay(wmsUrl, bounds, { opacity: 0.98, zIndex: 10 }).addTo(this.map);
+                } else {
+                    this.dynamicWmsLayer.setBounds(bounds);
+                    this.dynamicWmsLayer.setUrl(wmsUrl);
+                }
+            };
+
+            img.onerror = () => {
+                if (this.currentWmsImg !== img) return;
+                if (retryCount < 1) {
+                    retryCount++;
+                    setTimeout(() => {
+                        if (this.currentSurvey === activeSurvey && this.currentSheet === activeSheet) {
+                            loadTile();
+                        }
+                    }, 1200);
+                } else {
+                    this.currentWmsImg = null;
+                }
+            };
+
+            img.src = wmsUrl;
         };
 
-        img.src = wmsUrl;
+        loadTile();
     },
 
     // Debounced WMS Schedule: 400ms delay after user finishes zoom/pan gestures
