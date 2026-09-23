@@ -32,7 +32,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_Sheet_1_HD.png',
                     imgWidth: 7265,
                     imgHeight: 8000,
-                    bounds: { minX: 263375.602, minY: 2820048.664, maxX: 264945.802, maxY: 2821777.710 }
+                    bounds: { minX: 263390.602, minY: 2820063.664, maxX: 264930.802, maxY: 2821762.710 }
                 },
                 2: {
                     name: 'चादर 02',
@@ -41,7 +41,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_Sheet_2_HD.png',
                     imgWidth: 4819,
                     imgHeight: 8000,
-                    bounds: { minX: 264063.704, minY: 2818638.237, maxX: 264939.069, maxY: 2820091.325 }
+                    bounds: { minX: 264078.704, minY: 2818653.237, maxX: 264924.069, maxY: 2820076.325 }
                 },
                 3: {
                     name: 'चादर 03',
@@ -50,7 +50,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_Sheet_3_HD.png',
                     imgWidth: 7690,
                     imgHeight: 8000,
-                    bounds: { minX: 264850.142, minY: 2818164.791, maxX: 266737.105, maxY: 2820127.927 }
+                    bounds: { minX: 264865.142, minY: 2818179.791, maxX: 266722.105, maxY: 2820112.927 }
                 },
                 4: {
                     name: 'चादर 04',
@@ -59,7 +59,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_Sheet_4_HD.png',
                     imgWidth: 8000,
                     imgHeight: 6501,
-                    bounds: { minX: 264836.941, minY: 2820031.306, maxX: 266737.824, maxY: 2821575.966 }
+                    bounds: { minX: 264851.941, minY: 2820046.306, maxX: 266722.824, maxY: 2821560.966 }
                 },
                 5: {
                     name: 'चादर 05',
@@ -68,7 +68,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_Sheet_5_HD.png',
                     imgWidth: 3441,
                     imgHeight: 8000,
-                    bounds: { minX: 266658.792, minY: 2818671.265, maxX: 267422.110, maxY: 2820445.667 }
+                    bounds: { minX: 266673.792, minY: 2818686.265, maxX: 267407.110, maxY: 2820430.667 }
                 },
                 6: {
                     name: 'चादर 06',
@@ -77,7 +77,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_Sheet_6_HD.png',
                     imgWidth: 8000,
                     imgHeight: 6468,
-                    bounds: { minX: 265624.633, minY: 2819662.519, maxX: 266174.588, maxY: 2820107.181 }
+                    bounds: { minX: 265639.633, minY: 2819677.519, maxX: 266159.588, maxY: 2820092.181 }
                 }
             }
         },
@@ -92,7 +92,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_CS_Sheet_00_HD.png',
                     imgWidth: 8000,
                     imgHeight: 7327,
-                    bounds: { minX: 263300.0, minY: 2818000.0, maxX: 267340.0, maxY: 2821700.0 }
+                    bounds: { minX: 263318.465, minY: 2818026.266, maxX: 267319.183, maxY: 2821676.640 }
                 },
                 1: {
                     name: 'चादर 01',
@@ -101,7 +101,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_CS_Sheet_1_HD.png',
                     imgWidth: 7054,
                     imgHeight: 8000,
-                    bounds: { minX: 263305.0, minY: 2819948.0, maxX: 264915.0, maxY: 2821715.0 }
+                    bounds: { minX: 263320.390, minY: 2819963.040, maxX: 264825.173, maxY: 2821673.749 }
                 },
                 2: {
                     name: 'चादर 02',
@@ -110,7 +110,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_CS_Sheet_2_HD.png',
                     imgWidth: 4653,
                     imgHeight: 8000,
-                    bounds: { minX: 263950.0, minY: 2818513.0, maxX: 264939.0, maxY: 2820091.0 }
+                    bounds: { minX: 263964.905, minY: 2818528.476, maxX: 264796.991, maxY: 2819980.742 }
                 },
                 3: {
                     name: 'चादर 03',
@@ -119,7 +119,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_CS_Sheet_3_HD.png',
                     imgWidth: 7639,
                     imgHeight: 8000,
-                    bounds: { minX: 264755.0, minY: 2818020.0, maxX: 266737.0, maxY: 2820127.0 }
+                    bounds: { minX: 264770.270, minY: 2818035.435, maxX: 266604.776, maxY: 2819958.079 }
                 },
                 4: {
                     name: 'चादर 04',
@@ -128,7 +128,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_CS_Sheet_4_HD.png',
                     imgWidth: 8000,
                     imgHeight: 6835,
-                    bounds: { minX: 264780.0, minY: 2819887.0, maxX: 266737.0, maxY: 2821575.0 }
+                    bounds: { minX: 264794.537, minY: 2819902.458, maxX: 266612.022, maxY: 2821450.821 }
                 },
                 5: {
                     name: 'चादर 05',
@@ -137,7 +137,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_CS_Sheet_5_HD.png',
                     imgWidth: 3370,
                     imgHeight: 8000,
-                    bounds: { minX: 266569.0, minY: 2818490.0, maxX: 267422.0, maxY: 2820445.0 }
+                    bounds: { minX: 266584.073, minY: 2818505.168, maxX: 267317.400, maxY: 2820287.362 }
                 }
             }
         }

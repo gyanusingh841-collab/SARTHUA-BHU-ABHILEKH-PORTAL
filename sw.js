@@ -1,5 +1,5 @@
 // Sarthua Bhu-Abhilekh Portal Service Worker (PWA)
-const CACHE_NAME = 'sarthua-pwa-v1.2';
+const CACHE_NAME = 'sarthua-pwa-v1.3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
