@@ -339,8 +339,8 @@ const SarthuaMapViewer = {
         // --- OLD SCANNED IMAGE SYSTEM (TEMPORARILY COMMENTED OUT AS REQUESTED) ---
         // const mapSourceUrl = sheet.white;
         
-        // --- DIRECT BIHAR GOVERNMENT OFFICIAL MAP LAYER ---
-        const mapSourceUrl = `${this.apiBaseUrl}/api/gov-map?survey=${this.currentSurvey}&sheet=${this.currentSheet}`;
+        // --- DIRECT BIHAR GOVERNMENT OFFICIAL MAP LAYER (INSTANT STATIC) ---
+        const mapSourceUrl = `maps/gov/${this.currentSurvey}_sheet_${this.currentSheet}.png`;
         this.imageOverlay = L.imageOverlay(mapSourceUrl, this.imageBounds).addTo(this.map);
         this.map.fitBounds(this.imageBounds);
         setTimeout(() => {
@@ -479,8 +479,8 @@ const SarthuaMapViewer = {
             // --- OLD SCANNED IMAGE SYSTEM (TEMPORARILY COMMENTED OUT AS REQUESTED) ---
             // const newMapUrl = sheet.white;
 
-            // --- DIRECT BIHAR GOVERNMENT OFFICIAL MAP LAYER ---
-            const newMapUrl = `${this.apiBaseUrl}/api/gov-map?survey=${this.currentSurvey}&sheet=${sheetNum}`;
+            // --- DIRECT BIHAR GOVERNMENT OFFICIAL MAP LAYER (INSTANT STATIC) ---
+            const newMapUrl = `maps/gov/${this.currentSurvey}_sheet_${sheetNum}.png`;
             this.imageOverlay.setUrl(newMapUrl);
             this.map.setMaxBounds([[-500, -500], [h + 500, w + 500]]);
             this.map.fitBounds(this.imageBounds, { animate: true });

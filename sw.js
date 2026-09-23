@@ -1,5 +1,5 @@
 // Sarthua Bhu-Abhilekh Portal Service Worker (PWA)
-const CACHE_NAME = 'sarthua-pwa-v1.3';
+const CACHE_NAME = 'sarthua-pwa-v1.4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -53,8 +53,12 @@ self.addEventListener('fetch', (event) => {
   // Only handle GET requests from the same origin or CDN assets
   if (req.method !== 'GET') return;
 
-  // Don't intercept large PDF files or external APIs
-  if (url.pathname.endsWith('.pdf') || url.hostname.includes('s3') || url.hostname.includes('r2')) {
+  // Don't intercept large PDF files, API calls, or external services
+  if (url.pathname.endsWith('.pdf') || 
+      url.hostname.includes('s3') || 
+      url.hostname.includes('r2') || 
+      url.pathname.startsWith('/api/') || 
+      url.hostname.startsWith('api.')) {
     return;
   }
 

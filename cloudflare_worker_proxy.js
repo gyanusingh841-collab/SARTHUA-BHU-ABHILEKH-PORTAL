@@ -149,22 +149,22 @@ export default {
       const gisCodePrefix = survey === "RS" ? "RS290104029021807" : "CS290104029021806";
       const gisCode = `${gisCodePrefix}${sheetStr}`;
 
-      const boundsMap = {
-        "RS_1": "263390.6,2820063.6,264930.8,2821762.7",
-        "RS_2": "264078.7,2818653.2,264924.1,2820076.3",
-        "RS_3": "264865.1,2818179.8,266722.1,2820112.9",
-        "RS_4": "264851.9,2820046.3,266722.8,2821561.0",
-        "RS_5": "266673.8,2818686.3,267407.1,2820430.7",
-        "RS_6": "265639.6,2819677.5,266159.6,2820092.2",
-        "CS_0": "263318.5,2818026.3,267319.2,2821676.6",
-        "CS_1": "263320.4,2819963.0,264825.2,2821673.7",
-        "CS_2": "263964.9,2818528.5,264797.0,2819980.7",
-        "CS_3": "264770.3,2818035.4,266604.8,2819958.1",
-        "CS_4": "264794.5,2819902.5,266612.0,2821450.8",
-        "CS_5": "266584.1,2818505.2,267317.4,2820287.4"
+      const sheetConfig = {
+        "RS_1": { bbox: "263390.6,2820063.6,264930.8,2821762.7", w: 1800, h: 2000 },
+        "RS_2": { bbox: "264078.7,2818653.2,264924.1,2820076.3", w: 1200, h: 2000 },
+        "RS_3": { bbox: "264865.1,2818179.8,266722.1,2820112.9", w: 1900, h: 2000 },
+        "RS_4": { bbox: "264851.9,2820046.3,266722.8,2821561.0", w: 2000, h: 1600 },
+        "RS_5": { bbox: "266673.8,2818686.3,267407.1,2820430.7", w: 900,  h: 2000 },
+        "RS_6": { bbox: "265639.6,2819677.5,266159.6,2820092.2", w: 2000, h: 1600 },
+        "CS_0": { bbox: "263318.5,2818026.3,267319.2,2821676.6", w: 2000, h: 1800 },
+        "CS_1": { bbox: "263320.4,2819963.0,264825.2,2821673.7", w: 1800, h: 2000 },
+        "CS_2": { bbox: "263964.9,2818528.5,264797.0,2819980.7", w: 1200, h: 2000 },
+        "CS_3": { bbox: "264770.3,2818035.4,266604.8,2819958.1", w: 1900, h: 2000 },
+        "CS_4": { bbox: "264794.5,2819902.5,266612.0,2821450.8", w: 2000, h: 1700 },
+        "CS_5": { bbox: "266584.1,2818505.2,267317.4,2820287.4", w: 900,  h: 2000 }
       };
-      const bbox = boundsMap[`${survey}_${sheet}`] || boundsMap["RS_1"];
-      const wmsUrl = `https://bhunaksha.bihar.gov.in/WMS?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=VILLAGE_MAP&STYLES=VILLAGE_MAP&CRS=EPSG:3857&BBOX=${bbox}&WIDTH=3000&HEIGHT=3000&state=10&gis_code=${gisCode}&overlay_codes=`;
+      const cfg = sheetConfig[`${survey}_${sheet}`] || sheetConfig["RS_1"];
+      const wmsUrl = `https://bhunaksha.bihar.gov.in/WMS?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=VILLAGE_MAP&STYLES=VILLAGE_MAP&CRS=EPSG:3857&BBOX=${cfg.bbox}&WIDTH=${cfg.w}&HEIGHT=${cfg.h}&state=10&gis_code=${gisCode}&overlay_codes=`;
 
       try {
         const res = await fetch(wmsUrl, {
