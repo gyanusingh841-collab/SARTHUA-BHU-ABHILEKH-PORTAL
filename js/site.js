@@ -97,4 +97,71 @@
         var yearEl = document.getElementById('copyrightYear');
         if (yearEl) yearEl.textContent = new Date().getFullYear();
     });
+
+    // ---- PWA Service Worker & Install Prompt ----
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/sw.js').catch(function () {});
+        });
+    }
+
+    var deferredInstallPrompt = null;
+    var isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+
+    window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+
+        if (isStandalone || sessionStorage.getItem('pwa_banner_dismissed') === '1') {
+            return;
+        }
+
+        setTimeout(function () {
+            if (document.getElementById('pwaInstallBanner')) return;
+
+            var banner = document.createElement('div');
+            banner.id = 'pwaInstallBanner';
+            banner.className = 'pwa-install-banner';
+            banner.innerHTML = 
+                '<div class="pwa-install-icon"><i class="fas fa-download"></i></div>' +
+                '<div class="pwa-install-info">' +
+                    '<strong>सरथुआ ऐप इंस्टॉल करें</strong>' +
+                    '<span>बिना सर्च किए सीधे होमस्क्रीन से खोलें</span>' +
+                '</div>' +
+                '<button id="pwaInstallBtn" class="pwa-btn-install">इंस्टॉल</button>' +
+                '<button id="pwaDismissBtn" class="pwa-btn-dismiss" title="हटाएं">&times;</button>';
+
+            document.body.appendChild(banner);
+
+            var installBtn = document.getElementById('pwaInstallBtn');
+            var dismissBtn = document.getElementById('pwaDismissBtn');
+
+            if (installBtn) {
+                installBtn.addEventListener('click', function () {
+                    if (deferredInstallPrompt) {
+                        deferredInstallPrompt.prompt();
+                        deferredInstallPrompt.userChoice.then(function (choice) {
+                            if (choice.outcome === 'accepted') {
+                                banner.remove();
+                            }
+                            deferredInstallPrompt = null;
+                        });
+                    }
+                });
+            }
+
+            if (dismissBtn) {
+                dismissBtn.addEventListener('click', function () {
+                    banner.remove();
+                    try { sessionStorage.setItem('pwa_banner_dismissed', '1'); } catch (err) {}
+                });
+            }
+        }, 2000);
+    });
+
+    window.addEventListener('appinstalled', function () {
+        var banner = document.getElementById('pwaInstallBanner');
+        if (banner) banner.remove();
+        deferredInstallPrompt = null;
+    });
 })();
