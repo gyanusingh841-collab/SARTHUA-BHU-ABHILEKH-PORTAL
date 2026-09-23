@@ -123,7 +123,7 @@
             banner.id = 'pwaInstallBanner';
             banner.className = 'pwa-install-banner';
             banner.innerHTML = 
-                '<div class="pwa-install-icon"><i class="fas fa-download"></i></div>' +
+                '<div class="pwa-install-icon"><img src="/favicon.svg" width="42" height="42" alt="सरथुआ ऐप लोगो"></div>' +
                 '<div class="pwa-install-info">' +
                     '<strong>सरथुआ ऐप इंस्टॉल करें</strong>' +
                     '<span>बिना सर्च किए सीधे होमस्क्रीन से खोलें</span>' +

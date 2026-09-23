@@ -5082,17 +5082,22 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 .pwa-install-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  font-size: 18px;
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.4);
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  background: transparent;
+}
+.pwa-install-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 .pwa-install-info {
   display: flex;
