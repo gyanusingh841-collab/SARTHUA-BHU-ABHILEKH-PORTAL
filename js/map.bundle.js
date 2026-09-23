@@ -23,6 +23,7 @@ const SarthuaMapViewer = {
     lastCoords: null,
     livePlotCache: {},
     isLiveApiActive: true,
+    apiBaseUrl: (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ? '' : 'https://api.sarthua.in',
     plotsData: typeof sarthuaPlotsData !== 'undefined' ? sarthuaPlotsData : null,
     plotsDb: {},
     isDbLoaded: false,
@@ -339,7 +340,7 @@ const SarthuaMapViewer = {
         // const mapSourceUrl = sheet.white;
         
         // --- DIRECT BIHAR GOVERNMENT OFFICIAL MAP LAYER ---
-        const mapSourceUrl = `/api/gov-map?survey=${this.currentSurvey}&sheet=${this.currentSheet}`;
+        const mapSourceUrl = `${this.apiBaseUrl}/api/gov-map?survey=${this.currentSurvey}&sheet=${this.currentSheet}`;
         this.imageOverlay = L.imageOverlay(mapSourceUrl, this.imageBounds).addTo(this.map);
         this.map.fitBounds(this.imageBounds);
         setTimeout(() => {
@@ -479,7 +480,7 @@ const SarthuaMapViewer = {
             // const newMapUrl = sheet.white;
 
             // --- DIRECT BIHAR GOVERNMENT OFFICIAL MAP LAYER ---
-            const newMapUrl = `/api/gov-map?survey=${this.currentSurvey}&sheet=${sheetNum}`;
+            const newMapUrl = `${this.apiBaseUrl}/api/gov-map?survey=${this.currentSurvey}&sheet=${sheetNum}`;
             this.imageOverlay.setUrl(newMapUrl);
             this.map.setMaxBounds([[-500, -500], [h + 500, w + 500]]);
             this.map.fitBounds(this.imageBounds, { animate: true });
@@ -677,7 +678,7 @@ const SarthuaMapViewer = {
             this.clickAbortController = controller;
             const timeoutId = controller ? setTimeout(() => controller.abort(), 4500) : null;
 
-            const queryUrl = `/api/bihar-plot?x=${geo.x}&y=${geo.y}&survey=${this.currentSurvey}&sheet=${this.currentSheet}`;
+            const queryUrl = `${this.apiBaseUrl}/api/bihar-plot?x=${geo.x}&y=${geo.y}&survey=${this.currentSurvey}&sheet=${this.currentSheet}`;
 
             fetch(queryUrl, { signal: controller ? controller.signal : undefined })
                 .then(res => res.json())
@@ -892,7 +893,7 @@ const SarthuaMapViewer = {
 
         const activeSurvey = this.currentSurvey;
         const activeSheet = this.currentSheet;
-        const wmsUrl = `/api/bihar-wms?minx=${qMinX}&miny=${qMinY}&maxx=${qMaxX}&maxy=${qMaxY}&w=${w}&h=${h}&survey=${activeSurvey}&sheet=${activeSheet}`;
+        const wmsUrl = `${this.apiBaseUrl}/api/bihar-wms?minx=${qMinX}&miny=${qMinY}&maxx=${qMaxX}&maxy=${qMaxY}&w=${w}&h=${h}&survey=${activeSurvey}&sheet=${activeSheet}`;
 
         // Cancel previous pending image load
         if (this.currentWmsImg) {

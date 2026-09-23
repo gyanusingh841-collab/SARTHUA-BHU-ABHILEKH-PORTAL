@@ -141,6 +141,58 @@ export default {
       }
     }
 
+    // Base Official Government Map for full sheet view
+    if (url.pathname === "/api/gov-map") {
+      const survey = (url.searchParams.get("survey") || "RS").toUpperCase();
+      const sheet = parseInt(url.searchParams.get("sheet") || "1", 10);
+      const sheetStr = sheet < 10 ? `0${sheet}` : `${sheet}`;
+      const gisCodePrefix = survey === "RS" ? "RS290104029021807" : "CS290104029021806";
+      const gisCode = `${gisCodePrefix}${sheetStr}`;
+
+      const boundsMap = {
+        "RS_1": "263390.6,2820063.6,264930.8,2821762.7",
+        "RS_2": "264078.7,2818653.2,264924.1,2820076.3",
+        "RS_3": "264865.1,2818179.8,266722.1,2820112.9",
+        "RS_4": "264851.9,2820046.3,266722.8,2821561.0",
+        "RS_5": "266673.8,2818686.3,267407.1,2820430.7",
+        "RS_6": "265639.6,2819677.5,266159.6,2820092.2",
+        "CS_0": "263318.5,2818026.3,267319.2,2821676.6",
+        "CS_1": "263320.4,2819963.0,264825.2,2821673.7",
+        "CS_2": "263964.9,2818528.5,264797.0,2819980.7",
+        "CS_3": "264770.3,2818035.4,266604.8,2819958.1",
+        "CS_4": "264794.5,2819902.5,266612.0,2821450.8",
+        "CS_5": "266584.1,2818505.2,267317.4,2820287.4"
+      };
+      const bbox = boundsMap[`${survey}_${sheet}`] || boundsMap["RS_1"];
+      const wmsUrl = `https://bhunaksha.bihar.gov.in/WMS?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&FORMAT=image/png&TRANSPARENT=true&LAYERS=VILLAGE_MAP&STYLES=VILLAGE_MAP&CRS=EPSG:3857&BBOX=${bbox}&WIDTH=3000&HEIGHT=3000&state=10&gis_code=${gisCode}&overlay_codes=`;
+
+      try {
+        const res = await fetch(wmsUrl, {
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Referer": "https://bhunaksha.bihar.gov.in/10/indexmain.jsp",
+          },
+          cf: {
+            cacheTtl: 2592000,
+            cacheEverything: true,
+          },
+        });
+
+        if (res.ok) {
+          return new Response(res.body, {
+            headers: {
+              "Content-Type": "image/png",
+              "Access-Control-Allow-Origin": "*",
+              "Cache-Control": "public, max-age=2592000, immutable",
+            },
+          });
+        }
+        return new Response("Upstream error", { status: res.status });
+      } catch (err) {
+        return new Response(err.message, { status: 502 });
+      }
+    }
+
     return new Response("Not Found", { status: 404 });
   },
 };
