@@ -201,6 +201,9 @@
                         <div class="mfh-item" id="mapCoordsDisplay">
                             <i class="fas fa-crosshairs"></i> X: — | Y: —
                         </div>
+                        <div class="mfh-item" id="mapLiveApiStatus">
+                            <i class="fas fa-satellite-dish text-success"></i> <span data-en="Live GIS API: Active">लाइव GIS API: <strong class="text-success">सक्रिय</strong></span>
+                        </div>
                         <div class="mfh-item">
                             <span>पैमाना: <strong>16" = 1 मील</strong></span>
                         </div>
@@ -243,7 +246,7 @@
     </div>
     <script src="js/site.js?v=4" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
-    <script src="js/map.bundle.js?v=9.2" defer></script>
+    <script src="js/map.bundle.js?v=9.7" defer></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         var params = new URLSearchParams(window.location.search);
