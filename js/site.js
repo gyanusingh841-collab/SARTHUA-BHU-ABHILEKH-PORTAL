@@ -51,12 +51,29 @@
     // Every translatable text node carries data-en="English text"; the Hindi
     // original is captured into data-hi the first time we touch it.
     function applyLanguage(lang) {
-        document.querySelectorAll('[data-en]').forEach(function (el) {
-            if (!el.hasAttribute('data-hi')) {
-                el.setAttribute('data-hi', el.textContent);
+        var elements = document.querySelectorAll('[data-en]');
+        var total = elements.length;
+        var batch = [];
+        
+        // Pass 1: Read and initialize data-hi
+        for (var i = 0; i < total; i++) {
+            var el = elements[i];
+            var hi = el.getAttribute('data-hi');
+            if (hi === null) {
+                hi = el.textContent;
+                el.setAttribute('data-hi', hi);
             }
-            el.textContent = lang === 'en' ? el.getAttribute('data-en') : el.getAttribute('data-hi');
-        });
+            var targetText = lang === 'en' ? el.getAttribute('data-en') : hi;
+            if (targetText && el.textContent !== targetText) {
+                batch.push({ node: el, text: targetText });
+            }
+        }
+        
+        // Pass 2: Batch DOM text mutations
+        for (var j = 0; j < batch.length; j++) {
+            batch[j].node.textContent = batch[j].text;
+        }
+
         document.documentElement.setAttribute('lang', lang);
         var btn = document.getElementById('langToggleBtn');
         if (btn) btn.textContent = lang === 'en' ? 'हिं' : 'EN';

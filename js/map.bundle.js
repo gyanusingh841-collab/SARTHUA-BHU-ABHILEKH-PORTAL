@@ -182,8 +182,8 @@
 
         // Keeps sheets clear of the floating dock (bottom) and controls (right)
         getFitPadding: function () {
-            const dock = document.getElementById('mvDock');
-            const dockH = dock ? dock.offsetHeight : 0;
+            const isMob = this.isMobile();
+            const dockH = isMob ? 88 : 52;
             return {
                 paddingTopLeft: [16, 16],
                 paddingBottomRight: [68, dockH + 24]
