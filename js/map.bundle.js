@@ -729,8 +729,8 @@ const SarthuaMapViewer = {
         const nePix = this.geoToPixel(qMaxX, qMaxY);
         const exactOverlayBounds = [[swPix[0], swPix[1]], [nePix[0], nePix[1]]];
 
-        const w = Math.min(2048, Math.max(1024, Math.round(size.x * 2.0)));
-        const h = Math.min(2048, Math.max(768, Math.round(size.y * 2.0)));
+        const w = Math.max(256, Math.round(size.x));
+        const h = Math.max(256, Math.round(size.y));
 
         const activeSurvey = this.currentSurvey;
         const activeSheet = this.currentSheet;
