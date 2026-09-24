@@ -5,30 +5,37 @@
 (function (window) {
     'use strict';
 
-    // Official Survey & Sheet GIS Bounding Boxes (EPSG:3857 Web Mercator meters)
+    // Official Survey & Sheet GIS Bounding Boxes (EPSG:3857 Web Mercator meters).
+    // These are also the exact bounds of the pre-rendered overview images.
     const SHEET_CONFIG = {
         RS: {
             name: 'रिविजनल सर्वे (1970)',
             sheets: {
-                1: { minX: 263390.6, minY: 2820063.6, maxX: 264930.8, maxY: 2821762.7, label: 'चादर 01', gis_code: 'RS29010402902180701' },
-                2: { minX: 264078.7, minY: 2818653.2, maxX: 264924.0, maxY: 2820076.3, label: 'चादर 02', gis_code: 'RS29010402902180702' },
-                3: { minX: 264865.1, minY: 2818179.7, maxX: 266722.1, maxY: 2820112.9, label: 'चादर 03', gis_code: 'RS29010402902180703' },
-                4: { minX: 264851.9, minY: 2820046.3, maxX: 266722.8, maxY: 2821560.9, label: 'चादर 04', gis_code: 'RS29010402902180704' },
-                5: { minX: 266673.7, minY: 2818686.2, maxX: 267407.1, maxY: 2820430.6, label: 'चादर 05', gis_code: 'RS29010402902180705' },
-                6: { minX: 265639.6, minY: 2819677.5, maxX: 266159.5, maxY: 2820092.1, label: 'चादर 06', gis_code: 'RS29010402902180706' }
+                1: { minX: 263376.0, minY: 2820048.3, maxX: 264946.2, maxY: 2821778.3, label: 'चादर 01', gis_code: 'RS29010402902180701' },
+                2: { minX: 264063.9, minY: 2818638.0, maxX: 264939.3, maxY: 2820091.1, label: 'चादर 02', gis_code: 'RS29010402902180702' },
+                3: { minX: 264850.2, minY: 2818164.4, maxX: 266738.0, maxY: 2820127.8, label: 'चादर 03', gis_code: 'RS29010402902180703' },
+                4: { minX: 264837.2, minY: 2820030.7, maxX: 266738.5, maxY: 2821578.1, label: 'चादर 04', gis_code: 'RS29010402902180704' },
+                5: { minX: 266659.1, minY: 2818671.3, maxX: 267422.9, maxY: 2820445.4, label: 'चादर 05', gis_code: 'RS29010402902180705' },
+                6: { minX: 265624.7, minY: 2819662.5, maxX: 266174.8, maxY: 2820107.1, label: 'चादर 06', gis_code: 'RS29010402902180706' }
             }
         },
         CS: {
             name: 'कैडस्ट्रल सर्वे (1911)',
             sheets: {
-                0: { minX: 263200.0, minY: 2818000.0, maxX: 267600.0, maxY: 2822000.0, label: 'सम्पूर्ण मौजा', gis_code: 'CS29010402902180700' },
-                1: { minX: 263390.6, minY: 2820063.6, maxX: 264930.8, maxY: 2821762.7, label: 'चादर 01', gis_code: 'CS29010402902180701' },
-                2: { minX: 264078.7, minY: 2818653.2, maxX: 264924.0, maxY: 2820076.3, label: 'चादर 02', gis_code: 'CS29010402902180702' },
-                3: { minX: 264865.1, minY: 2818179.7, maxX: 266722.1, maxY: 2820112.9, label: 'चादर 03', gis_code: 'CS29010402902180703' },
-                4: { minX: 264851.9, minY: 2820046.3, maxX: 266722.8, maxY: 2821560.9, label: 'चादर 04', gis_code: 'CS29010402902180704' }
+                0: { minX: 263300.4, minY: 2817999.2, maxX: 267341.4, maxY: 2821701.8, label: 'सम्पूर्ण मौजा', gis_code: 'CS29010402902180700' },
+                1: { minX: 263305.1, minY: 2819946.9, maxX: 264841.3, maxY: 2821689.0, label: 'चादर 01', gis_code: 'CS29010402902180701' },
+                2: { minX: 263950.1, minY: 2818513.4, maxX: 264812.2, maxY: 2819995.5, label: 'चादर 02', gis_code: 'CS29010402902180702' },
+                3: { minX: 264755.1, minY: 2818019.5, maxX: 266620.9, maxY: 2819975.0, label: 'चादर 03', gis_code: 'CS29010402902180703' },
+                4: { minX: 264778.6, minY: 2819887.0, maxX: 266627.7, maxY: 2821465.5, label: 'चादर 04', gis_code: 'CS29010402902180704' },
+                5: { minX: 266569.4, minY: 2818490.1, maxX: 267332.5, maxY: 2820302.1, label: 'चादर 05', gis_code: 'CS29010402902180705' }
             }
         }
     };
+
+    // Pre-rendered sheet overviews (from the R2 8K maps, served by the site CDN).
+    // Shown at the fitted sheet zoom; the live WMS API is only used once the user zooms in.
+    const OVERVIEW_URL = (survey, sheet) => `maps/overview/${survey}_${sheet}.webp?v=1`;
+    const LIVE_WMS_ZOOM_DELTA = 0.3;
 
     const SarthuaMapViewer = {
         map: null,
@@ -36,6 +43,9 @@
         currentSheet: 1,
         apiBaseUrl: 'https://api.sarthua.in',
         wmsOverlay: null,
+        overviewOverlay: null,
+        overviewZoom: null,
+        overviewFailed: false,
         clickMarker: null,
         khasraIndex: null,
         isInitialized: false,
@@ -160,6 +170,47 @@
             const cfg = this.getActiveSheet();
             const bounds = L.latLngBounds([cfg.minY, cfg.minX], [cfg.maxY, cfg.maxX]);
             this.map.fitBounds(bounds, this.getFitPadding());
+            this.overviewZoom = this.map.getZoom();
+            this.showOverview();
+        },
+
+        showOverview: function () {
+            const cfg = this.getActiveSheet();
+            const bounds = [[cfg.minY, cfg.minX], [cfg.maxY, cfg.maxX]];
+            const url = OVERVIEW_URL(this.currentSurvey, this.currentSheet);
+            const alt = `सरथुआ ${SHEET_CONFIG[this.currentSurvey].name} ${this.getSheetLabel(this.currentSheet)} भू-नक्शा`;
+            this.overviewFailed = false;
+
+            if (!this.overviewOverlay) {
+                this.overviewOverlay = L.imageOverlay(url, bounds, { zIndex: 400, alt }).addTo(this.map);
+                this.overviewOverlay.on('error', () => {
+                    // No overview for this sheet: fall back to the live API at every zoom
+                    this.overviewFailed = true;
+                    this.updateWms();
+                });
+            } else {
+                this.overviewOverlay.setUrl(url);
+                this.overviewOverlay.setBounds(L.latLngBounds(bounds));
+                const el = this.overviewOverlay.getElement();
+                if (el) el.alt = alt;
+            }
+        },
+
+        needsLiveWms: function () {
+            if (this.overviewFailed || this.overviewZoom === null) return true;
+            return this.map.getZoom() > this.overviewZoom + LIVE_WMS_ZOOM_DELTA;
+        },
+
+        hideLiveWms: function () {
+            if (this.activeImageElement) {
+                this.activeImageElement.onload = null;
+                this.activeImageElement.onerror = null;
+                this.activeImageElement = null;
+            }
+            if (this.wmsOverlay) {
+                this.map.removeLayer(this.wmsOverlay);
+                this.wmsOverlay = null;
+            }
         },
 
         loadKhasraIndex: function (pendingQuery) {
@@ -192,6 +243,12 @@
 
             const size = this.map.getSize();
             if (!size || size.x < 100 || size.y < 100) return;
+
+            // At the overview zoom the CDN image is enough; skip the API call
+            if (!this.needsLiveWms()) {
+                this.hideLiveWms();
+                return;
+            }
 
             const bounds = this.map.getBounds();
             const minX = Math.round(bounds.getWest());
