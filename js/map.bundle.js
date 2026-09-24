@@ -34,9 +34,9 @@
 
     // Pre-rendered sheet overviews (downscaled from the 8K maps, served from S3 Mumbai via api.sarthua.in - ~2x faster than R2 for Indian users).
     // Shown at the fitted sheet zoom; the live WMS API is only used once the user zooms in.
-    // Two sizes (long side in px); the smallest one that stays sharp on this screen is used.
-    const OVERVIEW_SIZES = [800, 1600];
-    const OVERVIEW_URL = (survey, sheet, size) => `https://api.sarthua.in/maps/overview/${survey}_${sheet}-${size}.webp?v=1`;
+    // Sizes (long side in px; opaque on the map background colour); the smallest one that stays sharp on this screen is used.
+    const OVERVIEW_SIZES = [600, 800, 1600];
+    const OVERVIEW_URL = (survey, sheet, size) => `https://api.sarthua.in/maps/overview/${survey}_${sheet}-${size}.webp?v=2`;
     const LIVE_WMS_ZOOM_DELTA = 0.3;
 
     const SarthuaMapViewer = {
@@ -54,6 +54,9 @@
         wmsDebounceTimer: null,
         activeImageElement: null,
         toastTimer: null,
+        urlStateRead: false,
+        initialOverviewSize: null,
+        overviewPreload: null,
 
         detectApiEndpoint: function () {
             // Check if local dev server or cloud proxy
@@ -74,16 +77,8 @@
             }
 
             this.detectApiEndpoint();
-
-            // Deep link: ?survey=RS|CS&sheet=N&q=<khesra>
-            const params = new URLSearchParams(window.location.search);
-            const urlSurvey = (params.get('survey') || '').toUpperCase();
-            if (SHEET_CONFIG[urlSurvey]) this.currentSurvey = urlSurvey;
-            const urlSheet = parseInt(params.get('sheet'), 10);
-            if (SHEET_CONFIG[this.currentSurvey].sheets[urlSheet]) this.currentSheet = urlSheet;
-            const urlQuery = (params.get('q') || '').trim();
-
-            this.loadKhasraIndex(urlQuery);
+            this.readUrlState();
+            this.loadKhasraIndex((new URLSearchParams(window.location.search).get('q') || '').trim());
 
             // Direct Real GIS Coordinate Space (CRS.Simple: Lat=Y, Lng=X)
             this.map = L.map('sarthuaMapContainer', {
@@ -149,6 +144,42 @@
             return window.matchMedia('(max-width: 899px)').matches;
         },
 
+        // Deep link: ?survey=RS|CS&sheet=N (the ?q=<khesra> search runs once the index loads)
+        readUrlState: function () {
+            if (this.urlStateRead) return;
+            this.urlStateRead = true;
+            const params = new URLSearchParams(window.location.search);
+            const urlSurvey = (params.get('survey') || '').toUpperCase();
+            if (SHEET_CONFIG[urlSurvey]) this.currentSurvey = urlSurvey;
+            const urlSheet = parseInt(params.get('sheet'), 10);
+            if (SHEET_CONFIG[this.currentSurvey].sheets[urlSheet]) this.currentSheet = urlSheet;
+        },
+
+        // Start the first overview download before Leaflet has loaded (it is the LCP image).
+        // Mirrors Leaflet's fitBounds zoom (CRS.Simple, zoomSnap 0.1) to pick the same size.
+        preloadOverview: function () {
+            const container = document.getElementById('sarthuaMapContainer');
+            if (!container || !container.clientWidth) return;
+            this.readUrlState();
+            const cfg = this.getActiveSheet();
+            const pad = this.getFitPadding();
+            const w = container.clientWidth - pad.paddingTopLeft[0] - pad.paddingBottomRight[0];
+            const h = container.clientHeight - pad.paddingTopLeft[1] - pad.paddingBottomRight[1];
+            const bw = cfg.maxX - cfg.minX;
+            const bh = cfg.maxY - cfg.minY;
+            if (w <= 0 || h <= 0) return;
+            let zoom = Math.log2(Math.min(w / bw, h / bh));
+            zoom = Math.floor(Math.round(zoom * 1000) / 100) / 10;
+            zoom = Math.min(6, Math.max(-4, zoom));
+            const size = this.sizeForDisplay(Math.max(bw, bh) * Math.pow(2, zoom));
+
+            this.initialOverviewSize = { survey: this.currentSurvey, sheet: this.currentSheet, size };
+            const img = new Image();
+            img.fetchPriority = 'high';
+            img.src = OVERVIEW_URL(this.currentSurvey, this.currentSheet, size);
+            this.overviewPreload = img;
+        },
+
         // Keeps sheets clear of the floating dock (bottom) and controls (right)
         getFitPadding: function () {
             const dock = document.getElementById('mvDock');
@@ -179,7 +210,12 @@
         showOverview: function () {
             const cfg = this.getActiveSheet();
             const bounds = [[cfg.minY, cfg.minX], [cfg.maxY, cfg.maxX]];
-            const url = OVERVIEW_URL(this.currentSurvey, this.currentSheet, this.pickOverviewSize(bounds));
+            // First sheet: reuse the size preloaded at startup so the image is fetched only once
+            const pre = this.initialOverviewSize;
+            this.initialOverviewSize = null;
+            const size = pre && pre.survey === this.currentSurvey && pre.sheet === this.currentSheet
+                ? pre.size : this.pickOverviewSize(bounds);
+            const url = OVERVIEW_URL(this.currentSurvey, this.currentSheet, size);
             const alt = `सरथुआ ${SHEET_CONFIG[this.currentSurvey].name} ${this.getSheetLabel(this.currentSheet)} भू-नक्शा`;
             this.overviewFailed = false;
 
@@ -201,7 +237,11 @@
         pickOverviewSize: function (bounds) {
             const a = this.map.latLngToContainerPoint(bounds[0]);
             const b = this.map.latLngToContainerPoint(bounds[1]);
-            const need = Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y)) * Math.min(window.devicePixelRatio || 1, 2);
+            return this.sizeForDisplay(Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y)));
+        },
+
+        sizeForDisplay: function (cssLongSide) {
+            const need = cssLongSide * Math.min(window.devicePixelRatio || 1, 2);
             return OVERVIEW_SIZES.find(size => size * 1.1 >= need) || OVERVIEW_SIZES[OVERVIEW_SIZES.length - 1];
         },
 
@@ -651,6 +691,7 @@
     };
 
     window.SarthuaMapViewer = SarthuaMapViewer;
+    SarthuaMapViewer.preloadOverview();
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => SarthuaMapViewer.init());

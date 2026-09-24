@@ -1,3 +1,9 @@
 /llms.txt
   Content-Type: text/plain; charset=utf-8
 
+
+/js/leaflet-1.9.4.min.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/fa-mapviewer-*
+  Cache-Control: public, max-age=31536000, immutable
