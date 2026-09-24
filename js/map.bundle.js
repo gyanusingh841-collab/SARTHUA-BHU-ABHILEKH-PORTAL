@@ -96,7 +96,7 @@
             this.syncSurveyButtons();
             this.renderSheetSwitcher();
             this.updateDownloadLink();
-            this.updatePageState();
+            this.updatePageState(true);
             this.bindUi();
             this.isInitialized = true;
 
@@ -415,12 +415,18 @@
             }
         },
 
-        // Reflect survey/sheet in the tab title, subtitle and a shareable URL
-        updatePageState: function () {
+        // Reflect survey/sheet in the tab title, subtitle and a shareable URL.
+        // On a plain /map-viewer load the SEO <title> and clean URL are kept as-is
+        // (search engines index the rendered title).
+        updatePageState: function (initial) {
             const surveyShort = this.currentSurvey === 'CS' ? '1911 CS' : '1970 RS';
             const sheetLabel = this.getSheetLabel(this.currentSheet);
             const sub = document.getElementById('mvSubtitleText') || document.getElementById('mvSubtitle');
             if (sub) sub.textContent = `मौजा सरथुआ • थाना 218 • ${surveyShort} • ${sheetLabel}`;
+
+            const search = new URLSearchParams(window.location.search);
+            if (initial && !search.has('survey') && !search.has('sheet')) return;
+
             document.title = `${surveyShort} ${sheetLabel} - सरथुआ भू-नक्शा (GIS Map Viewer) | थाना 218`;
 
             if (window.history && history.replaceState) {
