@@ -90,7 +90,6 @@
             // Map Event Listeners
             this.map.on('moveend zoomend', () => this.scheduleWmsUpdate());
             this.map.on('click', (e) => this.handleMapClick(e.latlng));
-            this.map.on('mousemove', (e) => this.handleMouseMove(e.latlng));
 
             // Initial WMS Render
             this.updateWms();
@@ -271,7 +270,6 @@
         handleMapClick: function (latlng) {
             const x = Math.round(latlng.lng);
             const y = Math.round(latlng.lat);
-            this.handleMouseMove(latlng);
 
             if (this.clickMarker) {
                 this.map.removeLayer(this.clickMarker);
@@ -421,7 +419,7 @@
         updatePageState: function () {
             const surveyShort = this.currentSurvey === 'CS' ? '1911 CS' : '1970 RS';
             const sheetLabel = this.getSheetLabel(this.currentSheet);
-            const sub = document.getElementById('mvSubtitle');
+            const sub = document.getElementById('mvSubtitleText') || document.getElementById('mvSubtitle');
             if (sub) sub.textContent = `मौजा सरथुआ • थाना 218 • ${surveyShort} • ${sheetLabel}`;
             document.title = `${surveyShort} ${sheetLabel} - सरथुआ भू-नक्शा (GIS Map Viewer) | थाना 218`;
 

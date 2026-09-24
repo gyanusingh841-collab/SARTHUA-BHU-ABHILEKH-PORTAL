@@ -298,7 +298,32 @@
         .mv-ctrl-group .mv-icon-btn { border-radius: 0; font-size: 15px; }
         .mv-ctrl-group .mv-icon-btn + .mv-icon-btn { border-top: 1px solid var(--border); }
 
-        /* ----- Bottom dock: survey + sheets + status ----- */
+        /* ----- Live GIS badge in header ----- */
+        .mv-live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(52, 211, 153, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.35);
+            color: var(--ok);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-left: 6px;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        .mv-live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--ok);
+            box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
+            display: inline-block;
+        }
+
+        /* ----- Bottom dock: survey + sheets (compact & slim) ----- */
         .mv-dock {
             position: absolute;
             left: calc(8px + var(--safe-l));
@@ -309,14 +334,19 @@
             -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 14px;
             box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
-            padding: 8px;
+            padding: 6px 8px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
-        .mv-dock-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .mv-dock-top {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+        }
 
         .map-survey-switcher {
             display: flex;
@@ -329,7 +359,7 @@
         }
         .map-survey-btn {
             flex: 1;
-            height: 38px;
+            height: 36px;
             border: 0;
             border-radius: 8px;
             background: transparent;
@@ -347,7 +377,7 @@
 
         .btn-gov-request {
             flex: none;
-            height: 44px;
+            height: 42px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -371,6 +401,7 @@
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             padding: 1px;
+            align-items: center;
         }
         .map-sheet-switcher::-webkit-scrollbar { display: none; }
         .sheet-switcher-label {
@@ -385,9 +416,9 @@
         }
         .map-sheet-btn {
             flex: none;
-            min-width: 48px;
-            height: 38px;
-            padding: 0 12px;
+            min-width: 44px;
+            height: 34px;
+            padding: 0 10px;
             border-radius: 999px;
             border: 1px solid var(--border);
             background: var(--surface);
@@ -398,26 +429,6 @@
             white-space: nowrap;
         }
         .map-sheet-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-        .mv-status {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            font-size: 11px;
-            color: var(--muted);
-            padding: 0 4px;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-        .mv-status strong { color: var(--text); font-weight: 600; }
-        .mv-status .mf-item { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
-        .mv-status .mf-hide-sm { display: none; }
-        .mv-live-dot {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: var(--ok);
-            box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
-        }
 
         /* ----- Plot info bottom sheet ----- */
         .mv-sheet {
@@ -589,10 +600,9 @@
         /* ===== Tablet & up ===== */
         @media (min-width: 600px) {
             .btn-gov-request span { display: inline; }
-            .mv-status .mf-hide-sm { display: inline-flex; }
         }
 
-        /* ===== Desktop ===== */
+        /* ===== Desktop & Laptop ===== */
         @media (min-width: 900px) {
             .mv-top {
                 grid-template-columns: auto minmax(0, 1fr) minmax(280px, 420px) auto;
@@ -606,13 +616,39 @@
                 left: 50%;
                 right: auto;
                 transform: translateX(-50%);
-                width: min(760px, calc(100% - 120px));
+                width: max-content;
+                max-width: calc(100% - 32px);
                 bottom: 14px;
+                flex-direction: row;
+                align-items: center;
+                gap: 8px;
+                padding: 5px 8px;
+                border-radius: 999px;
             }
-            .mv-dock-main { flex-wrap: nowrap; }
-            .map-survey-switcher { flex: none; }
-            .map-survey-btn { padding: 0 14px; }
-            .map-sheet-switcher { flex: 1; }
+            .mv-dock-top {
+                display: contents;
+            }
+            .map-survey-switcher {
+                order: 1;
+                flex: none;
+                border-radius: 999px;
+            }
+            .map-survey-btn {
+                height: 34px;
+                padding: 0 14px;
+                border-radius: 999px;
+            }
+            .map-sheet-switcher {
+                order: 2;
+                flex: none;
+            }
+            .btn-gov-request {
+                order: 3;
+                height: 36px;
+                padding: 0 14px;
+                border-radius: 999px;
+                font-size: 12px;
+            }
             .mv-controls { right: 14px; }
             .mv-sheet {
                 left: 14px;
@@ -653,7 +689,10 @@
         </a>
         <div class="mv-title">
             <h1>सरथुआ भू-नक्शा <span class="sr-only">(GIS Map Viewer)</span></h1>
-            <p id="mvSubtitle">मौजा सरथुआ • थाना 218 • 1970 RS • चादर 01</p>
+            <p id="mvSubtitle">
+                <span id="mvSubtitleText">मौजा सरथुआ • थाना 218 • 1970 RS • चादर 01</span>
+                <span class="mv-live-badge"><span class="mv-live-dot" aria-hidden="true"></span> लाइव GIS</span>
+            </p>
         </div>
         <form class="mv-search" role="search" onsubmit="event.preventDefault(); SarthuaMapViewer.searchPlot();">
             <i class="fas fa-search" aria-hidden="true"></i>
@@ -690,7 +729,7 @@
 
     <!-- Bottom dock -->
     <div class="mv-dock" id="mvDock">
-        <div class="mv-dock-row mv-dock-main">
+        <div class="mv-dock-top">
             <div class="map-survey-switcher" role="group" aria-label="सर्वेक्षण चुनें">
                 <button type="button" class="map-survey-btn active" data-survey="RS" aria-pressed="true" onclick="SarthuaMapViewer.switchSurvey('RS')">
                     <i class="fas fa-layer-group" aria-hidden="true"></i> <span>1970 RS</span>
@@ -713,12 +752,6 @@
             <button type="button" class="map-sheet-btn" data-sheet="4" onclick="SarthuaMapViewer.switchSheet(4)">04</button>
             <button type="button" class="map-sheet-btn" data-sheet="5" onclick="SarthuaMapViewer.switchSheet(5)">05</button>
             <button type="button" class="map-sheet-btn" data-sheet="6" onclick="SarthuaMapViewer.switchSheet(6)">06</button>
-        </div>
-
-        <div class="mv-status">
-            <span class="mf-item"><span class="mv-live-dot" aria-hidden="true"></span> <span>लाइव GIS</span></span>
-            <span class="mf-item" id="mapCoordsDisplay">X: — | Y: —</span>
-            <span class="mf-item mf-hide-sm">पैमाना: <strong>16" = 1 मील</strong></span>
         </div>
     </div>
 
@@ -800,6 +833,6 @@
 
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
-    <script src="js/map.bundle.js?v=21.1" defer></script>
+    <script src="js/map.bundle.js?v=22.0" defer></script>
 </body>
 </html>
