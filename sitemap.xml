@@ -119,6 +119,14 @@
     </image:image>
   </url>
 
+  <!-- Interactive GIS Map Viewer (Khesra search) -->
+  <url>
+    <loc>https://sarthua.in/map-viewer</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
   <!-- Citizen Land Services -->
   <url>
     <loc>https://sarthua.in/services</loc>

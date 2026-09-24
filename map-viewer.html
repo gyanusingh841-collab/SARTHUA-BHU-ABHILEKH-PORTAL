@@ -1,400 +1,805 @@
 <!DOCTYPE html>
-<html lang="hi" data-theme="light">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>भू-नक्शा दर्शक (GIS Map Viewer) | मौजा सरथुआ (218)</title>
-    <meta name="description" content="मौजा सरथुआ का 8K अल्ट्रा HD डिजिटल भू-नक्शा - 1970 रिविजनल एवं 1911 कैडस्ट्रल सर्वे।">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="theme-color" content="#1b1c1f">
+    <meta name="color-scheme" content="dark">
+    <meta name="format-detection" content="telephone=no">
+
+    <title>सरथुआ भू-नक्शा ऑनलाइन (GIS Map Viewer) | खेसरा नंबर से प्लॉट खोजें - थाना 218</title>
+    <meta name="description" content="मौजा सरथुआ (थाना 218, उदवंतनगर, भोजपुर, बिहार) का इंटरैक्टिव डिजिटल भू-नक्शा। 1970 रिविजनल सर्वे (6 चादर) व 1911 कैडस्ट्रल सर्वे नक्शे पर खेसरा/प्लॉट नंबर खोजें, ज़ूम करें और प्लॉट की जानकारी देखें - मुफ्त, बिना लॉगिन।">
+    <meta name="keywords" content="सरथुआ भू-नक्शा, Sarthua Bhu Naksha, Sarthua map, खेसरा नंबर नक्शा, Bihar Bhunaksha Bhojpur, Udwantnagar naksha, RS 1970 map, CS 1911 map, cadastral map Bihar, प्लॉट नक्शा ऑनलाइन">
+    <meta name="author" content="सरथुआ ग्राम पंचायत एवं डिजिटल भू-अभिलेख संग्रह">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="https://sarthua.in/map-viewer">
+    <link rel="alternate" hreflang="hi-IN" href="https://sarthua.in/map-viewer">
+    <link rel="alternate" hreflang="x-default" href="https://sarthua.in/map-viewer">
+
+    <meta name="geo.region" content="IN-BR">
+    <meta name="geo.placename" content="Sarthua, Udwantnagar, Bhojpur, Bihar">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sarthua.in/map-viewer">
+    <meta property="og:title" content="सरथुआ भू-नक्शा ऑनलाइन - खेसरा नंबर से प्लॉट खोजें">
+    <meta property="og:description" content="मौजा सरथुआ (थाना 218) का इंटरैक्टिव GIS नक्शा: 1970 RS व 1911 CS सर्वे, खेसरा सर्च, ज़ूम और प्लॉट जानकारी - मोबाइल पर भी।">
+    <meta property="og:image" content="https://sarthua.in/og-image.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="सरथुआ भू-अभिलेख पोर्टल - डिजिटल भू-नक्शा">
+    <meta property="og:locale" content="hi_IN">
+    <meta property="og:site_name" content="सरथुआ भू-अभिलेख पोर्टल">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="सरथुआ भू-नक्शा ऑनलाइन - खेसरा नंबर से प्लॉट खोजें">
+    <meta name="twitter:description" content="मौजा सरथुआ (थाना 218) का इंटरैक्टिव GIS नक्शा: 1970 RS व 1911 CS सर्वे, खेसरा सर्च, ज़ूम और प्लॉट जानकारी।">
+    <meta name="twitter:image" content="https://sarthua.in/og-image.png">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "होम", "item": "https://sarthua.in/"},
+            {"@type": "ListItem", "position": 2, "name": "भू-नक्शा", "item": "https://sarthua.in/bhu-naksha"},
+            {"@type": "ListItem", "position": 3, "name": "GIS मैप व्यूअर", "item": "https://sarthua.in/map-viewer"}
+          ]
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://sarthua.in/map-viewer#app",
+          "name": "सरथुआ भू-नक्शा GIS मैप व्यूअर",
+          "alternateName": "Sarthua Bhu-Naksha GIS Map Viewer",
+          "url": "https://sarthua.in/map-viewer",
+          "applicationCategory": "ReferenceApplication",
+          "operatingSystem": "Any (Web Browser)",
+          "inLanguage": "hi-IN",
+          "isAccessibleForFree": true,
+          "offers": {"@type": "Offer", "price": "0", "priceCurrency": "INR"},
+          "featureList": [
+            "खेसरा / प्लॉट नंबर से खोज",
+            "1970 रिविजनल सर्वे के 6 चादर",
+            "1911 कैडस्ट्रल सर्वे के नक्शे",
+            "प्लॉट पर टैप करके खेसरा व PNIU जानकारी",
+            "मोबाइल पर पिंच-ज़ूम"
+          ],
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {"@type": "EntryPoint", "urlTemplate": "https://sarthua.in/map-viewer?q={khesra}"},
+            "query-input": "required name=khesra"
+          }
+        },
+        {
+          "@type": "Map",
+          "name": "मौजा सरथुआ (थाना 218) का कैडस्ट्रल भू-नक्शा",
+          "url": "https://sarthua.in/map-viewer",
+          "inLanguage": "hi-IN",
+          "isAccessibleForFree": true,
+          "spatialCoverage": {
+            "@type": "Place",
+            "name": "सरथुआ (Sarthua)",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "सरथुआ, अंचल उदवंतनगर",
+              "addressRegion": "भोजपुर, बिहार",
+              "postalCode": "802206",
+              "addressCountry": "IN"
+            }
+          },
+          "isPartOf": {"@type": "WebSite", "name": "सरथुआ भू-अभिलेख पोर्टल", "url": "https://sarthua.in/"}
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "सरथुआ का भू-नक्शा ऑनलाइन कैसे देखें?",
+              "acceptedAnswer": {"@type": "Answer", "text": "sarthua.in/map-viewer खोलें, ऊपर सर्वे (1970 RS या 1911 CS) और नीचे चादर चुनें। उंगलियों से ज़ूम करें और किसी भी प्लॉट पर टैप करके उसका खेसरा नंबर देखें।"}
+            },
+            {
+              "@type": "Question",
+              "name": "खेसरा नंबर से प्लॉट नक्शे पर कैसे खोजें?",
+              "acceptedAnswer": {"@type": "Answer", "text": "सर्च बॉक्स में खेसरा (प्लॉट) नंबर लिखकर 'खोजें' दबाएं। नक्शा अपने-आप सही चादर पर जाकर उस प्लॉट को पिन कर देगा। सीधा लिंक: sarthua.in/map-viewer?q=64"}
+            },
+            {
+              "@type": "Question",
+              "name": "क्या यह नक्शा कानूनी रूप से मान्य (प्रमाणित) है?",
+              "acceptedAnswer": {"@type": "Answer", "text": "यह नक्शा केवल जानकारी और अध्ययन के लिए है। विधिक प्रमाणित प्रतिलिपि (Certified Copy) केवल अंचल कार्यालय उदवंतनगर, भोजपुर से प्राप्त होती है।"}
+            }
+          ]
         }
+      ]
+    }
+    </script>
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="alternate icon" type="image/x-icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="preconnect" href="https://api.sarthua.in" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* ===== Mobile-first GIS viewer ===== */
+        :root {
+            --bg: #1b1c1f;
+            --surface: #26282c;
+            --surface-2: #303237;
+            --border: #3c4043;
+            --text: #f1f3f4;
+            --muted: #a9adb3;
+            --accent: #1a73e8;
+            --accent-hover: #1557b0;
+            --accent-soft: #8ab4f8;
+            --ok: #34d399;
+            --wa: #1faa59;
+            --map-bg: #faebd0;
+            --radius: 12px;
+            --tap: 44px;
+            --safe-t: env(safe-area-inset-top, 0px);
+            --safe-b: env(safe-area-inset-bottom, 0px);
+            --safe-l: env(safe-area-inset-left, 0px);
+            --safe-r: env(safe-area-inset-right, 0px);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body {
             width: 100%;
             height: 100%;
             overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: #202124;
-            color: #f1f3f4;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Noto Sans Devanagari", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: 100%;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+        }
+        button { font: inherit; color: inherit; }
+        a { color: inherit; }
+        :focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 2px; }
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
         }
 
-        /* Top Government Standard GIS Toolbar */
-        .map-viewer-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 52px;
-            background: #202124;
-            padding: 0 16px;
-            border-bottom: 1px solid #3c4043;
-            z-index: 1000;
+        /* ----- Top bar ----- */
+        .mv-top {
+            flex: none;
             position: relative;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-            gap: 12px;
-        }
-
-        .tb-left, .tb-center, .tb-right {
-            display: flex;
+            z-index: 1100;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: calc(8px + var(--safe-t)) calc(10px + var(--safe-r)) 8px calc(10px + var(--safe-l));
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            grid-template-areas: "back title info" "search search search";
             align-items: center;
-            gap: 10px;
-        }
-
-        /* Khasra Search Wrap */
-        .map-search-wrap {
-            display: flex;
-            align-items: center;
-            background: #2d3035;
-            border: 1px solid #5f6368;
-            border-radius: 6px;
-            padding: 2px 4px 2px 10px;
             gap: 8px;
         }
-        .map-search-wrap i {
-            color: #8ab4f8;
-            font-size: 13px;
-        }
-        .map-search-wrap input {
-            background: transparent;
-            border: none;
-            outline: none;
-            color: #ffffff;
-            font-size: 13px;
-            width: 170px;
-            font-family: inherit;
-        }
-        .map-search-wrap input::placeholder {
-            color: #9aa0a6;
-        }
-        .map-search-btn {
-            background: #1a73e8;
-            color: #ffffff;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-        .map-search-btn:hover {
-            background: #1557b0;
-        }
-
-        /* Survey Switcher */
-        .map-survey-switcher {
+        .mv-icon-btn {
+            width: var(--tap);
+            height: var(--tap);
             display: inline-flex;
-            align-items: center;
-            background: #2d3035;
-            border: 1px solid #3c4043;
-            border-radius: 6px;
-            padding: 2px;
-            gap: 2px;
-        }
-        .map-survey-btn {
-            background: transparent;
-            border: none;
-            padding: 5px 11px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #bdc1c6;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.15s;
-        }
-        .map-survey-btn:hover {
-            color: #ffffff;
-        }
-        .map-survey-btn.active {
-            background: #1a73e8;
-            color: #ffffff;
-        }
-
-        /* Sheet Switcher */
-        .map-sheet-switcher {
-            display: inline-flex;
-            align-items: center;
-            background: #2d3035;
-            border: 1px solid #3c4043;
-            border-radius: 6px;
-            padding: 2px 6px;
-            gap: 3px;
-        }
-        .sheet-switcher-label {
-            font-size: 12px;
-            font-weight: 700;
-            color: #9aa0a6;
-            padding-right: 4px;
-        }
-        .map-sheet-btn {
-            background: transparent;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #bdc1c6;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .map-sheet-btn:hover {
-            background: #3c4043;
-            color: #ffffff;
-        }
-        .map-sheet-btn.active {
-            background: #1a73e8;
-            color: #ffffff;
-        }
-
-        /* Action Buttons */
-        .tb-action-btn {
-            background: #2d3035;
-            border: 1px solid #3c4043;
-            color: #bdc1c6;
-            cursor: pointer;
-            padding: 6px 10px;
-            border-radius: 4px;
-            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.15s;
+            border-radius: 50%;
+            background: transparent;
+            border: 0;
+            color: var(--text);
+            font-size: 17px;
+            cursor: pointer;
+            text-decoration: none;
+            flex: none;
         }
-        .tb-action-btn:hover {
-            background: #3c4043;
-            color: #ffffff;
-            border-color: #5f6368;
+        .mv-icon-btn:hover, .mv-icon-btn:active { background: var(--surface-2); }
+        .mv-back { grid-area: back; }
+        .mv-info-btn { grid-area: info; }
+        .mv-title { grid-area: title; min-width: 0; }
+        .mv-title h1 {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.25;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mv-title p {
+            font-size: 12px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        /* Request For Download Pill */
-        .btn-gov-request {
+        .mv-search {
+            grid-area: search;
+            display: flex;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            height: var(--tap);
+            padding: 0 4px 0 14px;
+            gap: 8px;
+        }
+        .mv-search:focus-within { border-color: var(--accent-soft); }
+        .mv-search > i { color: var(--accent-soft); font-size: 14px; }
+        .mv-search input {
+            flex: 1;
+            min-width: 0;
+            background: transparent;
+            border: 0;
+            outline: 0;
+            color: #fff;
+            font: inherit;
+            font-size: 16px; /* 16px prevents iOS zoom-on-focus */
+        }
+        .mv-search input::placeholder { color: #8f949a; }
+        .mv-search button {
+            height: 36px;
+            padding: 0 16px;
+            border: 0;
+            border-radius: 999px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .mv-search button:hover { background: var(--accent-hover); }
+
+        /* ----- Map ----- */
+        .mv-stage {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .mv-map {
+            position: absolute;
+            inset: 0;
+            background: var(--map-bg);
+            outline: none;
+            touch-action: none;
+        }
+        .leaflet-container { background: var(--map-bg); font-family: inherit; }
+
+        /* ----- Floating map controls (right) ----- */
+        .mv-controls {
+            position: absolute;
+            right: calc(10px + var(--safe-r));
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .mv-ctrl-group {
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+        }
+        .mv-ctrl-group .mv-icon-btn { border-radius: 0; font-size: 15px; }
+        .mv-ctrl-group .mv-icon-btn + .mv-icon-btn { border-top: 1px solid var(--border); }
+
+        /* ----- Bottom dock: survey + sheets + status ----- */
+        .mv-dock {
+            position: absolute;
+            left: calc(8px + var(--safe-l));
+            right: calc(8px + var(--safe-r));
+            bottom: calc(8px + var(--safe-b));
+            z-index: 1000;
+            background: rgba(27, 28, 31, 0.94);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .mv-dock-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+
+        .map-survey-switcher {
+            display: flex;
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 3px;
+            gap: 3px;
+        }
+        .map-survey-btn {
+            flex: 1;
+            height: 38px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .map-survey-btn.active { background: var(--accent); color: #fff; }
+
+        .btn-gov-request {
+            flex: none;
+            height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             gap: 8px;
-            background: #007bff;
-            color: #ffffff !important;
+            padding: 0 14px;
+            border-radius: 10px;
+            background: var(--wa);
+            color: #fff;
             text-decoration: none;
             font-size: 13px;
             font-weight: 700;
-            padding: 6px 14px;
-            border-radius: 4px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-            transition: background 0.15s, transform 0.1s;
             white-space: nowrap;
         }
-        .btn-gov-request:hover {
-            background: #0056b3;
-        }
-        .btn-gov-request:active {
-            transform: scale(0.98);
-        }
+        .btn-gov-request i { font-size: 18px; }
+        .btn-gov-request span { display: none; }
 
-        /* Map Canvas */
-        .map-viewer-canvas {
-            width: 100vw;
-            height: calc(100vh - 52px);
-            background: #faebd0;
-            position: relative;
-            outline: none;
+        .map-sheet-switcher {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 1px;
         }
+        .map-sheet-switcher::-webkit-scrollbar { display: none; }
+        .sheet-switcher-label {
+            flex: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            padding-right: 2px;
+        }
+        .map-sheet-btn {
+            flex: none;
+            min-width: 48px;
+            height: 38px;
+            padding: 0 12px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .map-sheet-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-        /* Footer Info Overlay */
-        .map-floating-footer {
-            position: absolute;
-            bottom: 12px;
-            left: 12px;
-            right: 12px;
-            background: rgba(32, 33, 36, 0.92);
-            backdrop-filter: blur(8px);
-            border: 1px solid #3c4043;
-            border-radius: 6px;
-            padding: 6px 14px;
+        .mv-status {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 12px;
-            color: #bdc1c6;
-            z-index: 1000;
-            pointer-events: none;
+            gap: 10px;
+            font-size: 11px;
+            color: var(--muted);
+            padding: 0 4px;
+            white-space: nowrap;
+            overflow: hidden;
         }
-        .mf-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .mf-item strong {
-            color: #ffffff;
+        .mv-status strong { color: var(--text); font-weight: 600; }
+        .mv-status .mf-item { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
+        .mv-status .mf-hide-sm { display: none; }
+        .mv-live-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--ok);
+            box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.2);
         }
 
-        /* Popup Styles */
-        .leaflet-popup-content-wrapper {
-            background: #202124 !important;
-            color: #f1f3f4 !important;
-            border: 1px solid #3c4043;
-            border-radius: 8px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        /* ----- Plot info bottom sheet ----- */
+        .mv-sheet {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1200;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            border-radius: 18px 18px 0 0;
+            box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45);
+            padding: 8px calc(16px + var(--safe-r)) calc(16px + var(--safe-b)) calc(16px + var(--safe-l));
+            max-height: 70%;
+            overflow-y: auto;
+            transform: translateY(105%);
+            transition: transform 0.22s ease-out;
+            visibility: hidden;
         }
-        .leaflet-popup-tip {
-            background: #202124 !important;
+        .mv-sheet.open { transform: none; visibility: visible; }
+        .mv-sheet-grip {
+            width: 40px; height: 4px; border-radius: 2px;
+            background: #5f6368;
+            margin: 2px auto 8px;
         }
+        .mv-sheet-close {
+            position: absolute;
+            top: 6px;
+            right: calc(6px + var(--safe-r));
+        }
+
         .map-plot-popup .mpp-header {
-            border-bottom: 1px solid #3c4043;
-            padding-bottom: 6px;
-            margin-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            padding: 0 44px 10px 0;
+            margin-bottom: 10px;
         }
-        .map-plot-popup .mpp-badge {
-            font-size: 11px;
-            color: #8ab4f8;
-            font-weight: 600;
-        }
-        .map-plot-popup .mpp-title {
-            font-size: 15px;
-            color: #ffffff;
-            margin-top: 2px;
-        }
+        .map-plot-popup .mpp-badge { font-size: 12px; color: var(--accent-soft); font-weight: 600; }
+        .map-plot-popup .mpp-title { font-size: 20px; color: #fff; margin-top: 4px; font-weight: 700; }
+        .map-plot-popup .mpp-body { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .map-plot-popup .mpp-row {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 2px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 10px;
             font-size: 12px;
-            margin-bottom: 4px;
-            color: #bdc1c6;
+            color: var(--muted);
+            min-width: 0;
         }
         .map-plot-popup .mpp-row strong {
-            color: #ffffff;
+            color: #fff;
+            font-size: 14px;
+            overflow-wrap: anywhere;
         }
-        .map-plot-popup .mpp-actions {
-            display: flex;
-            gap: 6px;
-            margin-top: 10px;
-        }
+        .map-plot-popup .mpp-mono { font-family: ui-monospace, Consolas, monospace; color: var(--accent-soft) !important; font-size: 12px !important; }
+        .map-plot-popup .mpp-actions { display: flex; gap: 8px; margin-top: 12px; }
         .map-plot-popup .mpp-actions a {
             flex: 1;
-            text-align: center;
-            font-size: 11px;
-            padding: 4px 8px;
-            background: #1a73e8;
-            color: #ffffff;
-            border-radius: 4px;
-            text-decoration: none;
+            height: var(--tap);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border-radius: 10px;
+            font-size: 13px;
             font-weight: 600;
+            text-decoration: none;
+            background: var(--accent);
+            color: #fff;
+        }
+        .map-plot-popup .mpp-actions a.mpp-secondary { background: var(--surface-2); border: 1px solid #5f6368; }
+        .map-plot-popup .mpp-loading { text-align: center; padding: 18px 0 10px; color: var(--muted); font-size: 13px; }
+        .map-plot-popup .mpp-loading i { color: var(--accent-soft); font-size: 22px; display: block; margin-bottom: 8px; }
+        .map-plot-popup .mpp-note { font-size: 11px; color: #8f949a; margin-top: 10px; line-height: 1.5; }
+
+        /* ----- Info drawer (crawlable page content) ----- */
+        .mv-drawer {
+            position: fixed;
+            inset: 0;
+            z-index: 1500;
+            background: var(--bg);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: calc(12px + var(--safe-t)) calc(18px + var(--safe-r)) calc(28px + var(--safe-b)) calc(18px + var(--safe-l));
+            transform: translateY(100%);
+            transition: transform 0.25s ease-out;
+            visibility: hidden;
+        }
+        .mv-drawer.open { transform: none; visibility: visible; }
+        .mv-drawer-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .mv-drawer h2 { font-size: 19px; line-height: 1.35; }
+        .mv-drawer h3 { font-size: 15px; margin: 22px 0 8px; color: var(--accent-soft); }
+        .mv-drawer p, .mv-drawer li { font-size: 14px; line-height: 1.7; color: #d7dadd; }
+        .mv-drawer ol, .mv-drawer ul { padding-left: 20px; }
+        .mv-drawer li + li { margin-top: 4px; }
+        .mv-drawer a { color: var(--accent-soft); }
+        .mv-sheet-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; list-style: none; padding: 0 !important; }
+        .mv-sheet-links li { margin: 0 !important; }
+        .mv-sheet-links a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: var(--tap);
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            text-decoration: none;
+            color: var(--text) !important;
+            font-size: 13px;
+        }
+        .mv-sheet-links a i { color: var(--accent-soft); }
+        .mv-drawer details {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+        }
+        .mv-drawer summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+        .mv-drawer details p { margin-top: 6px; }
+        .mv-disclaimer {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #5c4a1c;
+            background: #2b2412;
+            font-size: 13px !important;
         }
 
-        @media (max-width: 900px) {
-            .map-viewer-toolbar {
-                flex-wrap: wrap;
-                height: auto;
-                padding: 8px 10px;
+        /* ----- Toast ----- */
+        .mv-toast {
+            position: fixed;
+            left: 50%;
+            top: calc(118px + var(--safe-t));
+            transform: translate(-50%, -12px);
+            z-index: 1600;
+            max-width: calc(100% - 32px);
+            background: #3c4043;
+            color: #fff;
+            font-size: 14px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s, transform 0.18s;
+        }
+        .mv-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+        .mv-noscript {
+            position: absolute; inset: 0; z-index: 2000;
+            display: flex; align-items: center; justify-content: center;
+            padding: 24px; text-align: center; background: var(--bg);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mv-sheet, .mv-drawer, .mv-toast { transition: none; }
+        }
+
+        /* ===== Tablet & up ===== */
+        @media (min-width: 600px) {
+            .btn-gov-request span { display: inline; }
+            .mv-status .mf-hide-sm { display: inline-flex; }
+        }
+
+        /* ===== Desktop ===== */
+        @media (min-width: 900px) {
+            .mv-top {
+                grid-template-columns: auto minmax(0, 1fr) minmax(280px, 420px) auto;
+                grid-template-areas: "back title search info";
+                padding-top: calc(6px + var(--safe-t));
+                padding-bottom: 6px;
+                gap: 12px;
             }
-            .map-viewer-canvas {
-                height: calc(100vh - 90px);
+            .mv-title h1 { font-size: 17px; }
+            .mv-dock {
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                width: min(760px, calc(100% - 120px));
+                bottom: 14px;
             }
-            .btn-gov-request span {
-                display: none;
+            .mv-dock-main { flex-wrap: nowrap; }
+            .map-survey-switcher { flex: none; }
+            .map-survey-btn { padding: 0 14px; }
+            .map-sheet-switcher { flex: 1; }
+            .mv-controls { right: 14px; }
+            .mv-sheet {
+                left: 14px;
+                right: auto;
+                top: 14px;
+                bottom: auto;
+                width: 360px;
+                max-height: calc(100% - 28px);
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                padding: 10px 16px 16px;
+                transform: translateX(-110%);
             }
+            .mv-sheet.open { transform: none; }
+            .mv-sheet-grip { display: none; }
+            .mv-drawer {
+                left: auto;
+                width: 440px;
+                border-left: 1px solid var(--border);
+                box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+                transform: translateX(100%);
+            }
+            .mv-toast { top: calc(72px + var(--safe-t)); }
+        }
+        @media (hover: hover) {
+            .map-survey-btn:not(.active):hover { color: #fff; }
+            .map-sheet-btn:not(.active):hover { background: var(--surface-2); }
+            .btn-gov-request:hover { filter: brightness(1.08); }
         }
     </style>
 </head>
 <body>
 
-    <!-- Top Government GIS Toolbar -->
-    <header class="map-viewer-toolbar">
-        <div class="tb-left">
-            <div class="map-search-wrap">
-                <i class="fas fa-search"></i>
-                <input type="text" inputmode="numeric" id="mapKhasraSearchInput" placeholder="खेसरा नं. खोजें (उदा. 64)..." onkeydown="if(event.key==='Enter') SarthuaMapViewer.searchPlot()">
-                <button class="map-search-btn" onclick="SarthuaMapViewer.searchPlot()">खोजें</button>
-            </div>
+    <!-- Top bar -->
+    <header class="mv-top">
+        <a href="bhu-naksha" class="mv-icon-btn mv-back" title="भू-नक्शा सूची पर वापस जाएं" aria-label="वापस: भू-नक्शा सूची">
+            <i class="fas fa-arrow-left" aria-hidden="true"></i>
+        </a>
+        <div class="mv-title">
+            <h1>सरथुआ भू-नक्शा <span class="sr-only">(GIS Map Viewer)</span></h1>
+            <p id="mvSubtitle">मौजा सरथुआ • थाना 218 • 1970 RS • चादर 01</p>
         </div>
-
-        <div class="tb-center">
-            <!-- Survey Switcher -->
-            <div class="map-survey-switcher" role="group" aria-label="सर्वेक्षण">
-                <button class="map-survey-btn active" data-survey="RS" onclick="SarthuaMapViewer.switchSurvey('RS')">
-                    <i class="fas fa-layer-group"></i> <span>1970 RS</span>
-                </button>
-                <button class="map-survey-btn" data-survey="CS" onclick="SarthuaMapViewer.switchSurvey('CS')">
-                    <i class="fas fa-history"></i> <span>1911 CS</span>
-                </button>
-            </div>
-
-            <!-- Dynamic Sheet Switcher -->
-            <div class="map-sheet-switcher" id="mapSheetSwitcherWrap" role="group" aria-label="चादर">
-                <span class="sheet-switcher-label"><i class="fas fa-map"></i> चादर:</span>
-                <button class="map-sheet-btn active" data-sheet="1" onclick="SarthuaMapViewer.switchSheet(1)">01</button>
-                <button class="map-sheet-btn" data-sheet="2" onclick="SarthuaMapViewer.switchSheet(2)">02</button>
-                <button class="map-sheet-btn" data-sheet="3" onclick="SarthuaMapViewer.switchSheet(3)">03</button>
-                <button class="map-sheet-btn" data-sheet="4" onclick="SarthuaMapViewer.switchSheet(4)">04</button>
-                <button class="map-sheet-btn" data-sheet="5" onclick="SarthuaMapViewer.switchSheet(5)">05</button>
-                <button class="map-sheet-btn" data-sheet="6" onclick="SarthuaMapViewer.switchSheet(6)">06</button>
-            </div>
-        </div>
-
-        <div class="tb-right">
-            <a id="requestDownloadBtn" href="https://wa.me/919006035986?text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%2C%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20%E0%A4%B8%E0%A4%B0%E0%A4%A5%E0%A5%81%E0%A4%86%20%E0%A4%AD%E0%A5%82-%E0%A4%A8%E0%A4%95%E0%A5%8D%E0%A4%B7%E0%A4%BE%20%E0%A4%95%E0%A5%80%20%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%AE%E0%A4%BE%E0%A4%A3%E0%A4%BF%E0%A4%A4%20%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%A4%E0%A4%BF%E0%A4%B2%E0%A4%BF%E0%A4%AA%E0%A4%BF%20%E0%A4%B9%E0%A5%87%E0%A4%A4%E0%A5%81%20%E0%A4%9C%E0%A4%BE%E0%A4%A8%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A5%80%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F%E0%A5%A4" target="_blank" class="btn-gov-request" title="प्रमाणित प्रतिलिपि / डाउनलोड अनुरोध">
-                <i class="fas fa-paper-plane"></i>
-                <span>Request For Download</span>
-            </a>
-            <button class="tb-action-btn" onclick="SarthuaMapViewer.zoomIn()" title="ज़ूम इन (+)"><i class="fas fa-plus"></i></button>
-            <button class="tb-action-btn" onclick="SarthuaMapViewer.zoomOut()" title="ज़ूम आउट (-)"><i class="fas fa-minus"></i></button>
-            <button class="tb-action-btn" onclick="SarthuaMapViewer.resetView()" title="नक्शा रीसेट"><i class="fas fa-expand-arrows-alt"></i></button>
-            <button class="tb-action-btn" onclick="SarthuaMapViewer.toggleFullscreen()" title="फुल स्क्रीन"><i class="fas fa-expand"></i></button>
-        </div>
+        <form class="mv-search" role="search" onsubmit="event.preventDefault(); SarthuaMapViewer.searchPlot();">
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <label for="mapKhasraSearchInput" class="sr-only">खेसरा / प्लॉट नंबर</label>
+            <input type="search" inputmode="numeric" enterkeyhint="search" autocomplete="off" id="mapKhasraSearchInput" placeholder="खेसरा नंबर खोजें (उदा. 64)">
+            <button type="submit">खोजें</button>
+        </form>
+        <button type="button" class="mv-icon-btn mv-info-btn" onclick="SarthuaMapViewer.toggleInfo(true)" title="जानकारी व सहायता" aria-label="जानकारी व सहायता" aria-controls="mvInfo" aria-expanded="false" id="mvInfoBtn">
+            <i class="fas fa-circle-info" aria-hidden="true"></i>
+        </button>
     </header>
 
-    <!-- Map Canvas Container -->
-    <main id="sarthuaMapContainer" class="map-viewer-canvas"></main>
+    <div class="mv-stage">
+    <!-- Map -->
+    <main id="sarthuaMapContainer" class="mv-map" aria-label="सरथुआ मौजा का इंटरैक्टिव भू-नक्शा">
+        <noscript>
+            <div class="mv-noscript">
+                <p>इंटरैक्टिव नक्शा देखने के लिए JavaScript चालू करें, या <a href="bhu-naksha">भू-नक्शा सूची</a> पर जाएं।</p>
+            </div>
+        </noscript>
+    </main>
 
-    <!-- Floating Footer Info -->
-    <div class="map-floating-footer">
-        <div class="mf-item">
-            <i class="fas fa-landmark"></i>
-            <span>मौजा: <strong>सरथुआ (थाना 218)</strong></span>
+    <!-- Right controls (placed over the map) -->
+    <div class="mv-controls" id="mvControls" role="toolbar" aria-label="नक्शा नियंत्रण">
+        <div class="mv-ctrl-group">
+            <button type="button" class="mv-icon-btn" onclick="SarthuaMapViewer.zoomIn()" title="ज़ूम इन" aria-label="ज़ूम इन"><i class="fas fa-plus" aria-hidden="true"></i></button>
+            <button type="button" class="mv-icon-btn" onclick="SarthuaMapViewer.zoomOut()" title="ज़ूम आउट" aria-label="ज़ूम आउट"><i class="fas fa-minus" aria-hidden="true"></i></button>
         </div>
-        <div class="mf-item" id="mapCoordsDisplay">
-            <i class="fas fa-crosshairs"></i> X: — | Y: —
-        </div>
-        <div class="mf-item">
-            <i class="fas fa-satellite-dish" style="color: #34d399;"></i>
-            <span>लाइव GIS API: <strong style="color: #34d399;">सक्रिय</strong></span>
-        </div>
-        <div class="mf-item">
-            <span>पैमाना: <strong>16" = 1 मील</strong></span>
+        <div class="mv-ctrl-group">
+            <button type="button" class="mv-icon-btn" onclick="SarthuaMapViewer.resetView()" title="पूरी चादर दिखाएं" aria-label="नक्शा रीसेट"><i class="fas fa-expand-arrows-alt" aria-hidden="true"></i></button>
+            <button type="button" class="mv-icon-btn" id="mvFullscreenBtn" onclick="SarthuaMapViewer.toggleFullscreen()" title="फुल स्क्रीन" aria-label="फुल स्क्रीन"><i class="fas fa-expand" aria-hidden="true"></i></button>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    <script src="js/map.bundle.js?v=20.0"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var params = new URLSearchParams(window.location.search);
-        var survey = params.get('survey') || 'RS';
-        var sheet = parseInt(params.get('sheet') || '1', 10);
-        var q = params.get('q');
+    <!-- Bottom dock -->
+    <div class="mv-dock" id="mvDock">
+        <div class="mv-dock-row mv-dock-main">
+            <div class="map-survey-switcher" role="group" aria-label="सर्वेक्षण चुनें">
+                <button type="button" class="map-survey-btn active" data-survey="RS" aria-pressed="true" onclick="SarthuaMapViewer.switchSurvey('RS')">
+                    <i class="fas fa-layer-group" aria-hidden="true"></i> <span>1970 RS</span>
+                </button>
+                <button type="button" class="map-survey-btn" data-survey="CS" aria-pressed="false" onclick="SarthuaMapViewer.switchSurvey('CS')">
+                    <i class="fas fa-history" aria-hidden="true"></i> <span>1911 CS</span>
+                </button>
+            </div>
+            <a id="requestDownloadBtn" href="https://wa.me/919006035986" target="_blank" rel="noopener" class="btn-gov-request" title="प्रमाणित प्रतिलिपि / डाउनलोड अनुरोध (WhatsApp)" aria-label="नक्शा डाउनलोड अनुरोध WhatsApp पर भेजें">
+                <i class="fab fa-whatsapp" aria-hidden="true"></i>
+                <span>डाउनलोड अनुरोध</span>
+            </a>
+        </div>
 
-        var checkInit = setInterval(function () {
-            if (window.SarthuaMapViewer && window.SarthuaMapViewer.isInitialized) {
-                clearInterval(checkInit);
-                if (survey !== 'RS') SarthuaMapViewer.switchSurvey(survey);
-                if (sheet !== 1) SarthuaMapViewer.switchSheet(sheet);
-                if (q) {
-                    var input = document.getElementById('mapKhasraSearchInput');
-                    if (input) input.value = q;
-                    SarthuaMapViewer.searchPlot(q);
-                }
-            }
-        }, 100);
-        setTimeout(function () { clearInterval(checkInit); }, 8000);
-    });
-    </script>
+        <div class="map-sheet-switcher" id="mapSheetSwitcherWrap" role="group" aria-label="चादर चुनें">
+            <span class="sheet-switcher-label"><i class="fas fa-map" aria-hidden="true"></i> चादर</span>
+            <button type="button" class="map-sheet-btn active" data-sheet="1" onclick="SarthuaMapViewer.switchSheet(1)">01</button>
+            <button type="button" class="map-sheet-btn" data-sheet="2" onclick="SarthuaMapViewer.switchSheet(2)">02</button>
+            <button type="button" class="map-sheet-btn" data-sheet="3" onclick="SarthuaMapViewer.switchSheet(3)">03</button>
+            <button type="button" class="map-sheet-btn" data-sheet="4" onclick="SarthuaMapViewer.switchSheet(4)">04</button>
+            <button type="button" class="map-sheet-btn" data-sheet="5" onclick="SarthuaMapViewer.switchSheet(5)">05</button>
+            <button type="button" class="map-sheet-btn" data-sheet="6" onclick="SarthuaMapViewer.switchSheet(6)">06</button>
+        </div>
+
+        <div class="mv-status">
+            <span class="mf-item"><span class="mv-live-dot" aria-hidden="true"></span> <span>लाइव GIS</span></span>
+            <span class="mf-item" id="mapCoordsDisplay">X: — | Y: —</span>
+            <span class="mf-item mf-hide-sm">पैमाना: <strong>16" = 1 मील</strong></span>
+        </div>
+    </div>
+
+    <!-- Plot info: bottom sheet on mobile, side card on desktop -->
+    <section class="mv-sheet" id="mvPlotSheet" aria-live="polite" aria-label="प्लॉट जानकारी">
+        <div class="mv-sheet-grip" aria-hidden="true"></div>
+        <button type="button" class="mv-icon-btn mv-sheet-close" onclick="SarthuaMapViewer.closePlotSheet()" aria-label="बंद करें"><i class="fas fa-times" aria-hidden="true"></i></button>
+        <div id="mvPlotContent"></div>
+    </section>
+    </div>
+
+    <!-- Info drawer: page guide (also the crawlable content of this page) -->
+    <aside class="mv-drawer" id="mvInfo" aria-labelledby="mvInfoTitle" aria-hidden="true">
+        <div class="mv-drawer-head">
+            <h2 id="mvInfoTitle">मौजा सरथुआ का डिजिटल भू-नक्शा (GIS Map Viewer)</h2>
+            <button type="button" class="mv-icon-btn" onclick="SarthuaMapViewer.toggleInfo(false)" aria-label="जानकारी बंद करें"><i class="fas fa-times" aria-hidden="true"></i></button>
+        </div>
+        <p>यह मौजा <strong>सरथुआ</strong> (थाना संख्या 218, अंचल उदवंतनगर, जिला भोजपुर, बिहार) का इंटरैक्टिव कैडस्ट्रल नक्शा है। इसमें <strong>1970 रिविजनल सर्वे (RS)</strong> के 6 चादर और <strong>1911 कैडस्ट्रल सर्वे (CS)</strong> के नक्शे शामिल हैं। किसी भी प्लॉट पर टैप करके उसका खेसरा नंबर और PNIU कोड देखें — मुफ्त, बिना लॉगिन।</p>
+
+        <h3>नक्शा कैसे इस्तेमाल करें</h3>
+        <ol>
+            <li>नीचे से सर्वे चुनें: <strong>1970 RS</strong> या <strong>1911 CS</strong>।</li>
+            <li>चादर (Sheet) नंबर पर टैप करें — नक्शा उस चादर पर चला जाएगा।</li>
+            <li>दो उंगलियों से पिंच करके ज़ूम करें, एक उंगली से खिसकाएं।</li>
+            <li>किसी प्लॉट पर टैप करें — खेसरा नंबर, चादर और PNIU कोड दिखेगा।</li>
+            <li>ऊपर सर्च बॉक्स में खेसरा नंबर लिखकर सीधे प्लॉट तक पहुंचें।</li>
+        </ol>
+
+        <h3>1970 रिविजनल सर्वे — चादर</h3>
+        <ul class="mv-sheet-links">
+            <li><a href="map-viewer?survey=RS&amp;sheet=1"><i class="fas fa-map" aria-hidden="true"></i> RS चादर 01</a></li>
+            <li><a href="map-viewer?survey=RS&amp;sheet=2"><i class="fas fa-map" aria-hidden="true"></i> RS चादर 02</a></li>
+            <li><a href="map-viewer?survey=RS&amp;sheet=3"><i class="fas fa-map" aria-hidden="true"></i> RS चादर 03</a></li>
+            <li><a href="map-viewer?survey=RS&amp;sheet=4"><i class="fas fa-map" aria-hidden="true"></i> RS चादर 04</a></li>
+            <li><a href="map-viewer?survey=RS&amp;sheet=5"><i class="fas fa-map" aria-hidden="true"></i> RS चादर 05</a></li>
+            <li><a href="map-viewer?survey=RS&amp;sheet=6"><i class="fas fa-map" aria-hidden="true"></i> RS चादर 06</a></li>
+        </ul>
+
+        <h3>1911 कैडस्ट्रल सर्वे — चादर</h3>
+        <ul class="mv-sheet-links">
+            <li><a href="map-viewer?survey=CS&amp;sheet=0"><i class="fas fa-map" aria-hidden="true"></i> CS सम्पूर्ण मौजा</a></li>
+            <li><a href="map-viewer?survey=CS&amp;sheet=1"><i class="fas fa-map" aria-hidden="true"></i> CS चादर 01</a></li>
+            <li><a href="map-viewer?survey=CS&amp;sheet=2"><i class="fas fa-map" aria-hidden="true"></i> CS चादर 02</a></li>
+            <li><a href="map-viewer?survey=CS&amp;sheet=3"><i class="fas fa-map" aria-hidden="true"></i> CS चादर 03</a></li>
+            <li><a href="map-viewer?survey=CS&amp;sheet=4"><i class="fas fa-map" aria-hidden="true"></i> CS चादर 04</a></li>
+        </ul>
+
+        <h3>अक्सर पूछे जाने वाले प्रश्न</h3>
+        <details>
+            <summary>सरथुआ का भू-नक्शा ऑनलाइन कैसे देखें?</summary>
+            <p>यही पेज खोलें, सर्वे (1970 RS या 1911 CS) और चादर चुनें। उंगलियों से ज़ूम करें और किसी भी प्लॉट पर टैप करके उसका खेसरा नंबर देखें।</p>
+        </details>
+        <details>
+            <summary>खेसरा नंबर से प्लॉट नक्शे पर कैसे खोजें?</summary>
+            <p>सर्च बॉक्स में खेसरा (प्लॉट) नंबर लिखकर "खोजें" दबाएं। नक्शा अपने-आप सही चादर पर जाकर प्लॉट को पिन कर देगा। सीधा लिंक भी बना सकते हैं: <a href="map-viewer?q=64">sarthua.in/map-viewer?q=64</a></p>
+        </details>
+        <details>
+            <summary>प्लॉट का खतियान या जमाबंदी कहां मिलेगी?</summary>
+            <p>1970 का खतियान <a href="revisional-survey">रिविजनल सर्वे</a> पेज पर, 1911 का <a href="cadastral-survey">कैडस्ट्रल सर्वे</a> पेज पर और <a href="jamabandi">जमाबंदी पंजी</a> अलग पेज पर उपलब्ध है। शब्दों के अर्थ के लिए <a href="glossary">राजस्व शब्दावली</a> देखें।</p>
+        </details>
+        <details>
+            <summary>नक्शे की प्रति (कॉपी) कैसे मिलेगी?</summary>
+            <p>नीचे दिए WhatsApp "डाउनलोड अनुरोध" बटन से चुनी गई चादर के लिए अनुरोध भेजें। अन्य सेवाओं के लिए <a href="services">ई-सेवाएं</a> पेज देखें।</p>
+        </details>
+
+        <p class="mv-disclaimer"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> यह नक्शा केवल जानकारी और अध्ययन के लिए है। विधिक प्रमाणित प्रतिलिपि (Certified Copy) केवल अंचल कार्यालय उदवंतनगर, भोजपुर से प्राप्त होती है।</p>
+
+        <h3>अन्य पेज</h3>
+        <ul>
+            <li><a href="/">सरथुआ भू-अभिलेख पोर्टल — होम</a></li>
+            <li><a href="bhu-naksha">सभी भू-नक्शा चादरों की सूची</a></li>
+            <li><a href="jamabandi">जमाबंदी पंजी (Register II)</a></li>
+            <li><a href="revisional-survey">1970 रिविजनल सर्वे खतियान</a></li>
+            <li><a href="cadastral-survey">1911 कैडस्ट्रल सर्वे खतियान</a></li>
+        </ul>
+    </aside>
+
+    <div class="mv-toast" id="mvToast" role="status" aria-live="polite"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
+    <script src="js/map.bundle.js?v=21.1" defer></script>
 </body>
 </html>

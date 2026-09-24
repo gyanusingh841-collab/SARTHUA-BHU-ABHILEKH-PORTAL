@@ -1,6 +1,6 @@
 // Sarthua Bhu-Abhilekh Portal - Pure Government Web GIS Client
 // Direct AWS Mumbai Lambda API (100% Government GIS Streaming)
-// Used on: map-viewer.html & bhu-naksha.html
+// Used on: map-viewer.html
 
 (function (window) {
     'use strict';
@@ -41,6 +41,7 @@
         isInitialized: false,
         wmsDebounceTimer: null,
         activeImageElement: null,
+        toastTimer: null,
 
         detectApiEndpoint: function () {
             // Check if local dev server or cloud proxy
@@ -61,19 +62,25 @@
             }
 
             this.detectApiEndpoint();
-            this.loadKhasraIndex();
 
-            const sheetCfg = this.getActiveSheet();
-            const centerLat = (sheetCfg.minY + sheetCfg.maxY) / 2;
-            const centerLng = (sheetCfg.minX + sheetCfg.maxX) / 2;
+            // Deep link: ?survey=RS|CS&sheet=N&q=<khesra>
+            const params = new URLSearchParams(window.location.search);
+            const urlSurvey = (params.get('survey') || '').toUpperCase();
+            if (SHEET_CONFIG[urlSurvey]) this.currentSurvey = urlSurvey;
+            const urlSheet = parseInt(params.get('sheet'), 10);
+            if (SHEET_CONFIG[this.currentSurvey].sheets[urlSheet]) this.currentSheet = urlSheet;
+            const urlQuery = (params.get('q') || '').trim();
+
+            this.loadKhasraIndex(urlQuery);
 
             // Direct Real GIS Coordinate Space (CRS.Simple: Lat=Y, Lng=X)
             this.map = L.map('sarthuaMapContainer', {
                 crs: L.CRS.Simple,
-                minZoom: -2,
+                minZoom: -4, // low enough to fit a whole sheet on narrow phones
                 maxZoom: 6,
                 zoomDelta: 0.5,
                 zoomSnap: 0.1,
+                bounceAtZoomLimits: false,
                 attributionControl: false,
                 zoomControl: false
             });
@@ -87,7 +94,11 @@
 
             // Initial WMS Render
             this.updateWms();
+            this.syncSurveyButtons();
             this.renderSheetSwitcher();
+            this.updateDownloadLink();
+            this.updatePageState();
+            this.bindUi();
             this.isInitialized = true;
 
             setTimeout(() => {
@@ -95,22 +106,73 @@
             }, 100);
         },
 
+        bindUi: function () {
+            // Overlays sit above the map; keep their taps and wheel from reaching it
+            ['mvControls', 'mvDock', 'mvPlotSheet'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    L.DomEvent.disableClickPropagation(el);
+                    L.DomEvent.disableScrollPropagation(el);
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key !== 'Escape') return;
+                const info = document.getElementById('mvInfo');
+                if (info && info.classList.contains('open')) this.toggleInfo(false);
+                else this.closePlotSheet();
+            });
+
+            document.addEventListener('fullscreenchange', () => {
+                const icon = document.querySelector('#mvFullscreenBtn i');
+                if (icon) icon.className = document.fullscreenElement ? 'fas fa-compress' : 'fas fa-expand';
+            });
+
+            // Toolbar height changes (rotation, on-screen keyboard) resize the map area
+            window.addEventListener('resize', () => {
+                if (this.map) this.map.invalidateSize();
+            });
+        },
+
+        isMobile: function () {
+            return window.matchMedia('(max-width: 899px)').matches;
+        },
+
+        // Keeps sheets clear of the floating dock (bottom) and controls (right)
+        getFitPadding: function () {
+            const dock = document.getElementById('mvDock');
+            const dockH = dock ? dock.offsetHeight : 0;
+            return {
+                paddingTopLeft: [16, 16],
+                paddingBottomRight: [68, dockH + 24]
+            };
+        },
+
         getActiveSheet: function () {
             const s = SHEET_CONFIG[this.currentSurvey] || SHEET_CONFIG.RS;
             return s.sheets[this.currentSheet] || s.sheets[1] || Object.values(s.sheets)[0];
         },
 
+        getSheetLabel: function (sheet) {
+            return sheet === 0 ? 'सम्पूर्ण मौजा' : 'चादर ' + (sheet < 10 ? '0' + sheet : sheet);
+        },
+
         fitToActiveSheet: function () {
             const cfg = this.getActiveSheet();
             const bounds = L.latLngBounds([cfg.minY, cfg.minX], [cfg.maxY, cfg.maxX]);
-            this.map.fitBounds(bounds, { padding: [20, 20] });
+            this.map.fitBounds(bounds, this.getFitPadding());
         },
 
-        loadKhasraIndex: function () {
+        loadKhasraIndex: function (pendingQuery) {
             fetch('js/khasra_index.json')
                 .then(res => res.json())
                 .then(data => {
                     this.khasraIndex = data;
+                    if (pendingQuery) {
+                        const input = document.getElementById('mapKhasraSearchInput');
+                        if (input) input.value = pendingQuery;
+                        this.searchPlot(pendingQuery);
+                    }
                 })
                 .catch(err => {
                     console.warn('[Map Viewer] Khasra index fetch warning:', err);
@@ -162,7 +224,11 @@
                 if (this.currentSurvey !== survey || this.currentSheet !== sheet) return;
 
                 if (!this.wmsOverlay) {
-                    this.wmsOverlay = L.imageOverlay(wmsUrl, targetBounds, { opacity: 1.0, zIndex: 500 }).addTo(this.map);
+                    this.wmsOverlay = L.imageOverlay(wmsUrl, targetBounds, {
+                        opacity: 1.0,
+                        zIndex: 500,
+                        alt: `सरथुआ ${SHEET_CONFIG[survey].name} ${this.getSheetLabel(sheet)} भू-नक्शा`
+                    }).addTo(this.map);
                 } else {
                     this.wmsOverlay.setBounds(targetBounds);
                     this.wmsOverlay.setUrl(wmsUrl);
@@ -172,6 +238,7 @@
             img.onerror = () => {
                 if (this.activeImageElement === img) {
                     this.activeImageElement = null;
+                    this.showToast('नक्शा लोड नहीं हो सका। इंटरनेट कनेक्शन जांचें।');
                 }
             };
 
@@ -190,42 +257,46 @@
                     </div>
                 `,
                 iconSize: [34, 42],
-                iconAnchor: [17, 42],
-                popupAnchor: [0, -42]
+                iconAnchor: [17, 42]
             });
         },
 
         handleMouseMove: function (latlng) {
             const coordsDisplay = document.getElementById('mapCoordsDisplay');
             if (coordsDisplay) {
-                coordsDisplay.innerHTML = `<i class="fas fa-crosshairs text-success"></i> X: <strong>${Math.round(latlng.lng)}</strong> | Y: <strong>${Math.round(latlng.lat)}</strong>`;
+                coordsDisplay.innerHTML = `X: <strong>${Math.round(latlng.lng)}</strong> | Y: <strong>${Math.round(latlng.lat)}</strong>`;
             }
         },
 
         handleMapClick: function (latlng) {
             const x = Math.round(latlng.lng);
             const y = Math.round(latlng.lat);
+            this.handleMouseMove(latlng);
 
             if (this.clickMarker) {
                 this.map.removeLayer(this.clickMarker);
             }
-            this.clickMarker = L.marker(latlng, { icon: this.createPinIcon() }).addTo(this.map);
+            this.clickMarker = L.marker(latlng, { icon: this.createPinIcon(), keyboard: false }).addTo(this.map);
 
-            // Open loading popup immediately
+            // Open loading panel immediately
             this.renderPopup(latlng, { loading: true, x, y });
 
             // Query Government GIS Database directly via Lambda API
-            const queryUrl = `${this.apiBaseUrl}/api/bihar-plot?x=${x}&y=${y}&survey=${this.currentSurvey}&sheet=${this.currentSheet}`;
+            const survey = this.currentSurvey;
+            const sheet = this.currentSheet;
+            const queryUrl = `${this.apiBaseUrl}/api/bihar-plot?x=${x}&y=${y}&survey=${survey}&sheet=${sheet}`;
             fetch(queryUrl)
                 .then(res => res.json())
                 .then(data => {
+                    // Ignore stale responses after the user tapped elsewhere
+                    if (!this.clickMarker || !this.clickMarker.getLatLng().equals(latlng)) return;
                     if (data && data.success && data.has_data === 'Y' && data.plotNo && String(data.plotNo) !== '-1') {
                         this.renderPopup(latlng, {
                             plotNo: data.plotNo,
                             pniu: data.pniu,
                             gis_code: data.gis_code,
-                            survey: data.survey || this.currentSurvey,
-                            sheet: data.sheet !== undefined ? data.sheet : this.currentSheet,
+                            survey: data.survey || survey,
+                            sheet: data.sheet !== undefined ? parseInt(data.sheet, 10) : sheet,
                             x,
                             y
                         });
@@ -243,46 +314,48 @@
             let html = '';
             if (plot.loading) {
                 html = `
-                    <div class="map-plot-popup" style="padding: 10px; text-align: center;">
-                        <i class="fas fa-spinner fa-spin" style="color: #8ab4f8; font-size: 20px;"></i>
-                        <p style="margin-top: 6px; font-size: 12px; color: #bdc1c6;">सरकारी भू-अभिलेख से जांच जारी...</p>
+                    <div class="map-plot-popup">
+                        <div class="mpp-loading">
+                            <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+                            सरकारी भू-अभिलेख से जांच जारी...
+                        </div>
                     </div>
                 `;
             } else if (plot.notFound) {
-                const sheetLabel = this.currentSheet === 0 ? 'सम्पूर्ण मौजा' : 'चादर ' + (this.currentSheet < 10 ? '0' + this.currentSheet : this.currentSheet);
                 html = `
                     <div class="map-plot-popup">
                         <div class="mpp-header">
                             <span class="mpp-badge"><i class="fas fa-landmark"></i> मौजा: सरथुआ (${this.currentSurvey === 'CS' ? 'CS 1911' : 'RS 1970'})</span>
-                            <h4 class="mpp-title">भू-निर्देशांक बिंदु</h4>
+                            <h2 class="mpp-title">भू-निर्देशांक बिंदु</h2>
                         </div>
                         <div class="mpp-body">
-                            <div class="mpp-row"><span>GIS X:</span> <strong>${plot.x}</strong></div>
-                            <div class="mpp-row"><span>GIS Y:</span> <strong>${plot.y}</strong></div>
-                            <div class="mpp-row"><span>चादर:</span> <strong>${sheetLabel}</strong></div>
-                            <div class="mpp-row"><span>थाना नं:</span> <strong>218 (उदवंतनगर)</strong></div>
+                            <div class="mpp-row"><span>GIS X</span> <strong>${plot.x}</strong></div>
+                            <div class="mpp-row"><span>GIS Y</span> <strong>${plot.y}</strong></div>
+                            <div class="mpp-row"><span>चादर</span> <strong>${this.getSheetLabel(this.currentSheet)}</strong></div>
+                            <div class="mpp-row"><span>थाना नं</span> <strong>218 (उदवंतनगर)</strong></div>
                         </div>
+                        <p class="mpp-note">इस बिंदु पर कोई प्लॉट नहीं मिला। थोड़ा ज़ूम करके प्लॉट के अंदर टैप करें।</p>
                     </div>
                 `;
             } else {
-                const sheetLabel = plot.sheet === 0 ? 'सम्पूर्ण मौजा' : 'चादर ' + (plot.sheet < 10 ? '0' + plot.sheet : plot.sheet);
+                const isCS = plot.survey === 'CS';
                 html = `
                     <div class="map-plot-popup">
                         <div class="mpp-header">
                             <span class="mpp-badge"><i class="fas fa-check-circle" style="color: #34d399;"></i> प्रमाणित सरकारी भू-प्लॉट</span>
-                            <h4 class="mpp-title">खेसरा संख्या: <strong>${plot.plotNo}</strong></h4>
+                            <h2 class="mpp-title">खेसरा संख्या: ${plot.plotNo}</h2>
                         </div>
                         <div class="mpp-body">
-                            <div class="mpp-row"><span>PNIU कोड:</span> <strong class="text-mono" style="color: #8ab4f8;">${plot.pniu || 'उपलब्ध'}</strong></div>
-                            <div class="mpp-row"><span>सर्वेक्षण:</span> <strong>${plot.survey === 'CS' ? '1911 कैडस्ट्रल' : '1970 रिविजनल'}</strong></div>
-                            <div class="mpp-row"><span>चादर संख्या:</span> <strong>${sheetLabel}</strong></div>
-                            <div class="mpp-row"><span>मौजा / थाना:</span> <strong>सरथुआ (218)</strong></div>
+                            <div class="mpp-row"><span>PNIU कोड</span> <strong class="mpp-mono">${plot.pniu || 'उपलब्ध'}</strong></div>
+                            <div class="mpp-row"><span>सर्वेक्षण</span> <strong>${isCS ? '1911 कैडस्ट्रल' : '1970 रिविजनल'}</strong></div>
+                            <div class="mpp-row"><span>चादर संख्या</span> <strong>${this.getSheetLabel(plot.sheet)}</strong></div>
+                            <div class="mpp-row"><span>मौजा / थाना</span> <strong>सरथुआ (218)</strong></div>
                         </div>
-                        <div class="mpp-actions" style="display: flex; gap: 6px; margin-top: 10px;">
-                            <a href="revisional-survey" target="_blank" style="flex: 1; text-align: center; font-size: 11px; padding: 5px 8px; background: #1a73e8; color: #fff; border-radius: 4px; text-decoration: none; font-weight: 600;">
-                                <i class="fas fa-book"></i> 1970 खतियान
+                        <div class="mpp-actions">
+                            <a href="${isCS ? 'cadastral-survey' : 'revisional-survey'}" target="_blank">
+                                <i class="fas fa-book"></i> ${isCS ? '1911' : '1970'} खतियान
                             </a>
-                            <a href="jamabandi" target="_blank" style="flex: 1; text-align: center; font-size: 11px; padding: 5px 8px; background: #2d3035; border: 1px solid #5f6368; color: #fff; border-radius: 4px; text-decoration: none; font-weight: 600;">
+                            <a href="jamabandi" target="_blank" class="mpp-secondary">
                                 <i class="fas fa-file-invoice"></i> जमाबंदी देखें
                             </a>
                         </div>
@@ -290,30 +363,109 @@
                 `;
             }
 
-            if (this.clickMarker) {
-                this.clickMarker.bindPopup(html, { maxWidth: 300, className: 'sarthua-leaflet-popup' }).openPopup();
+            this.openPlotSheet(html, latlng);
+        },
+
+        // Plot details: bottom sheet on phones, side card on desktop
+        openPlotSheet: function (html, latlng) {
+            const sheet = document.getElementById('mvPlotSheet');
+            const content = document.getElementById('mvPlotContent');
+            if (!sheet || !content) return;
+            content.innerHTML = html;
+            sheet.classList.add('open');
+
+            // On phones the sheet covers the lower map; lift the pin above it
+            if (latlng && this.map && this.isMobile()) {
+                requestAnimationFrame(() => {
+                    const pt = this.map.latLngToContainerPoint(latlng);
+                    const visibleBottom = this.map.getSize().y - sheet.offsetHeight - 24;
+                    if (pt.y > visibleBottom) this.map.panBy([0, pt.y - visibleBottom + 40]);
+                });
             }
         },
 
+        closePlotSheet: function () {
+            const sheet = document.getElementById('mvPlotSheet');
+            if (sheet) sheet.classList.remove('open');
+            if (this.clickMarker && this.map) {
+                this.map.removeLayer(this.clickMarker);
+                this.clickMarker = null;
+            }
+        },
+
+        showToast: function (msg) {
+            const toast = document.getElementById('mvToast');
+            if (!toast) return;
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(this.toastTimer);
+            this.toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+        },
+
+        toggleInfo: function (open) {
+            const drawer = document.getElementById('mvInfo');
+            const btn = document.getElementById('mvInfoBtn');
+            if (!drawer) return;
+            drawer.classList.toggle('open', open);
+            drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+            if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (open) {
+                const closeBtn = drawer.querySelector('button');
+                if (closeBtn) closeBtn.focus();
+            } else if (btn) {
+                btn.focus();
+            }
+        },
+
+        // Reflect survey/sheet in the tab title, subtitle and a shareable URL
+        updatePageState: function () {
+            const surveyShort = this.currentSurvey === 'CS' ? '1911 CS' : '1970 RS';
+            const sheetLabel = this.getSheetLabel(this.currentSheet);
+            const sub = document.getElementById('mvSubtitle');
+            if (sub) sub.textContent = `मौजा सरथुआ • थाना 218 • ${surveyShort} • ${sheetLabel}`;
+            document.title = `${surveyShort} ${sheetLabel} - सरथुआ भू-नक्शा (GIS Map Viewer) | थाना 218`;
+
+            if (window.history && history.replaceState) {
+                const params = new URLSearchParams(window.location.search);
+                params.set('survey', this.currentSurvey);
+                params.set('sheet', String(this.currentSheet));
+                history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+            }
+        },
+
+        syncSurveyButtons: function () {
+            document.querySelectorAll('.map-survey-btn').forEach(btn => {
+                const on = btn.getAttribute('data-survey') === this.currentSurvey;
+                btn.classList.toggle('active', on);
+                btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            });
+        },
+
         searchPlot: function (khasraNo) {
-            const query = (khasraNo || document.getElementById('mapKhasraSearchInput')?.value || '').trim();
+            const input = document.getElementById('mapKhasraSearchInput');
+            const query = String(khasraNo || (input && input.value) || '').trim();
             if (!query) {
-                alert('कृपया खेसरा संख्या दर्ज करें (उदा. 64, 763)');
+                this.showToast('कृपया खेसरा संख्या दर्ज करें (उदा. 64, 763)');
+                if (input) input.focus();
                 return;
             }
+            if (!this.khasraIndex) {
+                this.showToast('खेसरा इंडेक्स लोड हो रहा है, कृपया एक क्षण बाद दोबारा प्रयास करें।');
+                return;
+            }
+            // Dismiss the on-screen keyboard so the result is visible
+            if (input) input.blur();
 
             let found = null;
             let targetSurvey = this.currentSurvey;
 
-            if (this.khasraIndex) {
-                if (this.khasraIndex[this.currentSurvey] && this.khasraIndex[this.currentSurvey][query]) {
-                    found = this.khasraIndex[this.currentSurvey][query];
-                } else {
-                    const other = this.currentSurvey === 'RS' ? 'CS' : 'RS';
-                    if (this.khasraIndex[other] && this.khasraIndex[other][query]) {
-                        found = this.khasraIndex[other][query];
-                        targetSurvey = other;
-                    }
+            if (this.khasraIndex[this.currentSurvey] && this.khasraIndex[this.currentSurvey][query]) {
+                found = this.khasraIndex[this.currentSurvey][query];
+            } else {
+                const other = this.currentSurvey === 'RS' ? 'CS' : 'RS';
+                if (this.khasraIndex[other] && this.khasraIndex[other][query]) {
+                    found = this.khasraIndex[other][query];
+                    targetSurvey = other;
                 }
             }
 
@@ -336,23 +488,22 @@
                     this.handleMapClick(latlng);
                 }, 300);
             } else {
-                alert(`खेसरा संख्या ${query} वर्तमान इंडेक्स में नहीं मिला।`);
+                this.showToast(`खेसरा संख्या ${query} इंडेक्स में नहीं मिला।`);
             }
         },
 
         switchSurvey: function (survey) {
-            if (this.currentSurvey === survey) return;
+            if (this.currentSurvey === survey || !SHEET_CONFIG[survey]) return;
             this.currentSurvey = survey;
             this.currentSheet = 1;
 
-            document.querySelectorAll('.map-survey-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-survey') === survey);
-            });
-
+            this.syncSurveyButtons();
+            this.closePlotSheet();
             this.renderSheetSwitcher();
             this.fitToActiveSheet();
             this.updateWms();
             this.updateDownloadLink();
+            this.updatePageState();
         },
 
         switchSheet: function (sheet) {
@@ -361,12 +512,17 @@
             this.currentSheet = sheet;
 
             document.querySelectorAll('.map-sheet-btn').forEach(btn => {
-                btn.classList.toggle('active', parseInt(btn.getAttribute('data-sheet'), 10) === sheet);
+                const on = parseInt(btn.getAttribute('data-sheet'), 10) === sheet;
+                btn.classList.toggle('active', on);
+                btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                if (on && btn.scrollIntoView) btn.scrollIntoView({ block: 'nearest', inline: 'nearest' });
             });
 
+            this.closePlotSheet();
             this.fitToActiveSheet();
             this.updateWms();
             this.updateDownloadLink();
+            this.updatePageState();
         },
 
         renderSheetSwitcher: function () {
@@ -376,12 +532,12 @@
             const sInfo = SHEET_CONFIG[this.currentSurvey];
             if (!sInfo) return;
 
-            let html = '<span class="sheet-switcher-label"><i class="fas fa-map"></i> चादर:</span>';
-            for (const [sheetNo, cfg] of Object.entries(sInfo.sheets)) {
+            let html = '<span class="sheet-switcher-label"><i class="fas fa-map" aria-hidden="true"></i> चादर</span>';
+            for (const sheetNo of Object.keys(sInfo.sheets)) {
                 const sheetNum = parseInt(sheetNo, 10);
-                const activeCls = sheetNum === this.currentSheet ? ' active' : '';
-                const label = sheetNum === 0 ? '00' : (sheetNum < 10 ? '0' + sheetNum : '' + sheetNum);
-                html += `<button class="map-sheet-btn${activeCls}" data-sheet="${sheetNum}" onclick="SarthuaMapViewer.switchSheet(${sheetNum})">${label}</button>`;
+                const on = sheetNum === this.currentSheet;
+                const label = sheetNum === 0 ? 'पूरा मौजा' : (sheetNum < 10 ? '0' + sheetNum : '' + sheetNum);
+                html += `<button type="button" class="map-sheet-btn${on ? ' active' : ''}" data-sheet="${sheetNum}" aria-pressed="${on}" onclick="SarthuaMapViewer.switchSheet(${sheetNum})">${label}</button>`;
             }
             wrap.innerHTML = html;
         },
@@ -405,18 +561,19 @@
 
         resetView: function () {
             if (this.map) {
-                if (this.clickMarker) {
-                    this.map.removeLayer(this.clickMarker);
-                    this.clickMarker = null;
-                }
+                this.closePlotSheet();
                 this.fitToActiveSheet();
             }
         },
 
         toggleFullscreen: function () {
-            const container = document.getElementById('sarthuaMapContainer')?.parentElement || document.body;
+            const root = document.documentElement;
             if (!document.fullscreenElement) {
-                container.requestFullscreen().catch(err => console.warn(err));
+                if (!root.requestFullscreen) {
+                    this.showToast('इस ब्राउज़र में फुल स्क्रीन उपलब्ध नहीं है।');
+                    return;
+                }
+                root.requestFullscreen().catch(err => console.warn(err));
             } else {
                 document.exitFullscreen().catch(err => console.warn(err));
             }
@@ -425,8 +582,10 @@
 
     window.SarthuaMapViewer = SarthuaMapViewer;
 
-    document.addEventListener('DOMContentLoaded', () => {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => SarthuaMapViewer.init());
+    } else {
         SarthuaMapViewer.init();
-    });
+    }
 
 })(window);

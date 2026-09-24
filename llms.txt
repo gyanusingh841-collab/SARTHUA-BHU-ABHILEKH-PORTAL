@@ -11,6 +11,7 @@
 - [रिविजनल सर्वे खतियान 1970 / Revisional Survey](https://sarthua.in/revisional-survey): 9 पुस्तकें, खाता संख्या रेंज सहित
 - [कैडस्ट्रल सर्वे खतियान 1911 / Cadastral Survey](https://sarthua.in/cadastral-survey): ब्रिटिश कालीन मूल खतियान, 2 पुस्तकें
 - [डिजिटल भू-नक्शा / Bhu-Naksha](https://sarthua.in/bhu-naksha): 1970 रिविजनल (6 चादर) और 1911 कैडस्ट्रल (5 चादर) के 8K नक्शे, प्लॉट/खेसरा खोज सहित
+- [GIS मैप व्यूअर / Map Viewer](https://sarthua.in/map-viewer): इंटरैक्टिव नक्शा — सर्वे/चादर बदलें, प्लॉट पर टैप कर खेसरा व PNIU देखें; डीप लिंक `?survey=RS|CS&sheet=N&q=<खेसरा>` (उदा. https://sarthua.in/map-viewer?q=64)
 - [राजस्व शब्दावली व FAQ / Glossary](https://sarthua.in/glossary): खतियान, खेसरा, जमाबंदी आदि शब्दों के अर्थ
 - [ई-सेवाएं / Services](https://sarthua.in/services): WhatsApp पर प्रति का अनुरोध और बिहार सरकार के आधिकारिक पोर्टल लिंक
 
