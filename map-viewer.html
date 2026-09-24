@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="hi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>भू-नक्शा दर्शक (GIS Map Viewer) | मौजा सरथुआ (218)</title>
+    <meta name="description" content="मौजा सरथुआ का 8K अल्ट्रा HD डिजिटल भू-नक्शा - 1970 रिविजनल एवं 1911 कैडस्ट्रल सर्वे।">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #202124;
+            color: #f1f3f4;
+        }
+
+        /* Top Government Standard GIS Toolbar */
+        .map-viewer-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 52px;
+            background: #202124;
+            padding: 0 16px;
+            border-bottom: 1px solid #3c4043;
+            z-index: 1000;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            gap: 12px;
+        }
+
+        .tb-left, .tb-center, .tb-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Khasra Search Wrap */
+        .map-search-wrap {
+            display: flex;
+            align-items: center;
+            background: #2d3035;
+            border: 1px solid #5f6368;
+            border-radius: 6px;
+            padding: 2px 4px 2px 10px;
+            gap: 8px;
+        }
+        .map-search-wrap i {
+            color: #8ab4f8;
+            font-size: 13px;
+        }
+        .map-search-wrap input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-size: 13px;
+            width: 170px;
+            font-family: inherit;
+        }
+        .map-search-wrap input::placeholder {
+            color: #9aa0a6;
+        }
+        .map-search-btn {
+            background: #1a73e8;
+            color: #ffffff;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .map-search-btn:hover {
+            background: #1557b0;
+        }
+
+        /* Survey Switcher */
+        .map-survey-switcher {
+            display: inline-flex;
+            align-items: center;
+            background: #2d3035;
+            border: 1px solid #3c4043;
+            border-radius: 6px;
+            padding: 2px;
+            gap: 2px;
+        }
+        .map-survey-btn {
+            background: transparent;
+            border: none;
+            padding: 5px 11px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #bdc1c6;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s;
+        }
+        .map-survey-btn:hover {
+            color: #ffffff;
+        }
+        .map-survey-btn.active {
+            background: #1a73e8;
+            color: #ffffff;
+        }
+
+        /* Sheet Switcher */
+        .map-sheet-switcher {
+            display: inline-flex;
+            align-items: center;
+            background: #2d3035;
+            border: 1px solid #3c4043;
+            border-radius: 6px;
+            padding: 2px 6px;
+            gap: 3px;
+        }
+        .sheet-switcher-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #9aa0a6;
+            padding-right: 4px;
+        }
+        .map-sheet-btn {
+            background: transparent;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #bdc1c6;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .map-sheet-btn:hover {
+            background: #3c4043;
+            color: #ffffff;
+        }
+        .map-sheet-btn.active {
+            background: #1a73e8;
+            color: #ffffff;
+        }
+
+        /* Action Buttons */
+        .tb-action-btn {
+            background: #2d3035;
+            border: 1px solid #3c4043;
+            color: #bdc1c6;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.15s;
+        }
+        .tb-action-btn:hover {
+            background: #3c4043;
+            color: #ffffff;
+            border-color: #5f6368;
+        }
+
+        /* Request For Download Pill */
+        .btn-gov-request {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #007bff;
+            color: #ffffff !important;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 4px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+            transition: background 0.15s, transform 0.1s;
+            white-space: nowrap;
+        }
+        .btn-gov-request:hover {
+            background: #0056b3;
+        }
+        .btn-gov-request:active {
+            transform: scale(0.98);
+        }
+
+        /* Map Canvas */
+        .map-viewer-canvas {
+            width: 100vw;
+            height: calc(100vh - 52px);
+            background: #faebd0;
+            position: relative;
+            outline: none;
+        }
+
+        /* Footer Info Overlay */
+        .map-floating-footer {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            background: rgba(32, 33, 36, 0.92);
+            backdrop-filter: blur(8px);
+            border: 1px solid #3c4043;
+            border-radius: 6px;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #bdc1c6;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        .mf-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .mf-item strong {
+            color: #ffffff;
+        }
+
+        /* Popup Styles */
+        .leaflet-popup-content-wrapper {
+            background: #202124 !important;
+            color: #f1f3f4 !important;
+            border: 1px solid #3c4043;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        }
+        .leaflet-popup-tip {
+            background: #202124 !important;
+        }
+        .map-plot-popup .mpp-header {
+            border-bottom: 1px solid #3c4043;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+        }
+        .map-plot-popup .mpp-badge {
+            font-size: 11px;
+            color: #8ab4f8;
+            font-weight: 600;
+        }
+        .map-plot-popup .mpp-title {
+            font-size: 15px;
+            color: #ffffff;
+            margin-top: 2px;
+        }
+        .map-plot-popup .mpp-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #bdc1c6;
+        }
+        .map-plot-popup .mpp-row strong {
+            color: #ffffff;
+        }
+        .map-plot-popup .mpp-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .map-plot-popup .mpp-actions a {
+            flex: 1;
+            text-align: center;
+            font-size: 11px;
+            padding: 4px 8px;
+            background: #1a73e8;
+            color: #ffffff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media (max-width: 900px) {
+            .map-viewer-toolbar {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 8px 10px;
+            }
+            .map-viewer-canvas {
+                height: calc(100vh - 90px);
+            }
+            .btn-gov-request span {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Government GIS Toolbar -->
+    <header class="map-viewer-toolbar">
+        <div class="tb-left">
+            <div class="map-search-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" inputmode="numeric" id="mapKhasraSearchInput" placeholder="खेसरा नं. खोजें (उदा. 64)..." onkeydown="if(event.key==='Enter') SarthuaMapViewer.searchPlot()">
+                <button class="map-search-btn" onclick="SarthuaMapViewer.searchPlot()">खोजें</button>
+            </div>
+        </div>
+
+        <div class="tb-center">
+            <!-- Survey Switcher -->
+            <div class="map-survey-switcher" role="group" aria-label="सर्वेक्षण">
+                <button class="map-survey-btn active" data-survey="RS" onclick="SarthuaMapViewer.switchSurvey('RS')">
+                    <i class="fas fa-layer-group"></i> <span>1970 RS</span>
+                </button>
+                <button class="map-survey-btn" data-survey="CS" onclick="SarthuaMapViewer.switchSurvey('CS')">
+                    <i class="fas fa-history"></i> <span>1911 CS</span>
+                </button>
+            </div>
+
+            <!-- Dynamic Sheet Switcher -->
+            <div class="map-sheet-switcher" id="mapSheetSwitcherWrap" role="group" aria-label="चादर">
+                <span class="sheet-switcher-label"><i class="fas fa-map"></i> चादर:</span>
+                <button class="map-sheet-btn active" data-sheet="1" onclick="SarthuaMapViewer.switchSheet(1)">01</button>
+                <button class="map-sheet-btn" data-sheet="2" onclick="SarthuaMapViewer.switchSheet(2)">02</button>
+                <button class="map-sheet-btn" data-sheet="3" onclick="SarthuaMapViewer.switchSheet(3)">03</button>
+                <button class="map-sheet-btn" data-sheet="4" onclick="SarthuaMapViewer.switchSheet(4)">04</button>
+                <button class="map-sheet-btn" data-sheet="5" onclick="SarthuaMapViewer.switchSheet(5)">05</button>
+                <button class="map-sheet-btn" data-sheet="6" onclick="SarthuaMapViewer.switchSheet(6)">06</button>
+            </div>
+        </div>
+
+        <div class="tb-right">
+            <a id="requestDownloadBtn" href="https://wa.me/919006035986?text=%E0%A4%A8%E0%A4%AE%E0%A4%B8%E0%A5%8D%E0%A4%A4%E0%A5%87%2C%20%E0%A4%AE%E0%A5%81%E0%A4%9D%E0%A5%87%20%E0%A4%B8%E0%A4%B0%E0%A4%A5%E0%A5%81%E0%A4%86%20%E0%A4%AD%E0%A5%82-%E0%A4%A8%E0%A4%95%E0%A5%8D%E0%A4%B7%E0%A4%BE%20%E0%A4%95%E0%A5%80%20%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%AE%E0%A4%BE%E0%A4%A3%E0%A4%BF%E0%A4%A4%20%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%A4%E0%A4%BF%E0%A4%B2%E0%A4%BF%E0%A4%AA%E0%A4%BF%20%E0%A4%B9%E0%A5%87%E0%A4%A4%E0%A5%81%20%E0%A4%9C%E0%A4%BE%E0%A4%A8%E0%A4%95%E0%A4%BE%E0%A4%B0%E0%A5%80%20%E0%A4%9A%E0%A4%BE%E0%A4%B9%E0%A4%BF%E0%A4%8F%E0%A5%A4" target="_blank" class="btn-gov-request" title="प्रमाणित प्रतिलिपि / डाउनलोड अनुरोध">
+                <i class="fas fa-paper-plane"></i>
+                <span>Request For Download</span>
+            </a>
+            <button class="tb-action-btn" onclick="SarthuaMapViewer.zoomIn()" title="ज़ूम इन (+)"><i class="fas fa-plus"></i></button>
+            <button class="tb-action-btn" onclick="SarthuaMapViewer.zoomOut()" title="ज़ूम आउट (-)"><i class="fas fa-minus"></i></button>
+            <button class="tb-action-btn" onclick="SarthuaMapViewer.resetView()" title="नक्शा रीसेट"><i class="fas fa-expand-arrows-alt"></i></button>
+            <button class="tb-action-btn" onclick="SarthuaMapViewer.toggleFullscreen()" title="फुल स्क्रीन"><i class="fas fa-expand"></i></button>
+        </div>
+    </header>
+
+    <!-- Map Canvas Container -->
+    <main id="sarthuaMapContainer" class="map-viewer-canvas"></main>
+
+    <!-- Floating Footer Info -->
+    <div class="map-floating-footer">
+        <div class="mf-item">
+            <i class="fas fa-landmark"></i>
+            <span>मौजा: <strong>सरथुआ (थाना 218)</strong></span>
+        </div>
+        <div class="mf-item" id="mapCoordsDisplay">
+            <i class="fas fa-crosshairs"></i> X: — | Y: —
+        </div>
+        <div class="mf-item">
+            <i class="fas fa-satellite-dish" style="color: #34d399;"></i>
+            <span>लाइव GIS API: <strong style="color: #34d399;">सक्रिय</strong></span>
+        </div>
+        <div class="mf-item">
+            <span>पैमाना: <strong>16" = 1 मील</strong></span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="js/map.bundle.js?v=18.0"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var params = new URLSearchParams(window.location.search);
+        var survey = params.get('survey') || 'RS';
+        var sheet = parseInt(params.get('sheet') || '1', 10);
+        var q = params.get('q');
+
+        var checkInit = setInterval(function () {
+            if (window.SarthuaMapViewer && window.SarthuaMapViewer.isInitialized) {
+                clearInterval(checkInit);
+                if (survey !== 'RS') SarthuaMapViewer.switchSurvey(survey);
+                if (sheet !== 1) SarthuaMapViewer.switchSheet(sheet);
+                if (q) {
+                    var input = document.getElementById('mapKhasraSearchInput');
+                    if (input) input.value = q;
+                    SarthuaMapViewer.searchPlot(q);
+                }
+            }
+        }, 100);
+        setTimeout(function () { clearInterval(checkInit); }, 8000);
+    });
+    </script>
+</body>
+</html>

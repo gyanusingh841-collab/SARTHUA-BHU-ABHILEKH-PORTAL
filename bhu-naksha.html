@@ -51,11 +51,10 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://docs.sarthua.in" crossorigin>
 
-    <link rel="stylesheet" href="style.min.css?v=11.1">
+    <link rel="stylesheet" href="style.min.css?v=12.0">
     <link rel="preload" href="/fonts/fa-solid.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"></noscript>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
 <body>
     <div class="gov-tricolor-ribbon"></div>
@@ -63,10 +62,10 @@
     <header class="portal-navbar">
         <div class="container">
             <div class="navbar-inner">
-                <div class="navbar-brand">
-                    <a href="/" class="brand-crest" aria-label="होम पेज पर जाएं">
-                        <img src="favicon.svg" width="40" height="40" alt="" decoding="async">
-                    </a>
+                <div class="brand-block">
+                    <div class="brand-emblem">
+                        <img src="favicon.svg" alt="बिहार सरकार मुहर" class="emblem-img" width="44" height="44">
+                    </div>
                     <div class="brand-info">
                         <p class="brand-title" data-en="Sarthua Bhu-Abhilekh Portal">सरथुआ भू-अभिलेख पोर्टल</p>
                         <div class="brand-meta">
@@ -110,107 +109,213 @@
             </div>
         </div>
     </nav>
+
     <div class="breadcrumb-trail">
         <a href="/" data-en="Home">होम</a> / <span data-en="Bhu-Naksha">भू-नक्शा</span>
     </div>
+
     <main class="main-content">
         <div class="container">
-        <div class="page-banner">
-            <div class="modern-section-header">
-                <div class="msh-left">
-                    <div class="msh-icon" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); color: #2563eb; border-color: #bfdbfe;"><i class="fas fa-map-marked-alt"></i></div>
-                    <div class="msh-info">
-                        <h1 data-en="Digital Bhu-Naksha (GIS Cadastral Map)">डिजिटल भू-नक्शा (GIS Cadastral Map)</h1>
-                        <span class="msh-period" data-en="Ultra HD 8K map • Mauja: Sarthua, Thana No: 218">अल्ट्रा HD 8K नक्शा • मौजा: सरथुआ, थाना संख्या: 218</span>
+            <!-- Page Banner (Standardized matching Jamabandi / Revisional Survey) -->
+            <div class="page-banner">
+                <div class="modern-section-header">
+                    <div class="msh-left">
+                        <div class="msh-icon" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); color: #2563eb; border-color: #bfdbfe;">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <div class="msh-info">
+                            <h1 data-en="Digital Bhu-Naksha (GIS Cadastral Map)">डिजिटल भू-नक्शा (GIS Cadastral Map)</h1>
+                            <span class="msh-period" data-en="1970 RS & 1911 CS Maps • Mauja: Sarthua, Thana: 218">1970 RS एवं 1911 CS नक्शे • मौजा: सरथुआ, थाना: 218</span>
+                        </div>
+                    </div>
+                    <div class="msh-badges">
+                        <span class="msh-pill"><i class="fas fa-layer-group"></i> <span data-en="Total Sheets:">कुल चादरें:</span> <strong>11</strong></span>
+                        <span class="msh-pill msh-pill--status"><i class="fas fa-check-circle"></i> <span data-en="8K Ultra HD">8K अल्ट्रा HD</span></span>
                     </div>
                 </div>
-                <div class="msh-badges">
-                    <span class="msh-pill" id="mapActiveSheetBadge"><i class="fas fa-layer-group"></i> <span data-en="Sheet No:">चादर संख्या:</span> <strong>01</strong></span>
-                    <span class="msh-pill msh-pill--status"><i class="fas fa-check-circle"></i> <span data-en="8K Ultra HD (6 sheets total)">8K अल्ट्रा HD (कुल 6 चादर)</span></span>
+            </div>
+
+            <p class="page-intro" data-en="Maps of Mauja Sarthua from the 1970 Revisional Survey (6 sheets) and the 1911 Cadastral Survey (5 sheets) in 8K Ultra HD. Click on 'View Map' to open the dedicated full-screen GIS viewer in a new tab with deep zoom and Khasra search.">मौजा सरथुआ के 1970 रिविजनल सर्वे (6 चादर) और 1911 कैडस्ट्रल सर्वे (5 चादर) के सभी नक्शे 8K अल्ट्रा HD में उपलब्ध हैं। संबंधित चादर के <strong>'नक्शा देखें'</strong> बटन पर क्लिक करके नए टैब में समर्पित फुल-स्क्रीन GIS दर्शक खोलें।</p>
+
+            <!-- Modern Table of Map Sheets -->
+            <div class="modern-table-container">
+                <div class="table-responsive">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th class="col-sr" data-en="#">क्र. सं.</th>
+                                <th class="col-vol"><i class="fas fa-map"></i> <span data-en="Sheet Number">चादर संख्या</span></th>
+                                <th class="col-khata"><i class="fas fa-layer-group"></i> <span data-en="Survey Type">सर्वेक्षण प्रकार</span></th>
+                                <th class="col-pages"><i class="fas fa-draw-polygon"></i> <span data-en="Plot Coverage">खेसरा / प्लॉट कवरेज</span></th>
+                                <th class="col-size"><i class="fas fa-compress-arrows-alt"></i> <span data-en="Scale & Resolution">पैमाना व क्वालिटी</span></th>
+                                <th class="col-action text-right"><i class="fas fa-cogs"></i> <span data-en="Action">कार्य</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- RS 1970 Sheets -->
+                            <tr>
+                                <td class="col-sr"><span class="sr-badge">01</span></td>
+                                <td class="col-vol"><span class="vol-badge vol-badge--revisional"><i class="fas fa-map"></i> RS चादर 01</span></td>
+                                <td class="col-khata"><span class="khata-badge">1970 Revisional</span></td>
+                                <td class="col-pages"><span class="page-pill"><i class="fas fa-th-large"></i> 716 <small data-en="plots">खेसरा</small></span></td>
+                                <td class="col-size"><span class="size-pill">16" = 1 मील • 8K HD</span></td>
+                                <td class="col-action text-right">
+                                    <div class="action-buttons">
+                                        <a href="map-viewer?survey=RS&sheet=1" target="_blank" class="btn-action-view" title="फुल स्क्रीन GIS मैप नए टैब में खोलें">
+                                            <i class="fas fa-map-marked-alt"></i> <span data-en="View Map">नक्शा देखें</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-sr"><span class="sr-badge">02</span></td>
+                                <td class="col-vol"><span class="vol-badge vol-badge--revisional"><i class="fas fa-map"></i> RS चादर 02</span></td>
+                                <td class="col-khata"><span class="khata-badge">1970 Revisional</span></td>
+                                <td class="col-pages"><span class="page-pill"><i class="fas fa-th-large"></i> 452 <small data-en="plots">खेसरा</small></span></td>
+                                <td class="col-size"><span class="size-pill">16" = 1 मील • 8K HD</span></td>
+                                <td class="col-action text-right">
+                                    <div class="action-buttons">
+                                        <a href="map-viewer?survey=RS&sheet=2" target="_blank" class="btn-action-view" title="फुल स्क्रीन GIS मैप नए टैब में खोलें">
+                                            <i class="fas fa-map-marked-alt"></i> <span data-en="View Map">नक्शा देखें</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-sr"><span class="sr-badge">03</span></td>
+                                <td class="col-vol"><span class="vol-badge vol-badge--revisional"><i class="fas fa-map"></i> RS चादर 03</span></td>
+                                <td class="col-khata"><span class="khata-badge">1970 Revisional</span></td>
+                                <td class="col-pages"><span class="page-pill"><i class="fas fa-th-large"></i> 624 <small data-en="plots">खेसरा</small></span></td>
+                                <td class="col-size"><span class="size-pill">16" = 1 मील • 8K HD</span></td>
+                                <td class="col-action text-right">
+                                    <div class="action-buttons">
+                                        <a href="map-viewer?survey=RS&sheet=3" target="_blank" class="btn-action-view" title="फुल स्क्रीन GIS मैप नए टैब में खोलें">
+                                            <i class="fas fa-map-marked-alt"></i> <span data-en="View Map">नक्शा देखें</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-sr"><span class="sr-badge">04</span></td>
+                                <td class="col-vol"><span class="vol-badge vol-badge--revisional"><i class="fas fa-map"></i> RS चादर 04</span></td>
+                                <td class="col-khata"><span class="khata-badge">1970 Revisional</span></td>
+                                <td class="col-pages"><span class="page-pill"><i class="fas fa-th-large"></i> 580 <small data-en="plots">खेसरा</small></span></td>
+                                <td class="col-size"><span class="size-pill">16" = 1 मील • 8K HD</span></td>
+                                <td class="col-action text-right">
+                                    <div class="action-buttons">
+                                        <a href="map-viewer?survey=RS&sheet=4" target="_blank" class="btn-action-view" title="फुल स्क्रीन GIS मैप नए टैब में खोलें">
+                                            <i class="fas fa-map-marked-alt"></i> <span data-en="View Map">नक्शा देखें</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-sr"><span class="sr-badge">05</span></td>
+                                <td class="col-vol"><span class="vol-badge vol-badge--revisional"><i class="fas fa-map"></i> RS चादर 05</span></td>
+                                <td class="col-khata"><span class="khata-badge">1970 Revisional</span></td>
+                                <td class="col-pages"><span class="page-pill"><i class="fas fa-th-large"></i> 312 <small data-en="plots">खेसरा</small></span></td>
+                                <td class="col-size"><span class="size-pill">16" = 1 मील • 8K HD</span></td>
+                                <td class="col-action text-right">
+                                    <div class="action-buttons">
+                                        <a href="map-viewer?survey=RS&sheet=5" target="_blank" class="btn-action-view" title="फुल स्क्रीन GIS मैप नए टैब में खोलें">
+                                            <i class="fas fa-map-marked-alt"></i> <span data-en="View Map">नक्शा देखें</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-sr"><span class="sr-badge">06</span></td>
+                                <td class="col-vol"><span class="vol-badge vol-badge--revisional"><i class="fas fa-map"></i> RS चादर 06</span></td>
+                                <td class="col-khata"><span class="khata-badge">1970 Revisional</span></td>
+                                <td class="col-pages"><span class="page-pill"><i class="fas fa-th-large"></i> 242 <small data-en="plots">खेसरा</small></span></td>
+                                <td class="col-size"><span class="size-pill">16" = 1 मील • 8K HD</span></td>
+                                <td class="col-action text-right">
+                                    <div class="action-buttons">
+                                        <a href="map-viewer?survey=RS&sheet=6" target="_blank" class="btn-action-view" title="फुल स्क्रीन GIS मैप नए टैब में खोलें">
+                                            <i class="fas fa-map-marked-alt"></i> <span data-en="View Map">नक्शा देखें</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- CS 1911 Sheets -->
+                            <tr>
+                                <td class="col-sr"><span class="sr-badge">07</span></td>
+                                <td class="col-vol"><span class="vol-badge vol-badge--cadastral"><i class="fas fa-map"></i> CS सम्पूर्ण मौजा</span></td>
+                                <td class="col-khata"><span class="khata-badge">1911 Cadastral</span></td>
+                                <td class="col-pages"><span class="page-pill"><i class="fas fa-globe"></i> मास्टर शीट</span></td>
+                                <td class="col-size"><span class="size-pill">16" = 1 मील • 8K HD</span></td>
+                                <td class="col-action text-right">
+                                    <div class="action-buttons">
+                                        <a href="map-viewer?survey=CS&sheet=0" target="_blank" class="btn-action-view" title="फुल स्क्रीन GIS मैप नए टैब में खोलें">
+                                            <i class="fas fa-map-marked-alt"></i> <span data-en="View Map">नक्शा देखें</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-sr"><span class="sr-badge">08</span></td>
+                                <td class="col-vol"><span class="vol-badge vol-badge--cadastral"><i class="fas fa-map"></i> CS चादर 01</span></td>
+                                <td class="col-khata"><span class="khata-badge">1911 Cadastral</span></td>
+                                <td class="col-pages"><span class="page-pill"><i class="fas fa-th-large"></i> 650 <small data-en="plots">खेसरा</small></span></td>
+                                <td class="col-size"><span class="size-pill">16" = 1 मील • 8K HD</span></td>
+                                <td class="col-action text-right">
+                                    <div class="action-buttons">
+                                        <a href="map-viewer?survey=CS&sheet=1" target="_blank" class="btn-action-view" title="फुल स्क्रीन GIS मैप नए टैब में खोलें">
+                                            <i class="fas fa-map-marked-alt"></i> <span data-en="View Map">नक्शा देखें</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-sr"><span class="sr-badge">09</span></td>
+                                <td class="col-vol"><span class="vol-badge vol-badge--cadastral"><i class="fas fa-map"></i> CS चादर 02</span></td>
+                                <td class="col-khata"><span class="khata-badge">1911 Cadastral</span></td>
+                                <td class="col-pages"><span class="page-pill"><i class="fas fa-th-large"></i> 410 <small data-en="plots">खेसरा</small></span></td>
+                                <td class="col-size"><span class="size-pill">16" = 1 मील • 8K HD</span></td>
+                                <td class="col-action text-right">
+                                    <div class="action-buttons">
+                                        <a href="map-viewer?survey=CS&sheet=2" target="_blank" class="btn-action-view" title="फुल स्क्रीन GIS मैप नए टैब में खोलें">
+                                            <i class="fas fa-map-marked-alt"></i> <span data-en="View Map">नक्शा देखें</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-sr"><span class="sr-badge">10</span></td>
+                                <td class="col-vol"><span class="vol-badge vol-badge--cadastral"><i class="fas fa-map"></i> CS चादर 03</span></td>
+                                <td class="col-khata"><span class="khata-badge">1911 Cadastral</span></td>
+                                <td class="col-pages"><span class="page-pill"><i class="fas fa-th-large"></i> 590 <small data-en="plots">खेसरा</small></span></td>
+                                <td class="col-size"><span class="size-pill">16" = 1 मील • 8K HD</span></td>
+                                <td class="col-action text-right">
+                                    <div class="action-buttons">
+                                        <a href="map-viewer?survey=CS&sheet=3" target="_blank" class="btn-action-view" title="फुल स्क्रीन GIS मैप नए टैब में खोलें">
+                                            <i class="fas fa-map-marked-alt"></i> <span data-en="View Map">नक्शा देखें</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col-sr"><span class="sr-badge">11</span></td>
+                                <td class="col-vol"><span class="vol-badge vol-badge--cadastral"><i class="fas fa-map"></i> CS चादर 04</span></td>
+                                <td class="col-khata"><span class="khata-badge">1911 Cadastral</span></td>
+                                <td class="col-pages"><span class="page-pill"><i class="fas fa-th-large"></i> 520 <small data-en="plots">खेसरा</small></span></td>
+                                <td class="col-size"><span class="size-pill">16" = 1 मील • 8K HD</span></td>
+                                <td class="col-action text-right">
+                                    <div class="action-buttons">
+                                        <a href="map-viewer?survey=CS&sheet=4" target="_blank" class="btn-action-view" title="फुल स्क्रीन GIS मैप नए टैब में खोलें">
+                                            <i class="fas fa-map-marked-alt"></i> <span data-en="View Map">नक्शा देखें</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        <p class="page-intro" data-en="Maps of Mauja Sarthua from the 1970 Revisional Survey (6 sheets) and the 1911 Cadastral Survey in 8K HD. Enter a khesra/plot number in the search to zoom straight to that plot, or click any plot on the map to see its details.">मौजा सरथुआ के 1970 रिविजनल सर्वे (6 चादर) और 1911 कैडस्ट्रल सर्वे के नक्शे 8K HD में। सर्च में खेसरा/प्लॉट नंबर डालें — नक्शा सीधे उस प्लॉट पर पहुँच जाएगा, या नक्शे पर किसी भी प्लॉट पर क्लिक करके उसकी जानकारी देखें।</p>
-                <div class="sarthua-map-card" id="sarthuaMapCard">
-                    <!-- Map Toolbar -->
-                    <div class="map-toolbar">
-                        <div class="map-toolbar-left">
-                            <div class="map-search-wrap">
-                                <i class="fas fa-search"></i>
-                                <input type="text" inputmode="numeric" id="mapKhasraSearchInput" placeholder="खेसरा / प्लॉट नं. खोजें (उदा. 64)..." onkeydown="if(event.key==='Enter') SarthuaMapViewer.searchPlot()">
-                                <button class="btn btn--sm btn--primary" onclick="SarthuaMapViewer.searchPlot()" title="प्लॉट खोजें">
-                                    <span>खोजें</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="map-toolbar-center">
-                            <!-- Survey Switcher: 1970 RS vs 1911 CS -->
-                            <div class="map-survey-switcher" role="group" aria-label="सर्वेक्षण चयनकर्ता">
-                                <button class="map-survey-btn active" data-survey="RS" onclick="SarthuaMapViewer.switchSurvey('RS')" title="1970 रिविजनल सर्वे">
-                                    <i class="fas fa-layer-group"></i> <span>1970 RS</span>
-                                </button>
-                                <button class="map-survey-btn" data-survey="CS" onclick="SarthuaMapViewer.switchSurvey('CS')" title="1911 कैडस्ट्रल सर्वे">
-                                    <i class="fas fa-history"></i> <span>1911 CS</span>
-                                </button>
-                            </div>
-
-                            <!-- Dynamic Sheet Switcher -->
-                            <div class="map-sheet-switcher" id="mapSheetSwitcherWrap" role="group" aria-label="चादर चयनकर्ता">
-                                <span class="sheet-switcher-label"><i class="fas fa-map"></i> चादर:</span>
-                                <button class="map-sheet-btn active" data-sheet="1" onclick="SarthuaMapViewer.switchSheet(1)" title="चादर संख्या 01">01</button>
-                                <button class="map-sheet-btn" data-sheet="2" onclick="SarthuaMapViewer.switchSheet(2)" title="चादर संख्या 02">02</button>
-                                <button class="map-sheet-btn" data-sheet="3" onclick="SarthuaMapViewer.switchSheet(3)" title="चादर संख्या 03">03</button>
-                                <button class="map-sheet-btn" data-sheet="4" onclick="SarthuaMapViewer.switchSheet(4)" title="चादर संख्या 04">04</button>
-                                <button class="map-sheet-btn" data-sheet="5" onclick="SarthuaMapViewer.switchSheet(5)" title="चादर संख्या 05">05</button>
-                                <button class="map-sheet-btn" data-sheet="6" onclick="SarthuaMapViewer.switchSheet(6)" title="चादर संख्या 06">06</button>
-                            </div>
-                        </div>
-
-                        <div class="map-toolbar-right">
-                            <div class="map-actions-group">
-                                <button class="map-action-btn" onclick="SarthuaMapViewer.zoomIn()" title="ज़ूम इन (+)">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                                <button class="map-action-btn" onclick="SarthuaMapViewer.zoomOut()" title="ज़ूम आउट (-)">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <button class="map-action-btn" onclick="SarthuaMapViewer.resetView()" title="नक्शा रीसेट करें (H)">
-                                    <i class="fas fa-expand-arrows-alt"></i> <span>रीसेट</span>
-                                </button>
-                                <button class="map-action-btn" onclick="SarthuaMapViewer.toggleFullscreen()" title="फुल स्क्रीन (F)">
-                                    <i class="fas fa-expand"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Map Canvas Container -->
-                    <div id="sarthuaMapContainer" class="sarthua-map-canvas" role="application" aria-label="मौजा सरथुआ का इंटरैक्टिव भू-नक्शा (GIS कैडस्ट्रल मानचित्र)"></div>
-
-                    <!-- Footer Hint Strip -->
-                    <div class="map-footer-hint">
-                        <div class="mfh-item">
-                            <i class="fas fa-info-circle"></i>
-                            <span>माउस व्हील / डबल क्लिक या टच पिंच से ज़ूम करें</span>
-                        </div>
-                        <div class="mfh-item">
-                            <i class="fas fa-mouse-pointer"></i>
-                            <span>प्लॉट पर क्लिक कर विवरण देखें</span>
-                        </div>
-                        <div class="mfh-item" id="mapCoordsDisplay">
-                            <i class="fas fa-crosshairs"></i> X: — | Y: —
-                        </div>
-                        <div class="mfh-item" id="mapLiveApiStatus">
-                            <i class="fas fa-satellite-dish text-success"></i> <span data-en="Live GIS API: Active">लाइव GIS API: <strong class="text-success">सक्रिय</strong></span>
-                        </div>
-                        <div class="mfh-item">
-                            <span>पैमाना: <strong>16" = 1 मील</strong></span>
-                        </div>
-                    </div>
-                </div>
-        </div>
     </main>
+
     <footer class="portal-footer">
         <div class="container">
             <div class="footer-disclaimer-strip">
@@ -238,31 +343,6 @@
         </div>
     </footer>
 
-    <div id="loadingModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="loading-spinner"></div>
-            <p><i class="fas fa-file-pdf"></i> PDF लोड हो रहा है...</p>
-        </div>
-    </div>
     <script src="js/site.js?v=4" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
-    <script src="js/map.bundle.js?v=10.4" defer></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var params = new URLSearchParams(window.location.search);
-        var q = params.get('q');
-        if (q) {
-            var checkInit = setInterval(function () {
-                if (window.SarthuaMapViewer && window.SarthuaMapViewer.isInitialized) {
-                    clearInterval(checkInit);
-                    var input = document.getElementById('mapKhasraSearchInput');
-                    if (input) input.value = q;
-                    window.SarthuaMapViewer.searchPlot(q);
-                }
-            }, 100);
-            setTimeout(function () { clearInterval(checkInit); }, 8000);
-        }
-    });
-    </script>
 </body>
 </html>

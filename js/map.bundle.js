@@ -23,12 +23,12 @@ const SarthuaMapViewer = {
     lastCoords: null,
     livePlotCache: {},
     isLiveApiActive: true,
-    apiBaseUrl: 'https://api.sarthua.in',
+    apiBaseUrl: (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) ? window.location.origin : 'https://api.sarthua.in',
     plotsData: typeof sarthuaPlotsData !== 'undefined' ? sarthuaPlotsData : null,
     plotsDb: {},
     isDbLoaded: false,
 
-    // Survey Map Layers & Spatial Reference Registry (AWS S3 Hosted with Referer Protection)
+    // Survey Map Layers & Spatial Reference Registry
     s3BaseUrl: 'https://docs.sarthua.in',
     surveys: {
         'RS': {
@@ -129,7 +129,7 @@ const SarthuaMapViewer = {
                     transparent: 'https://docs.sarthua.in/maps/Sarthua_CS_Sheet_3_HD.png',
                     imgWidth: 7639,
                     imgHeight: 8000,
-                    bounds: { minX: 264770.270, minY: 2818035.435, maxX: 266604.776, maxY: 2819958.079 }
+                    bounds: { minX: 264770.270, minY: 2818035.435, maxX: 266604.776, maxY: 28219958.079 }
                 },
                 4: {
                     name: 'चादर 04',
@@ -153,43 +153,40 @@ const SarthuaMapViewer = {
         }
     },
 
-    // Get Active Sheet Info Object
     getActiveSheet: function () {
-        const survey = this.surveys[this.currentSurvey] || this.surveys['RS'];
-        return survey.sheets[this.currentSheet] || survey.sheets[survey.defaultSheet];
+        return this.surveys[this.currentSurvey].sheets[this.currentSheet];
     },
 
-    // Return active survey's plot dictionary
     getActivePlotsDb: function () {
-        if (this.plotsData && this.plotsData.surveys && this.plotsData.surveys[this.currentSurvey]) {
-            return this.plotsData.surveys[this.currentSurvey].plots || {};
+        if (!this.plotsData) return this.plotsDb;
+        if (this.currentSurvey === 'RS') {
+            return (this.plotsData.surveys && this.plotsData.surveys.RS && this.plotsData.surveys.RS.plots)
+                ? this.plotsData.surveys.RS.plots
+                : (this.plotsData.plots || {});
+        } else {
+            return (this.plotsData.surveys && this.plotsData.surveys.CS && this.plotsData.surveys.CS.plots)
+                ? this.plotsData.surveys.CS.plots
+                : {};
         }
-        return this.plotsDb || {};
     },
 
-    // Active Map Mode: 'GOV_DIRECT' (Direct Bihar Govt Vector/WMS Map) or 'SCANNED_8K'
-    mapMode: 'GOV_DIRECT',
-
-    // Convert pixel coordinates to EPSG:3857 coordinates for current sheet
     pixelToGeo: function (lat, lng) {
         const sheet = this.getActiveSheet();
         const r = sheet.bounds;
-        const w = this.mapMode === 'GOV_DIRECT' ? 3000 : sheet.imgWidth;
-        const h = this.mapMode === 'GOV_DIRECT' ? 3000 : sheet.imgHeight;
+        const w = 3000;
+        const h = 3000;
         const normX = Math.max(0, Math.min(1, lng / w));
-        const normY = Math.max(0, Math.min(1, (h - lat) / h));
-        const gx = Math.round(r.minX + normX * (r.maxX - r.minX));
-        const gy = Math.round(r.maxY - normY * (r.maxY - r.minY));
-        return { x: gx, y: gy };
+        const normY = Math.max(0, Math.min(1, lat / h));
+        const gx = r.minX + normX * (r.maxX - r.minX);
+        const gy = r.minY + normY * (r.maxY - r.minY);
+        return { x: Math.round(gx * 10) / 10, y: Math.round(gy * 10) / 10 };
     },
 
-    // Convert Geo EPSG:3857 (x, y) to Leaflet Image Pixel [lat, lng] for a sheet
-    geoToPixel: function (gx, gy, surveyKey, sheetNum) {
-        const survey = this.surveys[surveyKey || this.currentSurvey] || this.surveys['RS'];
-        const sheet = survey.sheets[sheetNum !== undefined ? sheetNum : this.currentSheet] || survey.sheets[survey.defaultSheet];
+    geoToPixel: function (gx, gy) {
+        const sheet = this.getActiveSheet();
         const r = sheet.bounds;
-        const w = this.mapMode === 'GOV_DIRECT' ? 3000 : sheet.imgWidth;
-        const h = this.mapMode === 'GOV_DIRECT' ? 3000 : sheet.imgHeight;
+        const w = 3000;
+        const h = 3000;
         const normX = (gx - r.minX) / (r.maxX - r.minX);
         const normY = (gy - r.minY) / (r.maxY - r.minY);
         const lng = Math.round(normX * w);
@@ -197,7 +194,6 @@ const SarthuaMapViewer = {
         return [lat, lng];
     },
 
-    // Load static offline database
     loadDatabase: function () {
         if (this.isDbLoaded && this.plotsData) return Promise.resolve();
 
@@ -216,35 +212,18 @@ const SarthuaMapViewer = {
             applyData(sarthuaPlotsData);
             return Promise.resolve();
         }
-        if (window.sarthuaPlotsData) {
-            applyData(window.sarthuaPlotsData);
-            return Promise.resolve();
-        }
-
-        return fetch('sarthua_plots_db.json?v=' + Date.now())
-            .then(res => res.json())
-            .then(data => applyData(data))
-            .catch(err => {
-                console.warn('[BhuNaksha] Fallback used:', err);
-                if (window.sarthuaPlotsData) {
-                    applyData(window.sarthuaPlotsData);
-                }
-            });
+        return Promise.resolve();
     },
 
-    // Find best matching plot at coordinates (gx, gy)
     findPlotAtCoords: function (gx, gy) {
         let bestMatch = null;
-        let minDistance = Infinity;
         const currentSheetNum = this.currentSheet;
         const currentSheetObj = this.getActiveSheet();
         const currentGisCode = currentSheetObj ? currentSheetObj.gis_code : null;
         const activePlots = this.getActivePlotsDb();
 
-        // Pass 1: exact bbox match in the current sheet (or across entire mauza on CS Sheet 00)
         for (const [plotNo, data] of Object.entries(activePlots)) {
             if (!data.center) continue;
-
             if (this.currentSurvey === 'RS') {
                 if (data.sheet !== undefined && data.sheet !== currentSheetNum) continue;
                 if (data.gis_code && currentGisCode && data.gis_code !== currentGisCode) continue;
@@ -255,34 +234,16 @@ const SarthuaMapViewer = {
                 }
             }
 
-            const cx = data.center.x;
-            const cy = data.center.y;
-            const bbox = data.bbox;
-
-            if (bbox) {
-                const bxmin = bbox.xmin !== undefined ? bbox.xmin : bbox[0];
-                const bymin = bbox.ymin !== undefined ? bbox.ymin : bbox[1];
-                const bxmax = bbox.xmax !== undefined ? bbox.xmax : bbox[2];
-                const bymax = bbox.ymax !== undefined ? bbox.ymax : bbox[3];
-
-                const isInside = (gx >= bxmin - 3 && gx <= bxmax + 3 &&
-                                 gy >= bymin - 3 && gy <= bymax + 3);
-                if (isInside) {
-                    const dist = Math.hypot(gx - cx, gy - cy);
-                    if (dist < minDistance) {
-                        minDistance = dist;
-                        bestMatch = data;
-                    }
-                }
+            if (data.bbox && gx >= data.bbox.xmin && gx <= data.bbox.xmax && gy >= data.bbox.ymin && gy <= data.bbox.ymax) {
+                bestMatch = data;
+                break;
             }
         }
 
-        // Pass 2: nearest plot center within snap radius (45m)
         if (!bestMatch) {
             let snapDist = 45;
             for (const [plotNo, data] of Object.entries(activePlots)) {
                 if (!data.center) continue;
-
                 if (this.currentSurvey === 'RS') {
                     if (data.sheet !== undefined && data.sheet !== currentSheetNum) continue;
                     if (data.gis_code && currentGisCode && data.gis_code !== currentGisCode) continue;
@@ -304,42 +265,31 @@ const SarthuaMapViewer = {
         return bestMatch;
     },
 
-    // Initialize Leaflet Map Engine
     init: function () {
         const container = document.getElementById('sarthuaMapContainer');
         if (!container || this.isInitialized) return;
 
         if (typeof L === 'undefined') {
-            console.warn('[BhuNaksha] Leaflet library loading, retrying in 50ms...');
             setTimeout(() => this.init(), 50);
             return;
         }
 
         this.loadDatabase();
 
-        const sheet = this.getActiveSheet();
-        const isGov = this.mapMode === 'GOV_DIRECT';
-        const h = isGov ? 3000 : sheet.imgHeight;
-        const w = isGov ? 3000 : sheet.imgWidth;
-        this.imageBounds = [[0, 0], [h, w]];
+        this.imageBounds = [[0, 0], [3000, 3000]];
 
-        // Initialize Leaflet Map with Pixel Coordinate System
         this.map = L.map('sarthuaMapContainer', {
             crs: L.CRS.Simple,
             minZoom: -2,
-            maxZoom: 4,
+            maxZoom: 7,
             zoomDelta: 0.5,
-            zoomSnap: 0.25,
+            zoomSnap: 0.1,
             wheelPxPerZoomLevel: 80,
             attributionControl: false,
             zoomControl: false,
-            maxBounds: [[-500, -500], [h + 500, w + 500]]
+            maxBounds: [[-1000, -1000], [4000, 4000]]
         });
 
-        // --- OLD SCANNED IMAGE SYSTEM (TEMPORARILY COMMENTED OUT AS REQUESTED) ---
-        // const mapSourceUrl = sheet.white;
-        
-        // --- DIRECT BIHAR GOVERNMENT OFFICIAL MAP LAYER VIA CLOUDFLARE ---
         const mapSourceUrl = `${this.apiBaseUrl}/api/gov-map?survey=${this.currentSurvey}&sheet=${this.currentSheet}`;
         this.imageOverlay = L.imageOverlay(mapSourceUrl, this.imageBounds).addTo(this.map);
         this.map.fitBounds(this.imageBounds);
@@ -347,10 +297,8 @@ const SarthuaMapViewer = {
             if (this.map) this.map.invalidateSize();
         }, 150);
 
-        // Render dynamic sheet switcher buttons
         this.renderSheetSwitcher();
 
-        // Throttled Coordinate Tracker on Mouse Move using requestAnimationFrame (60 FPS smooth)
         this.map.on('mousemove', (e) => {
             this.lastCoords = e.latlng;
             if (!this.animFrameId) {
@@ -363,16 +311,13 @@ const SarthuaMapViewer = {
             }
         });
 
-        // Click on Map to Inspect Point Coordinates & Details (Debounced & Abort-safe)
         this.map.on('click', (e) => {
             this.handleMapClick(e.latlng);
         });
 
-        // Dynamic High-Definition WMS re-rendering on zoom & pan (Debounced 400ms)
         this.map.on('zoomend', () => this.scheduleDynamicWmsUpdate());
         this.map.on('moveend', () => this.scheduleDynamicWmsUpdate());
 
-        // Anti-download and Anti-drag protection on map canvas
         const preventSave = (e) => {
             e.preventDefault();
             return false;
@@ -384,46 +329,29 @@ const SarthuaMapViewer = {
         this.setupKeyboardControls();
     },
 
-    // Switch Survey Type: 'RS' (1970) or 'CS' (1911)
     switchSurvey: function (surveyType) {
         if (!this.surveys[surveyType]) return;
         this.currentSurvey = surveyType;
         const survey = this.surveys[surveyType];
         this.currentSheet = survey.defaultSheet;
 
-        // Cancel pending timers and in-flight loads
-        if (this.clickDebounceTimer) {
-            clearTimeout(this.clickDebounceTimer);
-            this.clickDebounceTimer = null;
-        }
-        if (this.clickAbortController) {
-            this.clickAbortController.abort();
-            this.clickAbortController = null;
-        }
-        if (this.wmsDebounceTimer) {
-            clearTimeout(this.wmsDebounceTimer);
-            this.wmsDebounceTimer = null;
-        }
+        if (this.clickDebounceTimer) clearTimeout(this.clickDebounceTimer);
+        if (this.clickAbortController) this.clickAbortController.abort();
+        if (this.wmsDebounceTimer) clearTimeout(this.wmsDebounceTimer);
         if (this.currentWmsImg) {
             this.currentWmsImg.onload = null;
             this.currentWmsImg.onerror = null;
-            this.currentWmsImg.src = '';
             this.currentWmsImg = null;
         }
 
-        // Update Survey switcher buttons
         document.querySelectorAll('.map-survey-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.survey === surveyType);
         });
 
-        // Re-render sheet switcher pills
         this.renderSheetSwitcher();
-
-        // Load map
         this.switchSheet(this.currentSheet, true);
     },
 
-    // Render Sheet Switcher Pills dynamically
     renderSheetSwitcher: function () {
         const wrap = document.getElementById('mapSheetSwitcherWrap');
         if (!wrap) return;
@@ -441,48 +369,29 @@ const SarthuaMapViewer = {
         wrap.innerHTML = html;
     },
 
-    // Switch active cadastral sheet
     switchSheet: function (sheetNum, silent) {
         const survey = this.surveys[this.currentSurvey];
         sheetNum = parseInt(sheetNum);
         if (!survey.sheets[sheetNum]) return;
         this.currentSheet = sheetNum;
 
-        // Cancel pending debounces and in-flight image requests
-        if (this.clickDebounceTimer) {
-            clearTimeout(this.clickDebounceTimer);
-            this.clickDebounceTimer = null;
-        }
-        if (this.clickAbortController) {
-            this.clickAbortController.abort();
-            this.clickAbortController = null;
-        }
-        if (this.wmsDebounceTimer) {
-            clearTimeout(this.wmsDebounceTimer);
-            this.wmsDebounceTimer = null;
-        }
+        if (this.clickDebounceTimer) clearTimeout(this.clickDebounceTimer);
+        if (this.clickAbortController) this.clickAbortController.abort();
+        if (this.wmsDebounceTimer) clearTimeout(this.wmsDebounceTimer);
         if (this.currentWmsImg) {
             this.currentWmsImg.onload = null;
             this.currentWmsImg.onerror = null;
-            this.currentWmsImg.src = '';
             this.currentWmsImg = null;
         }
 
         const sheet = survey.sheets[sheetNum];
-        const isGov = this.mapMode === 'GOV_DIRECT';
-        const h = isGov ? 3000 : sheet.imgHeight;
-        const w = isGov ? 3000 : sheet.imgWidth;
-        this.imageBounds = [[0, 0], [h, w]];
+        this.imageBounds = [[0, 0], [3000, 3000]];
 
         if (this.imageOverlay && this.map) {
             this.imageOverlay.setBounds(this.imageBounds);
-            // --- OLD SCANNED IMAGE SYSTEM (TEMPORARILY COMMENTED OUT AS REQUESTED) ---
-            // const newMapUrl = sheet.white;
-
-            // --- DIRECT BIHAR GOVERNMENT OFFICIAL MAP LAYER VIA CLOUDFLARE ---
             const newMapUrl = `${this.apiBaseUrl}/api/gov-map?survey=${this.currentSurvey}&sheet=${sheetNum}`;
             this.imageOverlay.setUrl(newMapUrl);
-            this.map.setMaxBounds([[-500, -500], [h + 500, w + 500]]);
+            this.map.setMaxBounds([[-1000, -1000], [4000, 4000]]);
             this.map.fitBounds(this.imageBounds, { animate: true });
         }
 
@@ -495,7 +404,6 @@ const SarthuaMapViewer = {
             this.dynamicWmsLayer.setBounds([[0, 0], [0, 0]]);
         }
 
-        // Update UI Elements
         document.querySelectorAll('.map-sheet-btn').forEach(btn => {
             btn.classList.toggle('active', parseInt(btn.dataset.sheet) === sheetNum);
         });
@@ -517,7 +425,6 @@ const SarthuaMapViewer = {
         }
     },
 
-    // Create precision map pin marker
     createPinIcon: function () {
         return L.divIcon({
             className: 'sarthua-geo-pin',
@@ -535,7 +442,6 @@ const SarthuaMapViewer = {
         });
     },
 
-    // Render plot popup details (either from Live Gov API, Local DB, or Loading state)
     renderPlotPopup: function (latlng, geo, plot, isLoading) {
         if (!this.clickMarker) return;
 
@@ -626,24 +532,20 @@ const SarthuaMapViewer = {
         }
     },
 
-    // Handle user click anywhere on the authentic map (Option C Live API with bbox caching, debouncing & abort)
     handleMapClick: function (latlng) {
         const geo = this.pixelToGeo(latlng.lat, latlng.lng);
 
-        // Immediate visual response: place/move pin
         if (this.clickMarker) {
             this.map.removeLayer(this.clickMarker);
         }
         this.clickMarker = L.marker(latlng, { icon: this.createPinIcon() }).addTo(this.map);
 
-        // 1. Instant Memory Cache Check (Exact coordinate match -> 0ms)
         const cacheKey = `${this.currentSurvey}_${this.currentSheet}_${geo.x}_${geo.y}`;
         if (this.livePlotCache[cacheKey]) {
             this.renderPlotPopup(latlng, geo, this.livePlotCache[cacheKey], false);
             return;
         }
 
-        // 2. Instant Bounding Box Check across all known cached plots in current sheet (0ms)
         for (const key in this.livePlotCache) {
             const cached = this.livePlotCache[key];
             if (cached && cached.xmin !== undefined && cached.xmax !== undefined) {
@@ -657,22 +559,18 @@ const SarthuaMapViewer = {
             }
         }
 
-        // 3. Show instant loading feedback
         this.renderPlotPopup(latlng, geo, null, true);
 
-        // 4. Cancel any previous pending click debounce timer
         if (this.clickDebounceTimer) {
             clearTimeout(this.clickDebounceTimer);
             this.clickDebounceTimer = null;
         }
 
-        // 5. Abort any previous in-flight fetch request
         if (this.clickAbortController) {
             this.clickAbortController.abort();
             this.clickAbortController = null;
         }
 
-        // 6. Debounce 220ms so double-clicks for zoom or rapid clicks don't flood the API
         this.clickDebounceTimer = setTimeout(() => {
             const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
             this.clickAbortController = controller;
@@ -700,7 +598,6 @@ const SarthuaMapViewer = {
                         };
                         this.livePlotCache[cacheKey] = livePlot;
 
-                        // Also store in active survey plot lookup for search
                         const activeDb = this.getActivePlotsDb();
                         if (!activeDb[livePlot.plot_no]) {
                             activeDb[livePlot.plot_no] = {
@@ -713,23 +610,20 @@ const SarthuaMapViewer = {
                         }
                         this.renderPlotPopup(latlng, geo, livePlot, false);
                     } else {
-                        // Fallback to local DB
                         const localPlot = this.findPlotAtCoords(geo.x, geo.y);
                         this.renderPlotPopup(latlng, geo, localPlot ? { ...localPlot, source: 'LOCAL' } : null, false);
                     }
                 })
                 .catch(err => {
                     if (timeoutId) clearTimeout(timeoutId);
-                    if (err.name === 'AbortError') return; // Cancelled cleanly
+                    if (err.name === 'AbortError') return;
                     this.clickAbortController = null;
-                    // Fallback to local DB
                     const localPlot = this.findPlotAtCoords(geo.x, geo.y);
                     this.renderPlotPopup(latlng, geo, localPlot ? { ...localPlot, source: 'LOCAL' } : null, false);
                 });
         }, 220);
     },
 
-    // Search Khasra Plot Locator
     searchPlot: function (khasraNo) {
         const query = (khasraNo || document.getElementById('mapKhasraSearchInput')?.value || '').trim();
         if (!query) {
@@ -745,119 +639,67 @@ const SarthuaMapViewer = {
             this.map.removeLayer(this.clickMarker);
         }
 
-        // 1. Look up in current survey first
         let activeDb = this.getActivePlotsDb();
         let record = activeDb[query];
         let foundSurvey = this.currentSurvey;
 
-        // 2. If not found in current survey, check other survey
-        if (!record && this.plotsData && this.plotsData.surveys) {
+        if (!record) {
             const otherSurvey = this.currentSurvey === 'RS' ? 'CS' : 'RS';
-            const otherDb = this.plotsData.surveys[otherSurvey]?.plots || {};
-            if (otherDb[query]) {
+            const otherDb = (this.plotsData && this.plotsData.surveys && this.plotsData.surveys[otherSurvey])
+                ? this.plotsData.surveys[otherSurvey].plots
+                : {};
+            if (otherDb && otherDb[query]) {
                 record = otherDb[query];
                 foundSurvey = otherSurvey;
                 this.switchSurvey(otherSurvey);
             }
         }
 
-        let targetLatLng = null;
-
         if (record) {
-            const plotSheet = record.sheet !== undefined ? record.sheet : this.currentSheet;
-            if (plotSheet !== this.currentSheet) {
-                this.switchSheet(plotSheet);
+            const plotSheet = record.sheet !== undefined ? record.sheet : 1;
+            if (plotSheet !== this.currentSheet && !(this.currentSurvey === 'CS' && this.currentSheet === 0)) {
+                this.switchSheet(plotSheet, true);
             }
+
+            let latlng;
             if (record.center) {
-                targetLatLng = this.geoToPixel(record.center.x, record.center.y, foundSurvey, plotSheet);
+                const pix = this.geoToPixel(record.center.x, record.center.y);
+                latlng = L.latLng(pix[0], pix[1]);
             } else if (record.pixel) {
-                targetLatLng = record.pixel;
+                latlng = L.latLng(record.pixel[0], record.pixel[1]);
+            } else {
+                latlng = L.latLng(1500, 1500);
+            }
+
+            const geo = record.center ? { x: record.center.x, y: record.center.y } : this.pixelToGeo(latlng.lat, latlng.lng);
+            this.clickMarker = L.marker(latlng, { icon: this.createPinIcon() }).addTo(this.map);
+            this.renderPlotPopup(latlng, geo, { ...record, source: 'LOCAL' }, false);
+
+            this.map.flyTo(latlng, 2.5, { duration: 0.8 });
+
+            if (window.AppView) {
+                AppView.showAlert(`खेसरा संख्या ${query} मिला (चादर ${plotSheet})!`, 'success');
+            }
+        } else {
+            if (window.AppView) {
+                AppView.showAlert(`खेसरा संख्या "${query}" इस मौजा में नहीं मिला।`, 'warning');
+            } else {
+                alert(`खेसरा संख्या "${query}" इस मौजा में नहीं मिला।`);
             }
         }
-
-        if (!targetLatLng) {
-            const sheet = this.getActiveSheet();
-            targetLatLng = [Math.round(sheet.imgHeight / 2), Math.round(sheet.imgWidth / 2)];
-        }
-
-        this.clickMarker = L.marker(targetLatLng, { icon: this.createPinIcon() }).addTo(this.map);
-
-        const currentSheetInfo = this.getActiveSheet();
-        const pniuDisplay = (record && record.pniu) ? record.pniu : 'सरकारी अभिलेख';
-        const plotSheetNum = (record && record.sheet !== undefined) ? record.sheet : this.currentSheet;
-        const sheetDisplay = plotSheetNum === 0 ? 'सम्पूर्ण मौजा' : (plotSheetNum < 10 ? '0' + plotSheetNum : '' + plotSheetNum);
-        const gisCode = (record && record.gis_code) ? record.gis_code : currentSheetInfo.gis_code;
-        const lpmLink = `https://bhunaksha.bihar.gov.in/plotReportPDF.jsp?state=10&giscode=${gisCode}&plotno=${query}&sameowner=false&derivedLayers=-1&selectedLayers=-1&scale=0`;
-        const khatiyanUrl = this.currentSurvey === 'CS'
-            ? `cadastral-survey?q=${encodeURIComponent(query)}`
-            : `jamabandi?q=${encodeURIComponent(query)}`;
-        const khatiyanLabel = this.currentSurvey === 'CS' ? '1911 खतियान' : 'जमाबंदी / खतियान';
-        const surveyLabel = this.currentSurvey === 'CS' ? '1911 कैडस्ट्रल' : '1970 रिविजनल';
-
-        const popupHtml = `
-            <div class="map-plot-popup">
-                <div class="mpp-header">
-                    <span class="mpp-badge"><i class="fas fa-landmark"></i> मौजा: सरथुआ (${surveyLabel})</span>
-                    <h4 class="mpp-title">खेसरा संख्या: <strong>${query}</strong></h4>
-                </div>
-                <div class="mpp-body">
-                    <div class="mpp-row"><span>अंचल:</span> <strong>उदवंतनगर (भोजपुर)</strong></div>
-                    <div class="mpp-row"><span>ULPIN / भू-आधार:</span> <strong class="text-mono text-primary">${pniuDisplay}</strong></div>
-                    <div class="mpp-row"><span>चादर संख्या:</span> <strong>${sheetDisplay}</strong></div>
-                    ${record && record.center ? `<div class="mpp-row"><span>GIS X / Y:</span> <strong class="text-mono">${record.center.x} / ${record.center.y}</strong></div>` : ''}
-                </div>
-                <div class="mpp-actions">
-                    <a href="${khatiyanUrl}" class="btn btn--sm btn--primary">
-                        <i class="fas fa-history"></i> ${khatiyanLabel}
-                    </a>
-                    <a href="${lpmLink}" target="_blank" rel="noopener noreferrer" class="btn btn--sm btn--secondary" title="सरकारी LPM नक्शा रिपोर्ट PDF">
-                        <i class="fas fa-file-pdf"></i> LPM रिपोर्ट
-                    </a>
-                </div>
-            </div>
-        `;
-
-        this.clickMarker.bindPopup(popupHtml, { maxWidth: 320, className: 'sarthua-leaflet-popup' }).openPopup();
-        this.map.setView(targetLatLng, 1.2, { animate: true });
-
-        if (window.AppView) {
-            AppView.showAlert(`खेसरा नं. ${query} (${surveyLabel} चादर ${sheetDisplay}) में लोकेट हुआ!`, 'success');
-        }
     },
 
-    // Reset View
-    resetView: function () {
-        if (!this.map || !this.imageBounds) return;
-        this.map.fitBounds(this.imageBounds, { animate: true });
-        if (this.clickMarker) {
-            this.map.removeLayer(this.clickMarker);
-            this.clickMarker = null;
-        }
-        if (this.dynamicWmsLayer) {
-            this.dynamicWmsLayer.setBounds([[0, 0], [0, 0]]);
-        }
-        if (this.currentWmsImg) {
-            this.currentWmsImg.onload = null;
-            this.currentWmsImg.onerror = null;
-            this.currentWmsImg.src = '';
-            this.currentWmsImg = null;
-        }
-    },
-
-    // Update Dynamic High-Definition WMS Viewport Layer on Zoom/Pan
     updateDynamicWms: function () {
-        if (!this.map || this.mapMode !== 'GOV_DIRECT') return;
+        if (!this.map) return;
+        const zoom = this.map.getZoom();
 
-        const currentZoom = this.map.getZoom();
-        // Lower threshold: Trigger high-res dynamic viewport earlier (2 minus steps lower: zoom >= -0.25)
-        if (currentZoom < -0.25) {
+        if (zoom < -0.2) {
             if (this.dynamicWmsLayer) {
                 this.dynamicWmsLayer.setBounds([[0, 0], [0, 0]]);
             }
             if (this.currentWmsImg) {
                 this.currentWmsImg.onload = null;
                 this.currentWmsImg.onerror = null;
-                this.currentWmsImg.src = '';
                 this.currentWmsImg = null;
             }
             return;
@@ -870,7 +712,6 @@ const SarthuaMapViewer = {
         const sw = bounds.getSouthWest();
         const ne = bounds.getNorthEast();
 
-        // Convert current viewport bounds to GIS coordinates
         const geoSw = this.pixelToGeo(sw.lat, sw.lng);
         const geoNe = this.pixelToGeo(ne.lat, ne.lng);
 
@@ -879,26 +720,25 @@ const SarthuaMapViewer = {
         const minY = Math.min(geoSw.y, geoNe.y);
         const maxY = Math.max(geoSw.y, geoNe.y);
 
-        // Quantize coordinates to 4m steps for maximum cache hit rate
-        const quant = 4;
-        const qMinX = Math.round(minX / quant) * quant;
-        const qMinY = Math.round(minY / quant) * quant;
-        const qMaxX = Math.round(maxX / quant) * quant;
-        const qMaxY = Math.round(maxY / quant) * quant;
+        const qMinX = Math.round(minX);
+        const qMinY = Math.round(minY);
+        const qMaxX = Math.round(maxX);
+        const qMaxY = Math.round(maxY);
 
-        // Calculate optimal crisp tile dimension (capped at 1024x768 so NIC server renders in 1-2s without timing out)
-        const w = Math.min(1024, Math.max(640, Math.round(size.x)));
-        const h = Math.min(768, Math.max(480, Math.round(size.y)));
+        const swPix = this.geoToPixel(qMinX, qMinY);
+        const nePix = this.geoToPixel(qMaxX, qMaxY);
+        const exactOverlayBounds = [[swPix[0], swPix[1]], [nePix[0], nePix[1]]];
+
+        const w = Math.min(2048, Math.max(1024, Math.round(size.x * 2.0)));
+        const h = Math.min(2048, Math.max(768, Math.round(size.y * 2.0)));
 
         const activeSurvey = this.currentSurvey;
         const activeSheet = this.currentSheet;
         const wmsUrl = `${this.apiBaseUrl}/api/bihar-wms?minx=${qMinX}&miny=${qMinY}&maxx=${qMaxX}&maxy=${qMaxY}&w=${w}&h=${h}&survey=${activeSurvey}&sheet=${activeSheet}`;
 
-        // Cancel previous pending image load
         if (this.currentWmsImg) {
             this.currentWmsImg.onload = null;
             this.currentWmsImg.onerror = null;
-            this.currentWmsImg.src = '';
             this.currentWmsImg = null;
         }
 
@@ -908,15 +748,18 @@ const SarthuaMapViewer = {
             this.currentWmsImg = img;
 
             img.onload = () => {
-                if (this.currentWmsImg !== img) return; // Stale response, ignore
+                if (this.currentWmsImg !== img) return;
                 this.currentWmsImg = null;
                 if (this.currentSurvey !== activeSurvey || this.currentSheet !== activeSheet) return;
-                if (this.map.getZoom() < -0.25) return;
+                if (this.map.getZoom() < -0.2) return;
                 if (!this.dynamicWmsLayer) {
-                    this.dynamicWmsLayer = L.imageOverlay(wmsUrl, bounds, { opacity: 0.98, zIndex: 10 }).addTo(this.map);
+                    this.dynamicWmsLayer = L.imageOverlay(wmsUrl, exactOverlayBounds, { opacity: 1.0, zIndex: 1000 }).addTo(this.map);
                 } else {
-                    this.dynamicWmsLayer.setBounds(bounds);
+                    this.dynamicWmsLayer.setBounds(exactOverlayBounds);
                     this.dynamicWmsLayer.setUrl(wmsUrl);
+                }
+                if (this.dynamicWmsLayer.bringToFront) {
+                    this.dynamicWmsLayer.bringToFront();
                 }
             };
 
@@ -928,7 +771,7 @@ const SarthuaMapViewer = {
                         if (this.currentSurvey === activeSurvey && this.currentSheet === activeSheet) {
                             loadTile();
                         }
-                    }, 1200);
+                    }, 1000);
                 } else {
                     this.currentWmsImg = null;
                 }
@@ -940,17 +783,15 @@ const SarthuaMapViewer = {
         loadTile();
     },
 
-    // Debounced WMS Schedule: 400ms delay after user finishes zoom/pan gestures
     scheduleDynamicWmsUpdate: function () {
         if (this.wmsDebounceTimer) {
             clearTimeout(this.wmsDebounceTimer);
         }
         this.wmsDebounceTimer = setTimeout(() => {
             this.updateDynamicWms();
-        }, 400);
+        }, 200);
     },
 
-    // Zoom Controls
     zoomIn: function () {
         if (this.map) this.map.zoomIn();
     },
@@ -959,9 +800,14 @@ const SarthuaMapViewer = {
         if (this.map) this.map.zoomOut();
     },
 
-    // Fullscreen Toggle
+    resetView: function () {
+        if (this.map && this.imageBounds) {
+            this.map.fitBounds(this.imageBounds, { animate: true });
+        }
+    },
+
     toggleFullscreen: function () {
-        const mapCard = document.getElementById('sarthuaMapCard');
+        const mapCard = document.querySelector('.sarthua-map-card');
         if (!mapCard) return;
 
         if (!document.fullscreenElement) {
@@ -969,6 +815,8 @@ const SarthuaMapViewer = {
                 mapCard.requestFullscreen();
             } else if (mapCard.webkitRequestFullscreen) {
                 mapCard.webkitRequestFullscreen();
+            } else if (mapCard.msRequestFullscreen) {
+                mapCard.msRequestFullscreen();
             }
             mapCard.classList.add('map-fullscreen-active');
         } else {
@@ -983,7 +831,6 @@ const SarthuaMapViewer = {
         }, 200);
     },
 
-    // Coordinate Tracker
     updateCoordinateDisplay: function (latlng) {
         const geo = this.pixelToGeo(latlng.lat, latlng.lng);
         const coordsBadge = document.getElementById('mapCoordsDisplay');
@@ -992,7 +839,6 @@ const SarthuaMapViewer = {
         }
     },
 
-    // Keyboard Shortcuts
     setupKeyboardControls: function () {
         document.addEventListener('keydown', (e) => {
             if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
@@ -1016,7 +862,6 @@ const SarthuaMapViewer = {
     }
 };
 
-// Global Exposure and Auto-initialization
 window.SarthuaMapViewer = SarthuaMapViewer;
 
 document.addEventListener('DOMContentLoaded', function () {

@@ -1,5 +1,6 @@
 # Temporary scratch and cache files
 scratch/
+tiles/
 __pycache__/
 *.pyc
 .DS_Store
