@@ -32,9 +32,11 @@
         }
     };
 
-    // Pre-rendered sheet overviews (from the R2 8K maps, served by the site CDN).
+    // Pre-rendered sheet overviews (downscaled from the 8K maps, served from R2).
     // Shown at the fitted sheet zoom; the live WMS API is only used once the user zooms in.
-    const OVERVIEW_URL = (survey, sheet) => `maps/overview/${survey}_${sheet}.webp?v=1`;
+    // Two sizes (long side in px); the smallest one that stays sharp on this screen is used.
+    const OVERVIEW_SIZES = [800, 1600];
+    const OVERVIEW_URL = (survey, sheet, size) => `https://docs.sarthua.in/maps/overview/${survey}_${sheet}-${size}.webp?v=1`;
     const LIVE_WMS_ZOOM_DELTA = 0.3;
 
     const SarthuaMapViewer = {
@@ -177,7 +179,7 @@
         showOverview: function () {
             const cfg = this.getActiveSheet();
             const bounds = [[cfg.minY, cfg.minX], [cfg.maxY, cfg.maxX]];
-            const url = OVERVIEW_URL(this.currentSurvey, this.currentSheet);
+            const url = OVERVIEW_URL(this.currentSurvey, this.currentSheet, this.pickOverviewSize(bounds));
             const alt = `सरथुआ ${SHEET_CONFIG[this.currentSurvey].name} ${this.getSheetLabel(this.currentSheet)} भू-नक्शा`;
             this.overviewFailed = false;
 
@@ -194,6 +196,13 @@
                 const el = this.overviewOverlay.getElement();
                 if (el) el.alt = alt;
             }
+        },
+
+        pickOverviewSize: function (bounds) {
+            const a = this.map.latLngToContainerPoint(bounds[0]);
+            const b = this.map.latLngToContainerPoint(bounds[1]);
+            const need = Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y)) * Math.min(window.devicePixelRatio || 1, 2);
+            return OVERVIEW_SIZES.find(size => size * 1.1 >= need) || OVERVIEW_SIZES[OVERVIEW_SIZES.length - 1];
         },
 
         needsLiveWms: function () {
