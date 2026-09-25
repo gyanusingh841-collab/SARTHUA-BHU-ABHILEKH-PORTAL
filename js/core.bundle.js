@@ -630,9 +630,8 @@ const PdfViewerEngine = {
         isLandscape: false,
         renderedPages: new Set(),
         renderingPages: new Set(),
-        renderTasks: {},
-        maxActiveCanvases: 18, // Optimal RAM limit while holding 5-page lookahead buffer
-        bufferAheadCount: 5,   // Always keep 5 pages ahead preloaded in buffer
+        maxActiveCanvases: 10, // Optimal RAM limit while holding 2-page lookahead buffer (3 pages total)
+        bufferAheadCount: 2,   // Preload 2 pages ahead of current visible page (total 3 pages active window)
         pdfUrl: '',
         filename: '',
         observer: null,
@@ -1215,7 +1214,7 @@ const PdfViewerEngine = {
             // Sync dock controls state
             this.updateDockState();
 
-            // Immediately render Page 1 and preload next 5 pages in buffer
+            // Immediately render Page 1 and preload next 2 pages in buffer (total 3 pages initially: 1, 2, 3)
             this.renderPageCard(1, () => {
                 this.preloadBuffer(1);
             });
@@ -1354,7 +1353,7 @@ const PdfViewerEngine = {
                     this.renderPageCard(pageNum);
                 } else {
                     // Page is far away -> Evict distant canvas to preserve RAM on mobile
-                    if (Math.abs(pageNum - this.state.currentPage) > 5 &&
+                    if (Math.abs(pageNum - this.state.currentPage) > 4 &&
                         this.state.renderedPages.size > this.state.maxActiveCanvases) {
                         this.unloadPageCard(pageNum);
                     }
@@ -1461,21 +1460,20 @@ const PdfViewerEngine = {
         });
     },
 
-    // Sequential background preloader to keep 5 pages preloaded ahead
+    // Sequential background preloader to keep 2 pages preloaded ahead (3 pages total with active view)
     preloadBuffer: function (currentNum) {
         if (!this.state.pdfDoc) return;
         const targetPage = currentNum || this.state.currentPage;
 
-        // Build priority queue: next 5 pages ahead, then 1-2 pages behind
+        // Build priority queue: next 2 pages ahead (total 3 pages with current), then 1 page behind
         const targetQueue = [];
-        for (let i = 1; i <= 5; i++) {
+        const aheadLimit = this.state.bufferAheadCount || 2;
+        for (let i = 1; i <= aheadLimit; i++) {
             const pAhead = targetPage + i;
             if (pAhead <= this.state.totalPages) targetQueue.push(pAhead);
         }
-        for (let i = 1; i <= 2; i++) {
-            const pBehind = targetPage - i;
-            if (pBehind >= 1) targetQueue.push(pBehind);
-        }
+        const pBehind = targetPage - 1;
+        if (pBehind >= 1) targetQueue.push(pBehind);
 
         // Find the first unrendered and non-rendering page in the buffer queue
         const nextToRender = targetQueue.find(p => !this.state.renderedPages.has(p) && !this.state.renderingPages.has(p));
@@ -1488,7 +1486,7 @@ const PdfViewerEngine = {
                         this.preloadBuffer(this.state.currentPage);
                     });
                 }
-            }, 60);
+            }, 50);
         }
     },
 
@@ -1521,8 +1519,8 @@ const PdfViewerEngine = {
 
         while (pages.length > 0 && this.state.renderedPages.size > this.state.maxActiveCanvases) {
             const furthest = pages.shift();
-            // Never evict any page within 6 pages of the current page
-            if (Math.abs(furthest - this.state.currentPage) > 6) {
+            // Never evict any page within 4 pages of the current page
+            if (Math.abs(furthest - this.state.currentPage) > 4) {
                 this.unloadPageCard(furthest);
             } else {
                 break;
