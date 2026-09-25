@@ -36,7 +36,7 @@
     // Shown at the fitted sheet zoom; the live WMS API is only used once the user zooms in.
     // Sizes (long side in px; opaque on the map background colour); the smallest one that stays sharp on this screen is used.
     const OVERVIEW_SIZES = [600, 800, 1600];
-    const OVERVIEW_URL = (survey, sheet, size) => `https://api.sarthua.in/maps/overview/${survey}_${sheet}-${size}.webp?v=2`;
+    const OVERVIEW_URL = (survey, sheet, size) => `maps/overview/${survey}_${sheet}-${size}.webp?v=3`;
     const LIVE_WMS_ZOOM_DELTA = 0.3;
 
     const SarthuaMapViewer = {
