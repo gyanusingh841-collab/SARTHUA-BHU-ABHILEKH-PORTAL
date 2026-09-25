@@ -566,7 +566,8 @@ const PdfViewerEngine = {
             url: streamUrl,
             disableRange: false,
             disableStream: true,
-            disableAutoFetch: true
+            disableAutoFetch: true,
+            rangeChunkSize: 262144 // 256 KB optimal chunk size (replaces 64 KB, reducing round-trips by ~4x)
         };
         if (exactSize > 0) {
             docParams.length = exactSize;
