@@ -7,3 +7,12 @@
 
 /fonts/fa-mapviewer-*
   Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/js/pdf*
+  Cache-Control: public, max-age=31536000, immutable
+
+/images/leaflet/*
+  Cache-Control: public, max-age=31536000, immutable

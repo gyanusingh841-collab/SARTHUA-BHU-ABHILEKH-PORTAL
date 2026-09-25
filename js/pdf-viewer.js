@@ -9,7 +9,7 @@
 
 // Configure PDF.js Worker
 if (typeof pdfjsLib !== 'undefined') {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = './js/pdf.worker.min.js';
 }
 
 const PdfViewerEngine = {
@@ -486,10 +486,10 @@ const PdfViewerEngine = {
 
         this._pdfJsLoadingPromise = new Promise((resolve, reject) => {
             const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+            script.src = './js/pdf.min.js';
             script.onload = () => {
                 if (window.pdfjsLib) {
-                    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    window.pdfjsLib.GlobalWorkerOptions.workerSrc = './js/pdf.worker.min.js';
                 }
                 resolve();
             };
