@@ -310,8 +310,7 @@
             const h = Math.max(256, Math.round(size.y));
 
             const survey = this.currentSurvey;
-            const sheet = this.currentSheet;
-            const wmsUrl = `${this.apiBaseUrl}/api/bihar-wms?minx=${minX}&miny=${minY}&maxx=${maxX}&maxy=${maxY}&w=${w}&h=${h}&survey=${survey}&sheet=${sheet}`;
+            const wmsUrl = `${this.apiBaseUrl}/api/bihar-wms?BBOX=${minX},${minY},${maxX},${maxY}&WIDTH=${w}&HEIGHT=${h}&minx=${minX}&miny=${minY}&maxx=${maxX}&maxy=${maxY}&w=${w}&h=${h}&survey=${survey}&sheet=${sheet}`;
             const targetBounds = [[minY, minX], [maxY, maxX]];
 
             if (this.activeImageElement) {
