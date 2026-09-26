@@ -43,7 +43,7 @@
         map: null,
         currentSurvey: 'RS',
         currentSheet: 1,
-        apiBaseUrl: 'https://api.sarthua.in',
+        apiBaseUrl: '',
         wmsOverlay: null,
         overviewOverlay: null,
         overviewZoom: null,
@@ -59,12 +59,8 @@
         overviewPreload: null,
 
         detectApiEndpoint: function () {
-            // Check if local dev server or cloud proxy
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                this.apiBaseUrl = '';
-            } else {
-                this.apiBaseUrl = 'https://api.sarthua.in';
-            }
+            // Same-origin reverse proxy via Amplify (/api/*) - Zero CORS & no separate subdomain
+            this.apiBaseUrl = '';
         },
 
         init: function () {
